@@ -26,7 +26,7 @@
            <div class="col-lg-6">
                <div class="card mb-4">
                    <div class="card-body">
-                       <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit=" validateForm()">
+                       <form method="post" action="/admin/addProducts" enctype="multipart/form-data" id="productForm" onsubmit="return validateForm(event)">
                            <div class="mb-4">
                                <label for="product_name" class="form-label">Product Name</label>
                                <input type="text" placeholder="Type here" name="productName"
@@ -198,15 +198,56 @@
 <script>
 
               let cropper = null;
+              
 
 document.addEventListener('DOMContentLoaded', function() {
     // Add click handler to publish button
-   const form = document.querySelector('form')
+   const form = document.getElementById('productForm')
    const publishButton = document.getElementById('publishButton')
    
    publishButton.disabled = false;
+
+
     
+    // Add submit event listener to the form
+    form.addEventListener('submit', function(event) {
+        // Prevent the default form submission
+        event.preventDefault();
+        
+        // If validation passes, submit the form
+        if (validateForm(event)) {
+            this.submit();
+        }
     });
+
+    // Add input event listeners to check validation in real-time
+    const inputs = [
+        document.getElementsByName('productName')[0],
+        document.getElementById('descriptionid'),
+        document.getElementsByName('brand')[0],
+        document.getElementsByName('regularPrice')[0],
+        document.getElementsByName('salePrice')[0],
+        document.getElementsByName('color')[0],
+        document.getElementsByName('category')[0],
+        document.getElementById('quantity'),
+        document.getElementById('input1')
+    ];
+
+    // Add input event listeners to trigger validation
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            validateForm();
+        });
+    });
+});
+
+
+
+
+
+
+    
+   
 
 // Your existing image preview functions
 function viewImage1(event) { setImagePreview(event, 'imgview1'); }
@@ -305,7 +346,10 @@ const selectedImages = []
             addedImagesContainer.appendChild(thumbnail)
         }
     }
+
+
     function validateForm() {
+        
               clearErrorMessages();
               const name = document.getElementsByName('productName')[0].value;
               const description = document.getElementById('descriptionid').value;
@@ -319,8 +363,13 @@ const selectedImages = []
               console.log(quantity)
               let isValid = true
               if (name.trim() === "") {
+                
     displayErrorMessage('productName-error', 'Please enter a product name.');
     isValid = false;
+    setTimeout(()=>{
+        errorElement.style.display = "none";
+    },3000)
+    
   } else if (!/^[a-zA-Z0-9\s\-_]+$/.test(name.trim())) {
     displayErrorMessage('productName-error', 'Product name can only contain letters, numbers, spaces, hyphens and underscores.');
     isValid = false;
@@ -332,11 +381,7 @@ const selectedImages = []
       displayErrorMessage('description-error', 'Product description should contain only alphabetic characters.');
       isValid = false;
    }
-//    console.log(quantity ,typeof quantity)
-//     if (!quantity || isNaN(quantity) || parseInt(quantity) < 0) {
-//      displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
-//     isValid = false;
-//    }
+
               if (!/^\d+(\.\d{1,2})?$/.test(price) || parseFloat(price) < 0) {
                   displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
                   isValid = false;
@@ -359,6 +404,7 @@ const selectedImages = []
               }
               return isValid;
           }
+         
           //TO DISPLAY THE ERROR MESSAGES
           function displayErrorMessage(elementId, message) {
               var errorElement = document.getElementById(elementId);

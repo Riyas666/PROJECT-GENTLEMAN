@@ -1,16 +1,13 @@
 //IMPORT THE MODULES
 
-
 const User = require("../../models/userSchema");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
-
 
 //FOR ERROR PAGE
 const pageerror = async (req, res) => {
     res.render("admin-error");
 };
-
 
 // LOAD LOGIN PAGE BASED ON THE SESSION
 const loadLogin = async (req, res) => {
@@ -19,7 +16,6 @@ const loadLogin = async (req, res) => {
     }
     res.render("admin-login", { message: null });
 };
-
 
 //FOR LOGIN
 const login = async (req, res) => {
@@ -42,7 +38,6 @@ const login = async (req, res) => {
         return res.redirect("/pageerror");
     }
 };
-
 
 //TO LOAD THE DASHBOARD FOR LOGGED ONES
 const loadDashboard = async (req, res) => {
@@ -71,7 +66,6 @@ const logout = async (req, res) => {
         res.redirect("/pageerror");
     }
 };
-
 
 //EXPORTING..
 module.exports = {
