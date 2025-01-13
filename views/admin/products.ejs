@@ -1,0 +1,200 @@
+<!--------------------------------- PARTIAL HEADER -------------------------->
+
+<%- include("../../views/partials/admin/header") %>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+    <style>
+
+         .btn a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .edit-btn {
+            width: 80px;
+            height: 38px;  
+            line-height: 38px; 
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<section class="content-main">
+<div class="content-header">
+    <div>
+        <h2 class="content-title card-title">Products</h2>
+    </div>
+</div>
+<header class="card-header text-center mb-20">
+    <form action="" method="get" class="d-inline">
+        <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px;">
+            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search products or brands" name="search">
+            <button class="btn  border-0" type="submit">Search</button>
+        </div>
+    </form>
+</header>
+
+<!----------------------------- TABLE OF THE PRODUCTS LIST ------------------------------->
+
+<div class="right mt-5">
+    <table class="table"  style="background-color: rgb(48, 48, 48); ">
+        <thead>
+            <tr>
+                <th scope="col"><b>Product name</b></th>
+                <th scope="col"><b>Brand</b></th>
+                <th scope="col"><b>Category</b></th>
+                <th scope="col"><b>Sale Price</b></th>
+                <th scope="col"><b>Offer Price</b></th>
+                <th scope="col"><b style="margin-left: 5rem;">Offer</b></th>
+                <th scope="col"><b>Quantity</b></th>
+                <th scope="col"><b>Action</b></th>
+                <th scope="col"><b>Edit</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            <%for(let i = data.length-1; i >=0 ; i--){%>
+            <tr>
+                <td><%=data[i].productName%></td>
+                <td><%=data[i].brand%></td>
+                <td><%= data[i].category ? data[i].category.name : "No Category" %></td>
+                <td><%=data[i].regularPrice%></td>
+                <td><%=data[i].salePrice%></td>
+                <td class="text-start">
+                    <button class="btn btn-info" style="width: 100px">
+                      <a href="#" class="text-white">Add Offer</a>
+                    </button>
+                    <button class="btn btn-info"style="width: 100px">
+                      <a href="#" class="text-white">Remove</a>
+                    </button>
+
+                </td>
+                <td><%=data[i].quantity%></td>
+                <td>
+            <%if(data[i].isBlocked===false){%>
+            <button class="btn btn-danger block-btn" data-id="<%= data[i]._id %>" style="width: 80px;" >Block</button>
+            <%}else{%>
+            <button class="btn btn-success unblock-btn" data-id="<%= data[i]._id %>" style="width: 80px;" >Unblock</button>
+            <%}%> 
+                </td>
+                <td>
+                    <button class="btn btn-info" style="width: 80px;">
+                        <a href="/admin/editProduct?id=<%=data[i]._id%>" class="text-white" style="text-decoration: none;">Edit</a>
+                    </button>
+                </td>
+            </tr>
+            <%}%>
+        </tbody>
+    </table>
+</div>
+
+
+
+<!----------------------------- PAGINATION ------------------------------->
+
+<div class="container mt-3">
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+            
+            <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+    
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                </li>
+            <% } %>
+    
+            
+            <li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+ </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+    const baseUrl = "/admin";
+
+    /////////////////////    FOR BLOCKING THE PRODUCT  /////////////////////
+
+    document.querySelectorAll(".block-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+            const productId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
+            try {
+                const response = await fetch(`${baseUrl}/blockProduct`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: productId, isBlocked: true }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
+                });
+    //////////////////////   IF BLOCKED    ////////////////////
+                if (response.ok) {
+                    Swal.fire({
+                        title: "Blocked!",
+                        text: "The product has been blocked.",
+                        icon: "success",
+                        timer: 1000, 
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload(); // RELOAD THE PAGE
+                    });
+    ///////////////////////  IF ERROR   ////////////////////////                
+                } else {
+                    Swal.fire("Error!", "Failed to block the product.", "error");
+                }
+            } catch (error) {
+                Swal.fire("Error!", "An error occurred while blocking the product.", "error");
+            }
+        });
+    });
+
+    /////////////////////    FOR UNBLOCKING THE PRODUCT  /////////////////////
+    document.querySelectorAll(".unblock-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+            const productId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
+            try {
+                const response = await fetch(`${baseUrl}/unblockProduct`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: productId, isBlocked: false }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE FALSE
+                });
+    //////////////////////   IF UNBLOCKED    ////////////////////
+                if (response.ok) {
+                    Swal.fire({
+                        title: "Unblocked!",
+                        text: "The product has been unblocked.",
+                        icon: "success",
+                        timer: 1000, 
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload(); // RELOAD THE PAGE
+                    });
+    ///////////////////////  IF ERROR   ////////////////////////
+                } else {
+                    Swal.fire("Error!", "Failed to unblock the product.", "error");
+                }
+            } catch (error) {
+                Swal.fire("Error!", "An error occurred while unblocking the product.", "error");
+            }
+        });
+    });
+});
+  </script>
+
+     <!--------------------------------- PARTIAL FOOTER --------------------->
+  
+<%- include("../../views/partials/admin/footer") %>

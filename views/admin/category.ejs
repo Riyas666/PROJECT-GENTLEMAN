@@ -106,7 +106,7 @@
           </div>
           <div class="col-md-8 ml-10">
             <div class="table-responsive">
-              <table class="table table-hover">
+              <table class="table "  style="background-color: rgb(48, 48, 48); " >
                 <thead>
                   <tr>
                     <th class="text-center"></th>
@@ -138,8 +138,9 @@
                     </td>
                     <td class="text-start">
                         <%if(category.isListed){%>
-                      <span class="badge rounded-pill alert-success" style="width: 60px">Listed</span>
-                      <span class="badge rounded-pill alert-danger" style="width: 60px">Unlisted</span>
+                      <span class="badge rounded-pill btn-success" style="width: 60px;">Listed</span>
+                      <%}else{%>
+                      <span class="badge rounded-pill btn-danger" style="width: 60px">Unlisted</span>
                       <%}%>
                     </td>
                     <td class="text-start">

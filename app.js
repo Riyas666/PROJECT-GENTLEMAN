@@ -10,7 +10,10 @@ const userRouter = require("./routes/userRouter")
 const adminRouter = require("./routes/adminRouter")
 db()
 
+
+
 const logoutStatusMiddleware = require('./middlewares/logoutStatus')
+
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -28,8 +31,6 @@ app.use(session({
 
 app.use(passport.initialize())
 app.use(passport.session())
-
-
 
 
 app.use((req,res,next)=>{
@@ -57,4 +58,4 @@ app.listen(PORT, () => {
 
 
 
-module.exports = app
+module.exports = app 

@@ -36,26 +36,36 @@ const customerInfo = async (req, res) => {
     }
 };
 
+
+//FOR THE BLOCKING OF THE CUSTOMER
 const customerBlocked = async (req, res) => {
+    const { id, isBlocked } = req.body;
+
     try {
-        const { id } = req.body;
-        await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
-        res.redirect("/admin/users");
+        await User.updateOne({ _id: id }, { $set: { isBlocked } });
+        res.status(200).json({ success: true });
     } catch (error) {
-        res.redirect("/pageerror");
+        res.status(500).json({ success: false, error: "Failed to block product." });
     }
 };
 
+
+//FOR UNBLOCK THE CUSTOMER
 const customerunBlocked = async (req, res) => {
     try {
-        const { id } = req.body;
-        await User.updateOne({ _id: id }, { $set: { isBlocked: false } });
-        res.redirect("/admin/users");
+        const { id, isBlocked } = req.body;
+        await User.updateOne({ _id: id }, { $set: { isBlocked } });
+        res.status(200).json({ success: true });
+       
     } catch (error) {
         console.error("Error in customerunBlocked:", error.message);
-        res.redirect("/admin/pageerror");
+        res.status(500).json({ success: false, error: "Failed to unblock product." });
     }
 };
+
+
+
+//EXPORTING..
 
 module.exports = {
     customerInfo,

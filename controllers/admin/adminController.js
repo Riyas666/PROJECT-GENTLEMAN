@@ -1,11 +1,18 @@
+//IMPORT THE MODULES
+
+
 const User = require("../../models/userSchema");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
+
+//FOR ERROR PAGE
 const pageerror = async (req, res) => {
     res.render("admin-error");
 };
 
+
+// LOAD LOGIN PAGE BASED ON THE SESSION
 const loadLogin = async (req, res) => {
     if (req.session.admin) {
         return res.redirect("/admin/dashboard");
@@ -13,6 +20,8 @@ const loadLogin = async (req, res) => {
     res.render("admin-login", { message: null });
 };
 
+
+//FOR LOGIN
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -21,6 +30,7 @@ const login = async (req, res) => {
             return res.render("admin-login", { message: "Invalid email or password" });
         }
 
+        //COMPARE TWO PASSWORD
         const passwordMatch = await bcrypt.compare(password, admin.password);
         if (!passwordMatch) {
             return res.render("admin-login", { message: "Invalid Email or password" });
@@ -33,6 +43,8 @@ const login = async (req, res) => {
     }
 };
 
+
+//TO LOAD THE DASHBOARD FOR LOGGED ONES
 const loadDashboard = async (req, res) => {
     if (req.session.admin) {
         try {
@@ -44,7 +56,7 @@ const loadDashboard = async (req, res) => {
         res.redirect("/admin/login");
     }
 };
-
+//FOR LOGOUT
 const logout = async (req, res) => {
     try {
         req.session.destroy((err) => {
@@ -60,6 +72,8 @@ const logout = async (req, res) => {
     }
 };
 
+
+//EXPORTING..
 module.exports = {
     loadDashboard,
     loadLogin,

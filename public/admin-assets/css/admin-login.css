@@ -1,0 +1,122 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('/img/adminlogin.png');
+    background-size: cover;
+    background-position: center;
+    font-family: 'Nunito Sans', sans-serif;
+    color: white;
+}
+
+/* Container for login */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px 30px;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Semi-transparent black */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    color: white;
+}
+
+/* Title */
+.login-container h2 {
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    color: hsl(193, 80%, 90%);
+}
+
+/* Input fields */
+.login-container .form-group {
+    margin-bottom: 15px;
+}
+
+.login-container label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+    color: hsl(193, 80%, 80%);
+}
+
+.login-container input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.login-container input:focus {
+    outline: none;
+    border: 2px solid hsl(193, 80%, 60%);
+    box-shadow: 0 0 5px hsl(193, 80%, 60%);
+}
+
+/* Error messages */
+.error-message {
+    color: hsl(0, 80%, 70%);
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+/* Button */
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: hsl(193, 80%, 50%);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container button:hover {
+    background-color: hsl(193, 80%, 60%);
+}
+
+/* Alert Box */
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.alert-danger {
+    background-color: hsl(0, 80%, 50%);
+    color: white;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 15px 20px;
+    }
+
+    .login-container h2 {
+        font-size: 1.5rem;
+    }
+
+    .login-container button {
+        font-size: 0.9rem;
+    }
+}

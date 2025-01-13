@@ -16,7 +16,7 @@
     />
 
     <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="/styles/signupp.css" />
+    <link rel="stylesheet" href="/styles/signup.css" />
 
     <title>Ecommerce Website</title>
   </head>
@@ -27,10 +27,10 @@
         <div class="header__container container">
           <div class="header__contact">
             <span>(+01) - 2345 - 6789</span>
-            <span>Our location</span>
+            
           </div>
           <p class="header__alert-news">
-            Super Values Deals - Save more coupons
+            "Welcome to Gentleman Store - Quality Redefined!"
           </p>
           <a href="/login" class="header__top-action" style="margin-left: 40rem;">
             Log In
@@ -54,9 +54,7 @@
             <li class="nav__item">
               <a href="/home" class="nav__link">Home</a>
             </li>
-            <li class="nav__item">
-              <a href="shop.html" class="nav__link">Shop</a>
-            </li>
+           
             <li class="nav__item">
               <a href="/signup" class="nav__link ">Signup</a>
             </li>
@@ -67,16 +65,6 @@
               >
             </li>
           </ul>
-          <div class="header__search">
-            <input
-              type="text"
-              placeholder="Search For Items..."
-              class="form__input"
-            />
-            <button class="search__btn">
-              <img src="/img/search.png" alt="search icon" />
-            </button>
-          </div>
         </div>
       </nav>
     </header>
@@ -106,13 +94,15 @@
                   <!-- Email Input -->
                   <div class="mb-3">
                     <label for="email" class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="email" name="email"   placeholder="Enter your email" required>
+                    <input type="email" class="form-control" id="email" name="email"   placeholder="Enter your email" autocomplete="off">
+                    <span class="error-message" id="emailError"></span>
                   </div>
     
                   <!-- Password Input -->
                   <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" placeholder="Enter your password" name="password">
+                    <span class="error-message" id="passwordError"></span>
                     <div id="error2" class="error-message"></div>
                   </div>
                   <%if(locals.message && message.length > 0) {%>
@@ -124,7 +114,7 @@
                   <!-- Remember Me & Forgot Password -->
                   <div class="d-flex justify-content-between align-items-center mb-3">
                    
-                    <a href="forgot-password.html" class="text-decoration-none">Forgot Password?</a>
+                    <a href="/forgot-password" class="text-decoration-none">Forgot Password?</a>
                   </div>
     
                   <!-- Submit Button -->
@@ -149,5 +139,41 @@
     <!--=============== MAIN JS ===============-->
     <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+document.getElementById('registrationForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+        const confirmPasswordError = document.getElementById("confirmPasswordError");
+
+        emailError.textContent = "";
+        passwordError.textContent = "";
+
+        let isValid = true;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email === "") {
+            emailError.textContent = "Email Required";
+            isValid = false;
+        } else if (!emailRegex.test(email)) {
+            emailError.textContent = "Please Enter a valid Email";
+            isValid = false;
+        }
+
+        if (password === "") {
+            passwordError.textContent = "Password Required";
+            isValid = false;
+        }
+
+       
+        if (isValid) {
+            this.submit();
+        }
+    });
+  </script>
   </body>
 </html>

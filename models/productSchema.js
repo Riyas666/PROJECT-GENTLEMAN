@@ -13,7 +13,7 @@ const productSchema = new Schema({
     },
     brand: {
         type: String,
-        required: true
+        required: false
     },
     category: {
         type: Schema.Types.ObjectId,
@@ -38,12 +38,14 @@ const productSchema = new Schema({
     },
     color: {
         type: String,
-        required: true
+        required: false
     },
-    productImage: {
-        type: [String],
-        required: true
+    size:{
+        type: Number,
     },
+    productImage: [{
+        type: String
+    }],
     isBlocked: {
         type: Boolean,
         default: false
@@ -54,12 +56,13 @@ const productSchema = new Schema({
         required: true,
         default: "Available"
     },
+ 
 
 
 }, {timestamps:true})
 
 
-const Product = mongoose.Model("Product", productSchema)
+const Product = mongoose.model("Product", productSchema)
 
 
 module.exports = Product

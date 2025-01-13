@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const env = require("dotenv").config()
 
-
+//CONNECT THE DATABASE
 const connectDB = async()=>{
     try {
 
