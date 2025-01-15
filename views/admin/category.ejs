@@ -60,7 +60,7 @@
       </div>
     </div>
     <header class="card-header text-center mb-20">
-      <form action="/admin/category/" method="get" class="d-inline">
+      <form action="/category" method="get" class="d-inline">
         <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px">
           <input type="text" class="form-control border-0 rounded-pill mt-3" placeholder="Search categories" name="search"/>
           <button class="btn" type="submit">Search</button>
@@ -71,7 +71,7 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md-3">
-            <form method="post" action="/admin/addCategory" onsubmit="return handleFormSubmit(event)">
+            <form method="post" action="/admin/category/addCategory" onsubmit="return handleFormSubmit(event)">
               <div class="mb-4">
                 <label for="product_name" class="form-label">Name</label>
                 <input type="text" name="name" placeholder="Type here" class="form-control" id="product_name" required/>
@@ -132,16 +132,16 @@
                     <td class="text-start">
                         <%if(category.isListed){%>
                       <button class="btn btn-danger" style="width: 70px">
-                        <a href="/admin/listCategory?id=<%=category._id%>" class="text-white">Unlist</a>
+                        <a href="/admin/category/listCategory?id=<%=category._id%>" class="text-white">Unlist</a>
                       </button>
                       <%}else{%>
                       <button class="btn btn-success" style="width: 70px">
-                        <a href="/admin/unlistCategory?id=<%=category._id%>" class="text-white">List</a>
+                        <a href="/admin/category/unlistCategory?id=<%=category._id%>" class="text-white">List</a>
                       </button>
                       <%}%>
                     </td>
                     <td class="text-start">
-                      <a href="/admin/editCategory?id=<%=category._id%>" class="btn btn-info text-white">Edit</a>
+                      <a href="/admin/category/editCategory?id=<%=category._id%>" class="btn btn-info text-white">Edit</a>
                     </td>
                   </tr>
                   <%})%>
@@ -229,7 +229,7 @@
             const name = document.getElementsByName("name")[0].value;
             const description = document.getElementById("descriptionId").value;
 
-            fetch("/admin/addCategory",{
+            fetch("/admin/category/addCategory",{
                 method:"POST",
                 headers:{
                     'content-type':'application/json'

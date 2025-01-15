@@ -20,19 +20,17 @@ const userAuth = (req,res,next) => {
     }
 }
 
-const adminAuth = (req,res,next) => {
-    User.findOne({isAdmin:true})
-    .then(data =>{
-        if(data){
-            next()
-        }else{
-            res.redirect("/admin/login")
+const adminAuth = (req, res, next) => {
+    try {
+        if (req.session.admin) {  // Check if admin exists in session
+            next()  // Allow access to routes
+        } else {
+            res.redirect("/admin/login")  // Redirect to login if no admin in session
         }
-    })
-    .catch(error =>{
-        console.log("Error in admin auth middleware")
-        res.status(500).send("Internal Server Error")
-    })
+        
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 module.exports = {

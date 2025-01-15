@@ -1,8 +1,11 @@
 <%-include("../../views/partials/user/header")%>
+
     <!--=============== MAIN ===============-->
+
     <main class="main">
       <!--=============== BREADCRUMB ===============-->
       <section class="breadcrumb">
+
         <ul class="breadcrumb__list flex container">
           <li><a href="index.html" class="breadcrumb__link">Home</a></li>
           <li><span class="breadcrumb__link"></span>></li>
@@ -17,7 +20,7 @@
           <%for(let i= 0 ; i < products.length; i++){%>
           <div class="product__item">
             <div class="product__banner">
-              <a href="details.html" class="product__images">
+              <a href="/productDetails?id=<%=products[i]._id%>" class="product__images">
                 <img
                   src="/uploads/product-images/<%=products[i].productImage[0]%>"
                   alt="<%=products[i].productName%>"
@@ -40,9 +43,11 @@
                 >
                   <i class="fi fi-rs-heart"></i>
                 </a>
+
                 <!-- <a href="#" class="action__btn" aria-label="Compare">
                   <i class="fi fi-rs-shuffle"></i>
                 </a> -->
+
               </div>
               <!-- <div class="product__badge light-pink">Hot</div> -->
             </div>

@@ -52,7 +52,7 @@
     <div class="card-body">
       <div class="row">
         <div class="col-md-3">
-          <form method="post" action="/admin/addBrand" enctype="multipart/form-data">
+          <form method="post" action="/admin/brands/addBrand" enctype="multipart/form-data">
             <div class="mb-4">
               <label for="product_name" class="form-label">Brand Name</label>
               <input
@@ -216,7 +216,7 @@
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    const baseUrl = "/admin";
+    const baseUrl = "/admin/brands";
 
     /////////////////////    FOR BLOCKING THE PRODUCT  /////////////////////
 

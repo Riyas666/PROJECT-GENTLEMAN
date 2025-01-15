@@ -5,6 +5,7 @@ const router = express.Router()
 const passport = require("passport")
 const userController = require("../controllers/user/userController")
 const profileController = require("../controllers/user/profileController")
+const productController = require("../controllers/user/productController")
 
 //TO DISPLAY PAGE NOT FOUND PAGE
 router.get("/pageNotFound", userController.pageNotFound)
@@ -47,6 +48,12 @@ router.post("/verify-passForgot-otp", profileController.verifyForgotPassOtp)
 router.get("/reset-password", profileController.getResetPassPage)
 router.post("/reset-password", profileController.resetPassword)
 router.post("/resend-forgot-otp", profileController.resendOtp)
+
+
+
+//Product amanagement
+
+router.get("/productDetails", productController.productDetails)
 
 
 

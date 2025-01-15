@@ -38,7 +38,7 @@
 
 
                    <div class="card-body">
-                       <form method="post" action="/admin/editProduct/<%=product._id%>" enctype="multipart/form-data"
+                       <form method="post" action="/admin/products/editProduct/<%=product._id%>" enctype="multipart/form-data"
                            onsubmit=" return validateForm()">
                            <div class="mb-4">
                                <label for="product_name" class="form-label">Product Name</label>
@@ -404,7 +404,7 @@
 
            function deleteSingleImage(imageId, productId){
             $.ajax({
-                url:"/admin/deleteImage",
+                url:"/admin/products/deleteImage",
                 method:"post",
                 data:{imageNameToServer:imageId, productIdToServer:productId},
                 success:((response) => {

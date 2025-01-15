@@ -24,7 +24,7 @@ textarea {
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 mt-60">
-            <form class="form-container" method="post" action="/admin/editCategory/<%= category._id %>" onsubmit="return validateForm()">
+            <form class="form-container" method="post" action="/admin/category/editCategory/<%= category._id %>" onsubmit="return validateForm()">
                 <div class="d-grid text-end mt-30 col-md-5">
                     
                 </div>
@@ -57,7 +57,7 @@ function validateAndSubmit(event) {
             const name = document.getElementsByName("categoryname")[0].value;
             const description = document.getElementById("description").value;
 
-            fetch(`/admin/editCategory/${category.id} `,{
+            fetch(`/admin/category/editCategory/${category.id} `,{
                 method:"POST",
                 headers:{
                     'Content-Type': 'application/json'

@@ -2,16 +2,20 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const dotenv = require("dotenv");
+const nocache = require("nocache");
 const session = require("express-session");
 const passport = require("./config/passport");
 dotenv.config();
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
 const adminRouter = require("./routes/adminRouter");
+const productRouter = require("./routes/productRouter")
+const categoryRouter = require("./routes/categoryRouter")
+const brandRouter = require("./routes/brandRouter")
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
-
+app.use(nocache())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -43,6 +47,10 @@ app.use(logoutStatusMiddleware);
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
+app.use("/admin/category", categoryRouter);
+app.use("/admin/products", productRouter);
+app.use("/admin/brands", brandRouter)
+
 
 const PORT = 3000 || process.env.PORT;
 app.listen(PORT, () => {

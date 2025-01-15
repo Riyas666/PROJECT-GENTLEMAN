@@ -83,7 +83,7 @@
                 </td>
                 <td>
                     <button class="btn btn-info" style="width: 80px;">
-                        <a href="/admin/editProduct?id=<%=data[i]._id%>" class="text-white" style="text-decoration: none;">Edit</a>
+                        <a href="/admin/products/editProduct?id=<%=data[i]._id%>" class="text-white" style="text-decoration: none;">Edit</a>
                     </button>
                 </td>
             </tr>
@@ -154,7 +154,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
    document.addEventListener("DOMContentLoaded", () => {
-    const baseUrl = "/admin";
+    const baseUrl = "/admin/products";
 
     /////////////////////    FOR BLOCKING THE PRODUCT  /////////////////////
 

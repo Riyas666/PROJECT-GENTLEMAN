@@ -26,7 +26,7 @@
            <div class="col-lg-6">
                <div class="card mb-4">
                    <div class="card-body">
-                       <form method="post" action="/admin/addProducts" enctype="multipart/form-data" id="productForm" onsubmit="return validateForm(event)">
+                       <form method="post" action = "/admin/addProducts" enctype="multipart/form-data" id="productForm" onsubmit="return validateForm(event)">
                            <div class="mb-4">
                                <label for="product_name" class="form-label">Product Name</label>
                                <input type="text" placeholder="Type here" name="productName"
@@ -377,10 +377,11 @@ const selectedImages = []
    if (description.trim() === "") {
       displayErrorMessage('description-error', 'Please enter a product description.');
       isValid = false;
-   } else if (!/^[a-zA-Z\s]+$/.test(description.trim())) {
-      displayErrorMessage('description-error', 'Product description should contain only alphabetic characters.');
-      isValid = false;
    }
+//    } else if (!/^[a-zA-Z\s]+$/.test(description.trim())) {
+//       displayErrorMessage('description-error', 'Product description should contain only alphabetic characters.');
+//       isValid = false;
+//    }
 
               if (!/^\d+(\.\d{1,2})?$/.test(price) || parseFloat(price) < 0) {
                   displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
