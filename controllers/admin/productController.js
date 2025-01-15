@@ -88,6 +88,7 @@ const addProducts = async (req, res) => {
             productImage: images,
             status: "Available",
         });
+        console.log(newProduct)
 
         await newProduct.save();
 
@@ -100,12 +101,7 @@ const addProducts = async (req, res) => {
 
 //FOR GETTING ALL PRODUCTS
 const getAllProducts = async (req, res) => {
-    //   const productsWithImages = productData.map(product => {
-    //     const productObject = product.toObject();
-    //     productObject.imageUrls = product.productImage.map(getImageUrl);
-    //     return productObject;
-    // });
-    // };
+   
     const search = req.query.search || "";
     const page = req.query.page || 1;
     const limit = 4;

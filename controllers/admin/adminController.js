@@ -11,10 +11,12 @@ const pageerror = async (req, res) => {
 
 // LOAD LOGIN PAGE BASED ON THE SESSION
 const loadLogin = async (req, res) => {
-    if (req.session.admin) {
-        return res.redirect("/admin/dashboard");
+    if (!req.session.admin) {
+        res.render("admin-login",{message:null}) 
+    }else{
+        res.redirect("/admin/dashboard");
     }
-    res.render("admin-login", { message: null });
+   
 };
 
 //FOR LOGIN

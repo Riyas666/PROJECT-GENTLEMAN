@@ -1,22 +1,139 @@
 <%- include("../../views/partials/admin/header") %>
+<style>
+    .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px;  /* or whatever width you prefer */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+textarea {
+    resize: vertical;  /* This allows only vertical resizing */
+    min-height: 100px;  /* Set a minimum height */
+    max-height: 300px;  /* Set a maximum height */
+}
+</style>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 mt-60">
-            <form method="post" action="/admin/editCategory/<%= category._id %>">
+            <form class="form-container" method="post" action="/admin/editCategory/<%= category._id %>" onsubmit="return validateForm()">
                 <div class="d-grid text-end mt-30 col-md-5">
-                    <button class="btn btn-primary" type="submit">Update category</button>
+                    
                 </div>
-                <div class="mb-4 mt-30">
+                <div class="mb-4 mt-30 form-group">
                     <label for="product_name" class="form-label">Name</label>
                     <input type="text" name="categoryname" value="<%= category.name %>" class="form-control border" />
+                    <div id="categoryname-error" class="error-message"></div>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-4 form-group">
                     <label class="form-label">Description</label>
-                    <textarea name="description" class="form-control border"><%= category.description %></textarea>
+                    <input name="description" class="form-control border" value="<%= category.description %>" id="description"/>
+                    <div id="description-error" class="error-message"></div>
                 </div>
+                <button class="btn btn-primary" type="button" id="updatebtn" onclick="validateAndSubmit(event)">Update category</button>
             </form>
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script>
+var category =  JSON.stringify(category) 
+
+function validateAndSubmit(event) {
+    
+    event.preventDefault();
+    if(!validateForm()){
+                return;
+            }
+            const name = document.getElementsByName("categoryname")[0].value;
+            const description = document.getElementById("description").value;
+
+            fetch(`/admin/editCategory/${category.id} `,{
+                method:"POST",
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({name, description})
+            })
+            .then(response=>{
+                if(!response.ok){
+                    return response.json().then(err=>{
+                        throw new Error(err.error)
+                    })
+                }
+                return response.json()
+            })
+            .then(data => {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: data.message
+      }).then(() => {
+        location.reload();
+      }); 
+    })
+    .catch(error => {
+      Swal.fire({
+        icon: "error",
+        title: "Oops",
+        text: error.message
+      });
+    });
+}
+
+    function validateForm() {
+        clearErrorMessages();
+
+        let isValid = true; 
+      
+               console.log("validate form");
+               clearErrorMessages();
+               const categoryname = document.getElementsByName('categoryname')[0].value;
+               const description = document.getElementsByName('description')[0].value;
+    
+                 
+               if (categoryname.trim() === "") {
+       displayErrorMessage('categoryname-error', 'Please enter a product name.');
+       isValid = false;
+       console.log("categoryname is ", categoryname)
+       console.log("description is", description)
+    }
+              
+               if (description === '') {
+                   displayErrorMessage('description-error', 'Please enter a product description.');
+                   isValid = false;
+               } 
+              
+               return isValid;
+           }
+
+
+           function displayErrorMessage(elementId, message) {
+               var errorElement = document.getElementById(elementId);
+               errorElement.innerText = message;
+               errorElement.style.display = "block";
+           }
+    
+    
+           function clearErrorMessages() {
+               const errorElements = document.getElementsByClassName('error-message');
+               Array.from(errorElements).forEach(element => {
+                   element.innerText = '';
+               });
+               const errorMessage = document.getElementById('errorMessage');
+    
+    
+           }
+
+
+</script>
 <%- include("../../views/partials/admin/footer") %>

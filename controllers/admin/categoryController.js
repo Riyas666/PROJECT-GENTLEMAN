@@ -89,10 +89,7 @@ const editCategory = async (req, res) => {
         const { categoryname, description } = req.body;
         const category = await Category.findById(id);
         if (!category) {
-            return res.status(404).render("edit-category", {
-                category: {},
-                error: "Category not found",
-            });
+            return res.status(404).json({ error: "Category not found" });
         }
         const existingCategory = await Category.findOne({
             name: categoryname,
@@ -100,10 +97,7 @@ const editCategory = async (req, res) => {
         });
 
         if (existingCategory) {
-            return res.status(400).render("edit-category", {
-                category,
-                error: "Category exists, please choose another name",
-            });
+            return res.status(400).json({ error: "Category already exists, please choose another name" });
         }
 
         category.name = categoryname;
@@ -112,13 +106,10 @@ const editCategory = async (req, res) => {
         await category.save();
 
         
-        res.redirect("/admin/category");
+        return res.json({ message: "Category updated successfully" });
     } catch (error) {
         console.error(error);
-        res.status(500).render("edit-category", {
-            category: {},
-            error: "Internal server error",
-        });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 

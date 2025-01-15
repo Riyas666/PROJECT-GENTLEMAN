@@ -3,6 +3,16 @@ const path = require('path');
 
 
 const BASE_UPLOAD_PATH = path.join(process.cwd(), 'public', 'uploads', 'product-images');
+const BRAND_UPLOAD_PATH = path.join(process.cwd(), 'public', 'uploads', 'brand-image');
+
+const brandStorage = multer.diskStorage({
+    destination: function(req,file,cb){
+        cb(null, BRAND_UPLOAD_PATH)
+    },
+    filename:(req,file,cb)=>{
+        cb(null, Date.now() + '-' + file.originalname)
+    }
+})
 
 const productStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -31,7 +41,7 @@ const fileFilter = (req, file, cb) => {
     return cb(null, true); // Accept file
   } else {
     cb(new Error('Only image files are allowed'), false); // Reject file
-  }
+  }       
 };
 
 
@@ -47,8 +57,16 @@ const uploadCategoryImage = multer({
     limits: { fileSize: 5 * 1024 * 1024 }
 });
 
+const uploadBrandImage = multer({
+    storage: brandStorage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }
+});
+
 module.exports={
     uploadCategoryImage,
     BASE_UPLOAD_PATH,
-    uploadProductImage
+    uploadProductImage,
+    uploadBrandImage,
+    BRAND_UPLOAD_PATH
 }

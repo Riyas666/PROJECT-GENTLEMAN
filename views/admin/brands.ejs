@@ -1,0 +1,287 @@
+<%- include("../../views/partials/admin/header") %>
+<style>
+
+  .error-message {
+    color: red;
+  }
+  .col-md-3 {
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 10px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: #fff;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+    .table td button {
+  display: inline-block;
+  width: 90px; /* Same width for all buttons */
+  height: 35px; /* Fixed height */
+  margin: 2px; /* Add spacing between buttons */
+  text-align: center;
+}
+
+/* Make buttons responsive */
+.table td button a {
+  color: white;
+  text-decoration: none;
+}
+
+.table td button a:hover {
+  text-decoration: underline;
+}
+</style>
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Brands</h2>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <form method="post" action="/admin/addBrand" enctype="multipart/form-data">
+            <div class="mb-4">
+              <label for="product_name" class="form-label">Brand Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Type here"
+                class="form-control"
+              />
+            </div>
+            <label for="product_name" class="form-label">Brand Image</label>
+            <div class="input-upload">
+              <img src="" alt=""/>
+              <input class="form-control border" name="image" type="file" />
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-primary mt-20" type="submit">
+                Add Brand
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="col-md-8 ml-10">
+          <div class="table-responsive">
+            <table class="table "  style="background-color: rgb(48, 48, 48); ">
+              <thead>
+                <tr>
+                  
+                  <th>Brand</th>
+                  <th>Logo</th>
+                  <th>Status</th>
+                  <th>Active/Inactive</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%data.reverse().forEach((brand,index)=>{%>
+                <tr>
+                  <td class="text-start"><%=brand.brandName%></td>
+                  <td class="text-start">
+                    <div
+                      class="d-flex align-items-center justify-content-center"
+                      style="
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        overflow: hidden;
+                      "
+                    >
+                      <img
+                        src="/uploads/brand-image/<%=brand.brandImage[0]%>"
+                        alt="<%=brand.brandName%>"
+                        class="img-fluid rounded-circle"
+                        style="width: 100%; height: auto"
+                      />
+                    </div>
+                  </td>
+                  <td class="text-start">
+                    <%if(brand.isBlocked){%>
+                    <span
+                      class="badge rounded-pill "
+                      style="width: 60px; background-color: red;" 
+                      >Blocked</span>
+                    <%}else{%>
+                    <span
+                      class="badge rounded-pill alert-success"
+                      style="width: 60px; background-color: green;"
+                      >Active</span
+                    >
+                    <%}%>
+                  </td>
+                 
+                  <td class="text-start">
+                    <%if(brand.isBlocked===false){%>
+                    <button class="btn btn-danger block-btn" data-id="<%=brand._id%>" style="width: 90px">
+                      Inactive
+                    </button>
+                    <%}else{%>
+                    <button class="btn btn-success unblock-btn" style="width: 90px" data-id="<%=brand._id%>">
+                      Active
+                    </button>
+                    <%}%>
+                    <button
+                      class="btn btn-danger "
+                      style="width: 90px"
+                      onclick=""
+                    >
+                      <a href="" class="text-white">Delete</a>
+                    </button>
+                  </td>
+                </tr>
+                <%})%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!----------------------------- PAGINATION ------------------------------->
+            
+  <div class="container mt-3">
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+        
+        <!-- Previous Button -->
+        <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
+          <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+  
+        <!-- First Page -->
+        <% if (currentPage > 2) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=1">1</a>
+          </li>
+          <% if (currentPage > 3) { %>
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+          <% } %>
+        <% } %>
+  
+        <!-- Current and Nearby Pages -->
+        <% for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) { %>
+          <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+          </li>
+        <% } %>
+  
+        <!-- Last Page -->
+        <% if (currentPage < totalPages - 1) { %>
+          <% if (currentPage < totalPages - 2) { %>
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+          <% } %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+          </li>
+        <% } %>
+  
+        <!-- Next Button -->
+        <li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
+          <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        
+      </ul>
+    </nav>
+  </div>
+  
+</section>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const baseUrl = "/admin";
+
+    /////////////////////    FOR BLOCKING THE PRODUCT  /////////////////////
+
+    document.querySelectorAll(".block-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+            const productId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
+            try {
+                const response = await fetch(`${baseUrl}/blockBrand`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: productId, isBlocked: true }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
+                });
+    //////////////////////   IF BLOCKED    ////////////////////
+                if (response.ok) {
+                    Swal.fire({
+                        title: "Blocked!",
+                        text: "The Brand has been blocked.",
+                        icon: "success",
+                        timer: 1000, 
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload(); // RELOAD THE PAGE
+                    });
+    ///////////////////////  IF ERROR   ////////////////////////                
+                } else {
+                    Swal.fire("Error!", "Failed to block the Brand.", "error");
+                }
+            } catch (error) {
+                Swal.fire("Error!", "An error occurred while blocking the Brand.", "error");
+            }
+        });
+    });
+
+    /////////////////////    FOR UNBLOCKING THE PRODUCT  /////////////////////
+    document.querySelectorAll(".unblock-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+            const productId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
+            try {
+                const response = await fetch(`${baseUrl}/unblockBrand`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: productId, isBlocked: false }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE FALSE
+                });
+    //////////////////////   IF UNBLOCKED    ////////////////////
+                if (response.ok) {
+                    Swal.fire({
+                        title: "Unblocked!",
+                        text: "The Brand has been unblocked.",
+                        icon: "success",
+                        timer: 1000, 
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload(); // RELOAD THE PAGE
+                    });
+    ///////////////////////  IF ERROR   ////////////////////////
+                } else {
+                    Swal.fire("Error!", "Failed to unblock the Brand.", "error");
+                }
+            } catch (error) {
+                Swal.fire("Error!", "An error occurred while unblocking the Brand.", "error");
+            }
+        });
+    });
+});
+
+
+</script>
+<%- include("../../views/partials/admin/footer") %>

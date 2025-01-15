@@ -49,4 +49,8 @@ router.post("/reset-password", profileController.resetPassword)
 router.post("/resend-forgot-otp", profileController.resendOtp)
 
 
+
+
+
+
 module.exports = router

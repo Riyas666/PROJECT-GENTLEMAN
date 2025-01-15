@@ -10,7 +10,7 @@ const customerInfo = async (req, res) => {
         if (req.query.page) {
             page = parseInt(req.query.page);
         }
-        const limit = 6;
+        const limit = 5;
         const userData = await User.find({
             isAdmin: false,
             $or: [{ name: { $regex: ".*" + search + ".*" } }, { email: { $regex: ".*" + search + ".*" } }],

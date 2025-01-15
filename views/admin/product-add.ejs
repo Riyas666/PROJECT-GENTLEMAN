@@ -332,7 +332,7 @@ const selectedImages = []
             img.style.width = "50px";
             img.style.height = "auto";
             const removeIcon = document.createElement("span");
-            removeIcon.classList.add("remove-icon")
+            removeIcon.classList.add("remove-icon");
             removeIcon.innerHTML = "&times;";
             removeIcon.addEventListener("click", function(){
                 const index = selectedImages.indexOf(file);
@@ -404,7 +404,7 @@ const selectedImages = []
               }
               return isValid;
           }
-         
+          
           //TO DISPLAY THE ERROR MESSAGES
           function displayErrorMessage(elementId, message) {
               var errorElement = document.getElementById(elementId);
