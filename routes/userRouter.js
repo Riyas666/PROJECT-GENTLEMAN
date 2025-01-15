@@ -13,6 +13,14 @@ router.get("/pageNotFound", userController.pageNotFound)
 //LOAD HOME PAGE
 router.get("/home", userController.loadHomePage)
 
+
+//LOAD THE LOGIN PAGE
+router.get("/login", userController.loadLogin)
+router.post("/login",userController.login)
+router.post("/resend-otp", userController.resendOtp)
+router.get("/logout", userController.logout)
+ 
+
 //LOAD SIGNUP PAGE
 router.get("/signup", userController.loadSignup)
 
@@ -33,12 +41,7 @@ router.get("/auth/google/callback", passport.authenticate('google',{failureRedir
     res.redirect("/home")
 })
 
-//LOAD THE LOGIN PAGE
-router.get("/login", userController.loadLogin)
-router.post("/login",userController.login)
-router.post("/resend-otp", userController.resendOtp)
-router.get("/logout", userController.logout)
- 
+
 
 //PROFILE
 router.get("/forgot-password", profileController.forgotPassword)

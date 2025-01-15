@@ -16,19 +16,16 @@ const uploads = multer({brandStorage:storage});
 
 
 //TO SHOW THE ERROR
-
-
 router.get("/pageerror",adminAuth, adminController.pageerror);
+
 
 //RELATED TO ADMIN LOGIN
 router.get("/login", adminController.loadLogin);
 router.post("/login", adminController.login);
-
-//AFTER ADMIN LOGIN, LOAD DASHBOARD
 router.get("/dashboard",adminAuth, adminController.loadDashboard);
-
-//LOGOUT FROM THE ADMIN LOGIN
 router.get("/logout",adminAuth, adminController.logout);
+
+
 
 
 //RELATED TO CUSTOMER MANAGEMENT

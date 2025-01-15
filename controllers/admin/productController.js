@@ -1,5 +1,3 @@
-// FOR SIMPLE IMPORTSS
-
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
@@ -26,34 +24,32 @@ const getProductAddPage = async (req, res) => {
 const addProducts = async (req, res) => {
     try {
         const products = req.body;
-        console.log("req.body:", products);
+        console.log("req.body:", products);  
 
         const images = [];
 
         if (req.files && req.files.length > 0) {
             const uploadPath = path.join( "public", "uploads", "product-images");
 
-            // Ensure the directory exists
             if (!fs.existsSync(uploadPath)) {
                 fs.mkdirSync(uploadPath, { recursive: true });
-                console.log("Directory created:", uploadPath);
+                console.log("Directory created:", uploadPath);  
             } else {
-                console.log("Directory already exists:", uploadPath);
+                console.log("Directory already exists:", uploadPath);  
                            }
             for (let i = 0; i < req.files.length; i++) {
                 const originalImagePath = req.files[i].path;
-                console.log(originalImagePath)
+                console.log(originalImagePath) 
                 
                 
                 const filename = `${Date.now()}-${req.files[i].originalname}`;
                 const resizedImagepath = path.join(uploadPath, filename);
                 
                 await sharp(originalImagePath).resize({ width: 440, height: 440 }).toFile(resizedImagepath);
-                console.log('this is ',filename)
-                console.log("this is the resized image path", resizedImagepath)
-                // fs.unlinkSync(originalImagePath);
+                console.log('this is ',filename) 
+                console.log("this is the resized image path", resizedImagepath)  
                 images.push(filename);
-                console.log("image processde and saved", filename);
+                console.log("image processde and saved", filename);   
                 
             }
             
@@ -61,7 +57,6 @@ const addProducts = async (req, res) => {
             console.log("no files uploaded");
         }
 
-        // Solution
         const categoryId = products.category;
         if (!categoryId) {
             return res.status(400).json({ error: "Category is required." });
@@ -74,8 +69,8 @@ const addProducts = async (req, res) => {
             return res.status(400).json({ error: "Invalid category name" });
         }
 
-        //SAVING NEW PRODUCT
 
+        //SAVING NEW PRODUCT
         const newProduct = new Product({
             productName: products.productName,
             description: products.description,
@@ -99,6 +94,7 @@ const addProducts = async (req, res) => {
     }
 };
 
+
 //FOR GETTING ALL PRODUCTS
 const getAllProducts = async (req, res) => {
    
@@ -110,13 +106,13 @@ const getAllProducts = async (req, res) => {
         const productData = await Product.find({
             productName: { $regex: search, $options: "i" },
         })
-            .populate("category") // Populate category field
+            .populate("category")
             .limit(limit)
             .skip((page - 1) * limit);
 
         const productsWithImages = productData.map((product) => {
             const productObject = product.toObject();
-            productObject.imageUrls = product.productImage; // Directly pass the image names
+            productObject.imageUrls = product.productImage; 
             return productObject;
         });
 
@@ -137,34 +133,33 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-// FOR BLOCKING THE PRODUCT
 
+// FOR BLOCKING THE PRODUCT
 const blockProduct = async (req, res) => {
     const { id, isBlocked } = req.body;
     try {
         await Product.updateOne({ _id: id }, { $set: { isBlocked } });
 
         res.status(200).json({ success: true });
-        //res.redirect("/admin/products");
+        
     } catch (error) {
         res.status(500).json({ success: false, error: "Failed to block product." });
-        //res.redirect("/admin/pageerror");
+      
     }
 };
 
-//FOR UNBLOCKING THE PRODUCT
 
+//FOR UNBLOCKING THE PRODUCT
 const unblockProduct = async (req, res) => {
     try {
         const { id, isBlocked } = req.body;
         await Product.updateOne({ _id: id }, { $set: { isBlocked } });
         res.status(200).json({ success: true });
-        // res.redirect("/admin/products");
     } catch (error) {
         res.status(500).json({ success: false, error: "Failed to unblock product." });
-        // res.redirect("/admin/pageerror");
     }
 };
+
 
 //FOR THE EDIT PRODUCT PAGE
 const getEditProduct = async (req, res) => {
@@ -176,12 +171,13 @@ const getEditProduct = async (req, res) => {
         res.render("edit-product", {
             product: product,
             cat: category,
-            // brand:brand,
+            brand:brand,
         });
     } catch (error) {
         res.redirect("/admin/pageerror");
     }
 };
+
 
 //FOR EDIT THE PRODUCT
 const editProduct = async (req, res) => {
@@ -190,9 +186,7 @@ const editProduct = async (req, res) => {
 
         const product = await Product.findOne({ _id: id });
         const data = req.body;
-
         const images = [];
-
         if (req.files && req.files.length > 0) {
             for (let i = 0; i < req.files.length; i++) {
                 images.push(req.files[i].filename);

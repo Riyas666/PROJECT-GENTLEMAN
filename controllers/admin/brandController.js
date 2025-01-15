@@ -2,11 +2,11 @@ const Brand = require("../../models/brandSchema")
 const Product = require("../../models/productSchema")
 
 
+//GET BRAND PAGE
 const getBrandPage = async(req,res) =>{
     try{
         
         const page = parseInt(req.query.page) || 1;
-        // console.log('haiiii')
         const limit = 4
         const skip = (page-1)*limit
         const brandData = await Brand.find({})
@@ -16,7 +16,6 @@ const getBrandPage = async(req,res) =>{
         
         const totalBrands = await Brand.countDocuments()
         const totalPages = Math.ceil(totalBrands/limit)
- 
         const reverseBrand = brandData.reverse()
         
         res.render("brands", {
@@ -31,11 +30,11 @@ const getBrandPage = async(req,res) =>{
 }
 
 
+//ADD BRAND
 const addBrand = async(req,res) =>{
     const brand = req.body.name;
     const image = req.file.filename;
 
-    
     const trimmedBrand = brand.trim()
     try{
        
@@ -45,7 +44,6 @@ const addBrand = async(req,res) =>{
         if(existingBrand){
             return res.status(400).json({error:"Brand already exist"})
         }
-       
        
             const newBrand = new Brand({
                 brandName :trimmedBrand,
@@ -62,42 +60,35 @@ const addBrand = async(req,res) =>{
         console.log("error while saving the brand")
         res.redirect("/pageerror")
     }
-
 }
 
+
+//BLOCK BRAND
 const blockBrand = async (req, res) => {
     const { id, isBlocked } = req.body;
     try {
         await Brand.updateOne({ _id: id }, { $set: { isBlocked } });
-
         res.status(200).json({ success: true });
-        //res.redirect("/admin/products");
+       
     } catch (error) {
         res.status(500).json({ success: false, error: "Failed to block Brand." });
-        //res.redirect("/admin/pageerror");
     }
 };
 
 
+//UNBLOCK BRAND
 const unblockBrand = async (req, res) => {
     try {
         const { id, isBlocked } = req.body;
         await Brand.updateOne({ _id: id }, { $set: { isBlocked } });
         res.status(200).json({ success: true });
-        // res.redirect("/admin/products");
     } catch (error) {
         res.status(500).json({ success: false, error: "Failed to unblock product." });
-        // res.redirect("/admin/pageerror");
     }
 };
 
 
-
-
-
-
-
-
+//EXPORTING...
 module.exports = {
     addBrand,
     getBrandPage,

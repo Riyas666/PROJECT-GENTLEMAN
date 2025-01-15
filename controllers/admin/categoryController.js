@@ -105,7 +105,6 @@ const editCategory = async (req, res) => {
 
         await category.save();
 
-        
         return res.json({ message: "Category updated successfully" });
     } catch (error) {
         console.error(error);

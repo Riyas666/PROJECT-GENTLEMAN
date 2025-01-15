@@ -4,10 +4,12 @@ const User = require("../../models/userSchema");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
+
 //FOR ERROR PAGE
 const pageerror = async (req, res) => {
     res.render("admin-error");
 };
+
 
 // LOAD LOGIN PAGE BASED ON THE SESSION
 const loadLogin = async (req, res) => {
@@ -19,6 +21,7 @@ const loadLogin = async (req, res) => {
    
 };
 
+
 //FOR LOGIN
 const login = async (req, res) => {
     try {
@@ -28,7 +31,7 @@ const login = async (req, res) => {
             return res.render("admin-login", { message: "Invalid email or password" });
         }
 
-        //COMPARE TWO PASSWORD
+        //COMPARE TWO PASSWORDS
         const passwordMatch = await bcrypt.compare(password, admin.password);
         if (!passwordMatch) {
             return res.render("admin-login", { message: "Invalid Email or password" });
@@ -40,6 +43,7 @@ const login = async (req, res) => {
         return res.redirect("/pageerror");
     }
 };
+
 
 //TO LOAD THE DASHBOARD FOR LOGGED ONES
 const loadDashboard = async (req, res) => {
@@ -53,6 +57,8 @@ const loadDashboard = async (req, res) => {
         res.redirect("/admin/login");
     }
 };
+
+
 //FOR LOGOUT
 const logout = async (req, res) => {
     try {
@@ -68,6 +74,7 @@ const logout = async (req, res) => {
         res.redirect("/pageerror");
     }
 };
+
 
 //EXPORTING..
 module.exports = {

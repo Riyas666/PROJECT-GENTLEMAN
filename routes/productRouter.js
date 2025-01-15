@@ -8,7 +8,6 @@ const storage = require("../utils/multer");
 const uploads = multer({brandStorage:storage});
 
 
-
 //RELATED TO PRODUCT MANAGEMENT
 router.get("/",adminAuth,productController.getAllProducts)
 router.get("/addProducts", adminAuth,productController.getProductAddPage)

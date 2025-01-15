@@ -37,7 +37,7 @@ const customerInfo = async (req, res) => {
 };
 
 
-//FOR THE BLOCKING OF THE CUSTOMER
+//FOR THE BLOCK THE CUSTOMER
 const customerBlocked = async (req, res) => {
     const { id, isBlocked } = req.body;
 
@@ -62,7 +62,6 @@ const customerunBlocked = async (req, res) => {
         res.status(500).json({ success: false, error: "Failed to unblock product." });
     }
 };
-
 
 
 //EXPORTING..
