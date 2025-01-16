@@ -1,6 +1,6 @@
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
-const User = require("../../models/userSchema");
+const Brand = require("../../models/brandSchema")
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -14,15 +14,22 @@ const { BASE_UPLOAD_PATH } = require("../../utils/multer");
 const getProductAddPage = async (req, res) => {
     try {
         const category = await Category.find({ isListed: true });
-        res.render("product-add", { cat: category });
+        console.log(category)
+        const brand = await Brand.find({isBlocked:false})
+       
+        res.render("product-add", { cat: category ,brand:brand});
     } catch (error) {
         res.redirect("/admin/pageerror");
     }
 };
 
 //FOR ADD THE PRODUCT
+
+
 const addProducts = async (req, res) => {
+
     try {
+
         const products = req.body;
         console.log("req.body:", products);  
 
@@ -68,6 +75,20 @@ const addProducts = async (req, res) => {
         if (!category) {
             return res.status(400).json({ error: "Invalid category name" });
         }
+        let sizes = [];
+        if (products.sizes && products.quantities) {
+            const sizeArray = products.sizes;
+            const quantityArray = products.quantities;
+
+            for (let i = 0; i < sizeArray.length; i++) {
+                if (sizeArray[i] && quantityArray[i]) {
+                    sizes.push({ size: sizeArray[i], quantity: Number(quantityArray[i]) });
+                }
+            }
+        }else {
+            console.error("Sizes or Quantities are missing");
+        }
+        console.log("this are the sizes before saving", sizes)
 
 
         //SAVING NEW PRODUCT
@@ -79,12 +100,11 @@ const addProducts = async (req, res) => {
             regularPrice: products.regularPrice,
             salePrice: products.salePrice,
             createdAt: new Date(),
-            color: products.color,
             productImage: images,
+            sizes: sizes,
             status: "Available",
         });
         console.log(newProduct)
-
         await newProduct.save();
 
         return res.redirect("/admin/products");
@@ -97,9 +117,9 @@ const addProducts = async (req, res) => {
 
 //FOR GETTING ALL PRODUCTS
 const getAllProducts = async (req, res) => {
-   
+
     const search = req.query.search || "";
-    const page = req.query.page || 1;
+    const page = parseInt(req.query.page) || 1;
     const limit = 4;
 
     try {
@@ -107,6 +127,7 @@ const getAllProducts = async (req, res) => {
             productName: { $regex: search, $options: "i" },
         })
             .populate("category")
+            .populate("brand")
             .limit(limit)
             .skip((page - 1) * limit);
 
@@ -167,11 +188,11 @@ const getEditProduct = async (req, res) => {
         const id = req.query.id;
         const product = await Product.findOne({ _id: id });
         const category = await Category.find({ isListed: true });
-
+        const brand = await Brand.find({isBlocked:false})
         res.render("edit-product", {
             product: product,
             cat: category,
-            brand:brand,
+            brand:brand
         });
     } catch (error) {
         res.redirect("/admin/pageerror");

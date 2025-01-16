@@ -49,11 +49,11 @@
                            <div class="col-lg-4 mb-4">
                                <label class="form-label">Brand</label>
                                <select class="form-select border" name="brand">
-                                  
-                                       <option value="">
-                                          
-                                       </option>
-                                      
+                                   <% for (let i = 0; i < brand.length; i++) { %>
+                                <option value="<%= brand[i]._id %>">
+                                    <%= brand[i].brandName %>
+                                </option>
+                                <% } %>
                                </select>
                                <div id="brand-error" class="error-message"></div>
 
@@ -69,7 +69,7 @@
                                <div class="col-lg-4">
                                    <div class="mb-4">
                                        <label class="form-label">Regular price</label>
-                                       <input placeholder="$" name="regularPrice" type="text"
+                                       <input placeholder="₹" name="regularPrice" type="text"
                                            value="<%=product.regularPrice%>" class="form-control border">
                                            <div id="regularPrice-error" class="error-message"></div>
                                    </div>
@@ -77,7 +77,8 @@
                                <div class="col-lg-4">
                                    <div class="mb-4">
                                        <label class="form-label">Sale price</label>
-                                       <input name="salePrice" type="text" value="<%=product.salePrice%>"
+                                       <input name="salePrice" type="text"
+                                       placeholder="₹" value="<%=product.salePrice%>"
                                            class="form-control border">
                                    </div>
                                    <div id="salePrice-error" class="error-message"></div>
@@ -91,18 +92,7 @@
                                    </div>
                                </div>
                            </div>
-                           <div class="row">
-                             
-                               <div class="col-lg-4">
-                                   <div class="mb-4">
-                                       <label class="form-label">Color</label>
-                                       <input name="color" type="text" value="<%=product.color%>"
-                                           class="form-control border">
-                                           <div id="color-error" class="error-message"></div>
-                                   </div>
-                               </div>
-                              
-                           </div>
+                          
                            <div class="card mb-4">
 
 
@@ -138,7 +128,7 @@
                                                        <input type="hidden" value="<%=product.productImage[i]%>" id="imageDatas">
                                                        <img class="rounded" style="width: 50px; height: 60px;"
                                                            src="/uploads/<%=product.productImage[i]%>"
-                                                           alt="">
+                                                           alt="nuy">
                                                        <i onclick="deleteSingleImage('<%=product.productImage[i]%>', '<%=product._id%>')" style="position: absolute; margin-left: .5rem; cursor: pointer;" class="fa-thin fa-x"></i>
                                                    </td>
                                                </div>
@@ -146,7 +136,7 @@
                                            </div>
                                        </div>
                               <%}%>
-                                  
+
                                <div class="card-body">
                                    <div class="card-body align-items-center" style="margin-bottom: 20px;">
                                        <img src="" alt="" id="imgView1">
@@ -204,7 +194,6 @@
                                </div>
                            </div>
                            <div>
-
 
                                <button class="btn btn-md rounded font-sm hover-up" id="updatebtn"
                                    type="button"  onclick="validateAndSubmit()">Update</button>
@@ -271,7 +260,7 @@
                    displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
                    isValid = false;
                }
-              if (!/^\d+(\.\d{1,2})?$/.test(saleprice) || parseFloat(saleprice) < 0) {
+               if (!/^\d+(\.\d{1,2})?$/.test(saleprice) || parseFloat(saleprice) < 0) {
                    displayErrorMessage('salePrice-error', 'Please enter a valid non-negative price.');
                    isValid = false;
                }
@@ -280,6 +269,7 @@
                    displayErrorMessage('color-error', 'Please enter a color.');
                    isValid = false;
                }
+
                if (!imageDatas && images.files.length === 0) {
                    displayErrorMessage("images-error",'Please select an image.');
                    isValid = false;

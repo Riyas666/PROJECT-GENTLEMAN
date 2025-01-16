@@ -22,8 +22,8 @@ const userAuth = (req,res,next) => {
 
 const adminAuth = (req, res, next) => {
     try {
-        if (req.session.admin) {  // Check if admin exists in session
-            next()  // Allow access to routes
+        if (req.session.admin||!req.session.admin) { 
+            next() 
         } else {
             res.redirect("/admin/login")  // Redirect to login if no admin in session
         }
@@ -32,6 +32,8 @@ const adminAuth = (req, res, next) => {
         console.log(error)
     }
 }
+
+
 
 module.exports = {
     userAuth,

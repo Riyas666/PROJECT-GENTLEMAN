@@ -2,6 +2,13 @@ const mongoose = require("mongoose")
 const {Schema} = mongoose
 
 
+
+const SizeSchema = new mongoose.Schema({
+    size: { type: String, required: true },
+    quantity: { type: Number, required: true }
+});
+
+
 const productSchema = new Schema({
     productName: {
         type: String,
@@ -11,9 +18,10 @@ const productSchema = new Schema({
         type: "String",
         required: true
     },
-    brand: {
-        type: String,
-        required: false
+    brand: { 
+        type: mongoose.Schema.Types.ObjectId,
+         ref: "Brand" ,
+         required:true
     },
     category: {
         type: Schema.Types.ObjectId,
@@ -32,17 +40,11 @@ const productSchema = new Schema({
         type: Number,
         default: 0
     },
-    quantity: {
-        type: Number,
-        default: true
-    },
     color: {
         type: String,
         required: false
     },
-    size:{
-        type: Number,
-    },
+    sizes: [SizeSchema],
     productImage: [{
         type: String
     }],

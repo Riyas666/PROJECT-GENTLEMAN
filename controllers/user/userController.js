@@ -156,7 +156,7 @@ const loadHomePage = async (req, res) => {
         let productData = await Products.find(
             {
                 isBlocked:false,
-                category:{$in:categories.map(category=>category._id)}, quantity:{$gt:0}
+                category:{$in:categories.map(category=>category._id)}
             }
         )
 
@@ -244,12 +244,12 @@ const userData = await User.findOne({_id:user})
 const categories = await Category.find({isListed:true})
 const categoryIds = categories.map((category)=>category._id.toString())
 const page = parseInt(req.query.page) || 1;
-const limit = 9;
+const limit = 3;
 const skip = (page-1)*limit;
 const products = await Product.find({
     isBlocked:false,
     category:{$in:categoryIds},
-    quantity:{$gt:0},
+   
 })
 .sort({createdOn:-1})
 .skip(skip)

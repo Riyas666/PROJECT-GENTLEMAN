@@ -13,7 +13,4 @@ router.patch("/blockBrand",adminAuth,brandController.blockBrand);
 router.patch("/unblockBrand",adminAuth, brandController.unblockBrand);
 
 
-
-
-
 module.exports = router;

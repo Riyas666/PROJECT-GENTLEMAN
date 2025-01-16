@@ -79,7 +79,7 @@
             <table class="table "  style="background-color: rgb(48, 48, 48); ">
               <thead>
                 <tr>
-                  
+                  <th>No</th>
                   <th>Brand</th>
                   <th>Logo</th>
                   <th>Status</th>
@@ -89,6 +89,7 @@
               <tbody>
                 <%data.reverse().forEach((brand,index)=>{%>
                 <tr>
+                  <td class="text-start"><%= (currentPage - 1) * limit + index + 1 %></td>
                   <td class="text-start"><%=brand.brandName%></td>
                   <td class="text-start">
                     <div
@@ -133,13 +134,13 @@
                       Active
                     </button>
                     <%}%>
-                    <button
+                    <!-- <button
                       class="btn btn-danger "
                       style="width: 90px"
                       onclick=""
                     >
                       <a href="" class="text-white">Delete</a>
-                    </button>
+                    </button> -->
                   </td>
                 </tr>
                 <%})%>

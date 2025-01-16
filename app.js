@@ -8,10 +8,11 @@ const passport = require("./config/passport");
 dotenv.config();
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
+const brandRouter = require("./routes/brandRouter");
 const adminRouter = require("./routes/adminRouter");
-const productRouter = require("./routes/productRouter")
-const categoryRouter = require("./routes/categoryRouter")
-const brandRouter = require("./routes/brandRouter")
+const productRouter = require("./routes/productRouter");
+const categoryRouter = require("./routes/categoryRouter");
+const customerRouter = require("./routes/customerRouter");
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
@@ -50,7 +51,7 @@ app.use("/admin", adminRouter);
 app.use("/admin/category", categoryRouter);
 app.use("/admin/products", productRouter);
 app.use("/admin/brands", brandRouter)
-
+app.use("/admin/users", customerRouter)
 
 const PORT = 3000 || process.env.PORT;
 app.listen(PORT, () => {

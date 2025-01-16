@@ -72,9 +72,12 @@ const getUnListCategory = async (req, res) => {
 //FOR GETTING THE EDIT CATEGORY PAGE
 const getEditCategory = async (req, res) => {
     try {
-        const id = req.query.id;
+        const id = req.params.id;
         const category = await Category.findById(id);
-        await Category.updateOne({ _id: id });
+        
+        if (!category) {
+            throw new Error("Category not found");
+        }
         res.render("edit-category", { category });
     } catch (error) {
         res.redirect("/pageerror");
@@ -87,12 +90,13 @@ const editCategory = async (req, res) => {
     try {
         const id = req.params.id;
         const { categoryname, description } = req.body;
+        const trimmedName = categoryname.trim();
         const category = await Category.findById(id);
         if (!category) {
             return res.status(404).json({ error: "Category not found" });
         }
         const existingCategory = await Category.findOne({
-            name: categoryname,
+            name: trimmedName,
             _id: { $ne: id },
         });
 
@@ -100,12 +104,12 @@ const editCategory = async (req, res) => {
             return res.status(400).json({ error: "Category already exists, please choose another name" });
         }
 
-        category.name = categoryname;
+        category.name = trimmedName;
         category.description = description;
 
         await category.save();
 
-        return res.json({ message: "Category updated successfully" });
+        return res.json({ success:true, message: "Category updated successfully" });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal server error" });
