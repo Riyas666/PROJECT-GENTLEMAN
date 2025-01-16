@@ -189,10 +189,14 @@ const getEditProduct = async (req, res) => {
         const product = await Product.findOne({ _id: id });
         const category = await Category.find({ isListed: true });
         const brand = await Brand.find({isBlocked:false})
+        const sizes = product.sizes || [];
+
+        
         res.render("edit-product", {
             product: product,
             cat: category,
-            brand:brand
+            brand:brand,
+            sizes: sizes,
         });
     } catch (error) {
         res.redirect("/admin/pageerror");
@@ -204,9 +208,9 @@ const getEditProduct = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
         const id = req.params.id;
-
-        const product = await Product.findOne({ _id: id });
         const data = req.body;
+        const product = await Product.findById(id);
+       
         const images = [];
         if (req.files && req.files.length > 0) {
             for (let i = 0; i < req.files.length; i++) {
@@ -223,7 +227,17 @@ const editProduct = async (req, res) => {
         const deletedImages = Array.isArray(data.deletedImages) ? data.deletedImages : [];
 
         const updatedImages = [...existingImages.filter((img) => !deletedImages.includes(img)), ...images];
+        let sizes = [];
+        if (data.sizes && data.quantities) {
+            const sizeArray = data.sizes;
+            const quantityArray = data.quantities;
 
+            for (let i = 0; i < sizeArray.length; i++) {
+                if (sizeArray[i] && quantityArray[i]) {
+                    sizes.push({ size: sizeArray[i], quantity: Number(quantityArray[i]) });
+                }
+            }
+        }
         const updateFields = {
             productName: data.productName,
             description: data.description,
@@ -231,10 +245,8 @@ const editProduct = async (req, res) => {
             category: product.category,
             regularPrice: data.regularPrice,
             salePrice: data.salePrice,
-            quantity: data.quantity,
-            color: data.color,
             productImage: updatedImages,
-            size: data.size,
+            sizes: sizes,
         };
 
         await Product.findByIdAndUpdate(id, updateFields, { new: true });

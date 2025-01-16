@@ -21,7 +21,7 @@ router.patch("/unblockProduct",adminAuth, productController.unblockProduct);
 
 
 router.get("/editProduct",adminAuth, productController.getEditProduct)
-router.post("/editProduct/:id",adminAuth, uploadProductImage.array('productImage', 5), productController.editProduct)
+router.post("/editProduct/:id",adminAuth, uploadProductImage.array('images', 5), productController.editProduct)
 router.post("/deleteImage",adminAuth, productController.deleteSingleImage)
 
 
