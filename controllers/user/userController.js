@@ -1,7 +1,7 @@
 const User = require("../../models/userSchema");
-const Category = require("../../models/categorySchema")
-const Products = require("../../models/productSchema")
-const Brand = require("../../models/brandSchema")
+const Category = require("../../models/categorySchema");
+const Products = require("../../models/productSchema");
+const Brand = require("../../models/brandSchema");
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -20,7 +20,6 @@ const loadSignup = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
-
 
 //AFTER THE SIGNUP PAGE IT WILL MOVE TO THE  OTP
 const signup = async (req, res) => {
@@ -53,12 +52,10 @@ const signup = async (req, res) => {
     }
 };
 
-
 //FOR GENERATING THE OTP
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
-
 
 //SEND THE OTP TO THE MAIL
 async function SendVerificationEmail(email, otp) {
@@ -89,7 +86,6 @@ async function SendVerificationEmail(email, otp) {
     }
 }
 
-
 //FOR RESENDING THE OTP
 const resendOtp = async (req, res) => {
     try {
@@ -114,7 +110,6 @@ const resendOtp = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
 
 //FOR VERIFY THE OTP
 const verifyOtp = async (req, res) => {
@@ -146,40 +141,35 @@ const verifyOtp = async (req, res) => {
     }
 };
 
-
 //LOADING THE HOME PAGE ALSO CHECKING THE SESSION
 const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user;
-        const categories = await Category.find({isListed:true});
-        console.log('Categories:', categories);
-        let productData = await Products.find(
-            {
-                isBlocked:false,
-                category:{$in:categories.map(category=>category._id)}
-            }
-        )
+        const categories = await Category.find({ isListed: true });
+        console.log("Categories:", categories);
+        let productData = await Products.find({
+            isBlocked: false,
+            category: { $in: categories.map((category) => category._id) },
+        });
 
-        productData.sort((a,b) => new Date(b.createdOn) - new Date(a.createdOn))
-        productData = productData.slice(0,4);
-        console.log(productData,'fdafdafdfdsfdsgf');
-        
+        productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+        productData = productData.slice(0, 4);
+        console.log(productData, "fdafdafdfdsfdsgf");
 
-        console.log('Product data after sorting and slicing:', productData);
-
+        console.log("Product data after sorting and slicing:", productData);
+        const status = User.find
         if (user) {
             const userData = await User.findById(user);
-            console.log(userData)
-            res.render("home", { user: userData, products:productData });
+            console.log(userData);
+            res.render("home", { user: userData, products: productData });
         } else {
-            return res.render("home", {products:productData});
+            return res.render("home", { products: productData });
         }
     } catch (error) {
         console.log("Home page not found");
         res.status(500).send("Server Error");
     }
 };
-
 
 //PASSWORD HASHING
 const securePassword = async (password) => {
@@ -193,7 +183,6 @@ const securePassword = async (password) => {
     }
 };
 
-
 //RENDER THE LOGIN PAGE IF SESSION HAVE THEN TO THE HOME PAGE
 const loadLogin = async (req, res) => {
     try {
@@ -206,7 +195,6 @@ const loadLogin = async (req, res) => {
         res.redirect("/pageNotFound");
     }
 };
-
 
 //AFTER THE SIGNUP PAGE IT WILL MOVE TO THE HOMEPAGE
 const login = async (req, res) => {
@@ -236,53 +224,49 @@ const login = async (req, res) => {
     }
 };
 
-
 const loadShopping = async (req, res) => {
     try {
-const user = req.session.user;
-const userData = await User.findOne({_id:user})
-const categories = await Category.find({isListed:true})
-const categoryIds = categories.map((category)=>category._id.toString())
-const page = parseInt(req.query.page) || 1;
-const limit = 3;
-const skip = (page-1)*limit;
-const products = await Product.find({
-    isBlocked:false,
-    category:{$in:categoryIds},
-   
-})
-.sort({createdOn:-1})
-.skip(skip)
-.limit(limit)
+        const user = req.session.user;
+        const userData = await User.findOne({ _id: user });
+        const categories = await Category.find({ isListed: true });
+        const categoryIds = categories.map((category) => category._id.toString());
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const skip = (page - 1) * limit;
+        const products = await Product.find({
+            isBlocked: false,
+            category: { $in: categoryIds },
+        })
+            .sort({ createdOn: -1 })
+            .skip(skip)
+            .limit(limit);
 
+        const totalProducts = await Product.countDocuments({
+            isBlocked: false,
+            category: { $in: categoryIds },
+            quantity: { $gt: 0 },
+        });
+        const totalPages = Math.ceil(totalProducts / limit);
 
-const totalProducts = await Product.countDocuments({
-    isBlocked:false,
-    category:{$in:categoryIds},
-    quantity:{$gt:0}
-});
-const totalPages = Math.ceil(totalProducts/limit)
+        const brands = await Brand.find({
+            isBlocked: false,
+        });
+        const categoriesWithIds = categories.map((category) => ({ _id: category._id, name: category.name }));
 
-const brands = await Brand.find({
-    isBlocked:false})
-   const categoriesWithIds = categories.map(category=>({_id:category._id, name:category.name}))
-
-
-         res.render("shop", {
-            user:userData,
-            products:products,
-            category:categoriesWithIds,
-            brand:brands,
-            totalProducts:totalProducts,
-            currentPage:page,
-            totalPages:totalPages
-         });
+        res.render("shop", {
+            user: userData,
+            products: products,
+            category: categoriesWithIds,
+            brand: brands,
+            totalProducts: totalProducts,
+            currentPage: page,
+            totalPages: totalPages,
+        });
     } catch (error) {
         console.log("Shopping page not loading", error);
         res.status(500).send("Server Error");
     }
 };
-
 
 //PAGE NOT FOUND
 const pageNotFound = async (req, res) => {
@@ -292,7 +276,6 @@ const pageNotFound = async (req, res) => {
         res.redirect("/pageNotFound");
     }
 };
-
 
 //FOR LOGOUT
 const logout = async (req, res) => {
@@ -309,9 +292,6 @@ const logout = async (req, res) => {
         res.redirect("/pageNotFound");
     }
 };
-
-
-
 
 //EXPORTING..
 module.exports = {

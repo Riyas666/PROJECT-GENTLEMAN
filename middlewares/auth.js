@@ -1,41 +1,52 @@
-const User = require("../models/userSchema")
+const User = require("../models/userSchema");
 
+const userAuth = async (req, res, next) => {
+    try {
+        if (req.session.user) {
+            const user = await User.findById(req.session.user);
 
-const userAuth = (req,res,next) => {
-    if(req.session.user){
-        User.findById(req.session.user)
-        .then(data=>{
-            if(data && !data.isBlocked){
-                next()
-            }else{
-                res.redirect("/login")
+            if (user) {
+                if (user.isBlocked) {
+                    // Destroy session if the user is blocked
+                    req.session.destroy((err) => {
+                        if (err) {
+                            console.error("Error destroying session:", err);
+                            return res.status(500).send("Internal Server Error");
+                        }
+                        res.redirect("/login"); // Redirect to login page
+                    });
+                } else {
+                    return next(); // User is authenticated and not blocked
+                }
+            } else {
+                // If user record not found in the database
+                req.session.destroy(() => {
+                    res.redirect("/login");
+                });
             }
-        })
-        .catch(error =>{
-            console.log("Error in user auth middleware")
-            res.status(500).send("Internal Server Error")
-        })
-    }else{
-        res.redirect("/login")
+        } else {
+            return next(); // Allow access to public pages
+        }
+    } catch (error) {
+        console.error("Error in user auth middleware:", error);
+        res.status(500).send("Internal Server Error");
     }
-}
+};
+
 
 const adminAuth = (req, res, next) => {
     try {
-        if (req.session.admin||!req.session.admin) { 
-            next() 
+        if (req.session.admin) {
+            next();
         } else {
-            res.redirect("/admin/login")  // Redirect to login if no admin in session
+            res.redirect("/admin/login");
         }
-        
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
-}
-
-
+};
 
 module.exports = {
     userAuth,
-    adminAuth
-}
+    adminAuth,
+};

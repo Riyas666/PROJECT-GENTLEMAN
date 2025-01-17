@@ -7,6 +7,7 @@ const session = require("express-session");
 const passport = require("./config/passport");
 dotenv.config();
 const db = require("./config/db");
+
 const userRouter = require("./routes/userRouter");
 const brandRouter = require("./routes/brandRouter");
 const adminRouter = require("./routes/adminRouter");
@@ -16,7 +17,7 @@ const customerRouter = require("./routes/customerRouter");
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
-app.use(nocache())
+app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -50,8 +51,8 @@ app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/admin/category", categoryRouter);
 app.use("/admin/products", productRouter);
-app.use("/admin/brands", brandRouter)
-app.use("/admin/users", customerRouter)
+app.use("/admin/brands", brandRouter);
+app.use("/admin/users", customerRouter);
 
 const PORT = 3000 || process.env.PORT;
 app.listen(PORT, () => {

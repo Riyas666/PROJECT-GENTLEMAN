@@ -26,13 +26,12 @@
     }
     .table td button {
   display: inline-block;
-  width: 90px; /* Same width for all buttons */
-  height: 35px; /* Fixed height */
-  margin: 2px; /* Add spacing between buttons */
+  width: 90px;
+  height: 35px;
+  margin: 2px; 
   text-align: center;
 }
 
-/* Make buttons responsive */
 .table td button a {
   color: white;
   text-decoration: none;
@@ -134,13 +133,6 @@
                       Active
                     </button>
                     <%}%>
-                    <!-- <button
-                      class="btn btn-danger "
-                      style="width: 90px"
-                      onclick=""
-                    >
-                      <a href="" class="text-white">Delete</a>
-                    </button> -->
                   </td>
                 </tr>
                 <%})%>
@@ -158,14 +150,12 @@
     <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
         
-        <!-- Previous Button -->
         <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
           <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
   
-        <!-- First Page -->
         <% if (currentPage > 2) { %>
           <li class="page-item">
             <a class="page-link" href="?page=1">1</a>
@@ -177,14 +167,12 @@
           <% } %>
         <% } %>
   
-        <!-- Current and Nearby Pages -->
         <% for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) { %>
           <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
             <a class="page-link" href="?page=<%= i %>"><%= i %></a>
           </li>
         <% } %>
   
-        <!-- Last Page -->
         <% if (currentPage < totalPages - 1) { %>
           <% if (currentPage < totalPages - 2) { %>
             <li class="page-item disabled">
@@ -196,13 +184,11 @@
           </li>
         <% } %>
   
-        <!-- Next Button -->
         <li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
           <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
-        
       </ul>
     </nav>
   </div>

@@ -46,8 +46,7 @@ const addProducts = async (req, res) => {
                            }
             for (let i = 0; i < req.files.length; i++) {
                 const originalImagePath = req.files[i].path;
-                console.log(originalImagePath) 
-                
+                console.log(originalImagePath)
                 
                 const filename = `${Date.now()}-${req.files[i].originalname}`;
                 const resizedImagepath = path.join(uploadPath, filename);
