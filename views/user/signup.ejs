@@ -9,8 +9,43 @@
 
   <!--=============== CSS ===============-->
   <link rel="stylesheet" href="/styles/signup.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <title>Ecommerce Website</title>
+  <style>
+    .password-field {
+  position: relative;
+  width: 100%;
+ 
+}
+  .togglePassword {
+  position: absolute;
+  right: 10px;    
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  z-index: 2;
+  /* Prevent the icon from being clickable when the input is disabled */
+  pointer-events: auto;
+  /* Prevent text selection */
+  user-select: none;
+}
+
+.togglePassword:hover {
+  color: #333;
+}
+
+
+.togglePassword:hover {
+  color: #333;
+}
+
+.form__input {
+  width: 100%;
+  padding-right: 35px; /* Make space for the icon */
+}
+  </style>
 </head>
 
 <body>
@@ -79,14 +114,28 @@
                 <input type="text" id="name" name="name" placeholder="Username" class="form__input" autocomplete="off" />
                 <span class="error-message" id="nameError"></span>
                 <input type="email" id="email" name="email" placeholder="Your Email" class="form__input" autocomplete="off" />
+                
                 <span class="error-message" id="emailError"></span>
 
                 <input type="text" id="phone" name="phone" placeholder="Phone Number" class="form__input" />
                 <span class="error-message" id="phoneError"></span>
-                <input type="password" id="password" name="password" placeholder="Your Password" class="form__input" autocomplete="off" />
-                <span class="error-message" id="passwordError"></span>
-                <input type="password" id="confirmPassword" name="cPassword" placeholder="Confirm Password" class="form__input" autocomplete="off" />
-                <span class="error-message" id="confirmPasswordError"></span>
+                <div class="password-field">
+                  <input type="password" id="password" name="password" placeholder="Your Password" class="form__input" autocomplete="off" />
+                  <span class="togglePassword" data-target="password">
+                    <i class="fas fa-eye"></i>
+                  </span>
+                  <span class="error-message" id="passwordError"></span>
+                </div>
+                
+                <div class="password-field" >
+                  <input type="password" id="confirmPassword" name="cPassword" placeholder="Confirm Password" class="form__input" autocomplete="off" />
+                  <span class="togglePassword" data-target="confirmPassword">
+                    <i class="fas fa-eye"></i>
+                  </span>
+                  <span class="error-message" id="confirmPasswordError"></span>
+                </div>
+                
+               
                 <%if(locals.message && message.length > 0) {%>
                 <div class="alert alert-danger text-center">
                   <%=message%>
@@ -119,7 +168,38 @@
 
 
 
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 <script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Get all toggle password elements
+  const toggles = document.querySelectorAll('.togglePassword');
+  
+  toggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      // Get the target input field
+      const targetId = this.getAttribute('data-target');
+      const inputField = document.getElementById(targetId);
+      const icon = this.querySelector('i');
+      
+      // Toggle the input type
+      if (inputField.type === 'password') {
+        inputField.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        inputField.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+  });
+});
+
+
+
     document.getElementById("signupform").addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -217,6 +297,4 @@ inputs.forEach(inputId => {
 
 
 </script>
-
-
 <%-include("../../views/partials/user/footer")%>

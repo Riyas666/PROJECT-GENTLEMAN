@@ -104,7 +104,7 @@ const editCategory = async (req, res) => {
             return res.status(400).json({ error: "Category already exists, please choose another name" });
         }
 
-        category.name = trimmedName;
+        category.name = trimmedName; 
         category.description = description;
 
         await category.save();

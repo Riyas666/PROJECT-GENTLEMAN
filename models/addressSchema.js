@@ -21,10 +21,6 @@ const addressSchema = new Schema({
             type: String,
             required: true
         },
-        landMark: {
-            type: String,
-            required: true
-        },
         state: {
             type: String,
             required: true
@@ -33,14 +29,15 @@ const addressSchema = new Schema({
             type: Number,
             required: true
         },
-        phone: {
+        landmark: {
             type: String,
             required: true
         },
-        altPhone:{
+        phonenumber: {
             type: String,
             required: true
-        }
+        },
+        
     }]
 })
 

@@ -9,7 +9,7 @@
       <li><span class="breadcrumb__link"></span>></li>
       <li><span class="breadcrumb__link">Fashion</span></li>
       <li><span class="breadcrumb__link"></span>></li>
-      <li><span class="breadcrumb__link">Henley Shirt</span></li>
+      <li><span class="breadcrumb__link"><%=product.productName%></span></li>
     </ul>
   </section>
 
@@ -110,7 +110,7 @@
         <ul class="details__meta">
           <li class="meta__list flex"><span>SKU:</span>FWM15VKT</li>
           <li class="meta__list flex">
-            <span>Tags:</span>Shoes, <%=category.name%>,
+            <span>Tags:</span>Shoes, <%=category.name%>
           </li>
           <li class="meta__list flex">
             <span>Availability:</span>8 Items in Stock
@@ -152,7 +152,7 @@
             </td>
           </tr>
           <th>Usage</th>
-          <td><%=category.name === "Formal" ? "For Formal" : category.name==="rge" ? "For Casual" : category.name === "Boots" ? "For Both Formal and Casual" : category.name === "Loafers" ? "For Both Formal and Casual" : ""%></td>
+          <td><%=category.name === "Formal" ? "For Formal" : category.name==="Sneakers" ? "For Casual" : category.name === "Boots" ? "For Both Formal and Casual" : category.name === "Loafers" ? "For Both Formal and Casual" : ""%></td>
           </tr>
 
           <tr>

@@ -9,15 +9,50 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
     rel="stylesheet">
 
+
     <!--=============== SWIPER CSS ===============-->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="/styles/signup.css" />
+<style>
+   .password-field {
+  position: relative;
+  width: 100%;
+ 
+}
+  .togglePassword {
+  position: absolute;
+  right: 10px;    
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  z-index: 2;
+  /* Prevent the icon from being clickable when the input is disabled */
+  pointer-events: auto;
+  /* Prevent text selection */
+  user-select: none;
+}
 
+.togglePassword:hover {
+  color: #333;
+}
+
+
+.togglePassword:hover {
+  color: #333;
+}
+
+.form__input {
+  width: 100%;
+  padding-right: 35px; /* Make space for the icon */
+}
+</style>
     <title>Ecommerce Website</title>
   </head>
   <body>
@@ -97,13 +132,15 @@
                     <input type="email" class="form-control" id="email" name="email"   placeholder="Enter your email" autocomplete="off">
                     <span class="error-message" id="emailError"></span>
                   </div>
+                  
     
                   <!-- Password Input -->
-                  <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter your password" name="password">
+                  <div class="password-field">
+                    <input type="password" id="password" name="password" placeholder="Your Password" class="form__input" autocomplete="off" />
+                    <span class="togglePassword" data-target="password">
+                      <i class="fas fa-eye"></i>
+                    </span>
                     <span class="error-message" id="passwordError"></span>
-                    <div id="error2" class="error-message"></div>
                   </div>
                   <%if(locals.message && message.length > 0) {%>
                     <div class="alert alert-danger text-center">
@@ -140,6 +177,44 @@
     <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Get all toggle password elements
+  const toggles = document.querySelectorAll('.togglePassword');
+  
+  toggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      // Get the target input field
+      const targetId = this.getAttribute('data-target');
+      const inputField = document.getElementById(targetId);
+      const icon = this.querySelector('i');
+      
+      // Toggle the input type
+      if (inputField.type === 'password') {
+        inputField.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        inputField.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+  });
+});
+
+
+
+
+
+
+
+
+
+
 document.getElementById('registrationForm').addEventListener('submit', function (e) {
         e.preventDefault();
 

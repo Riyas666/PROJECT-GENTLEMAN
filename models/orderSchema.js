@@ -58,7 +58,7 @@ const orderScehema = new Schema({
         type: Boolean,
         default: false
     }
-})
+},{timestamps:true})
 
 const Order = mongoose.model("Order", orderSchema)
 module.exports = Order

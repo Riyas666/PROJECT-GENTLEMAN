@@ -157,7 +157,7 @@ const loadHomePage = async (req, res) => {
         console.log(productData, "fdafdafdfdsfdsgf");
 
         console.log("Product data after sorting and slicing:", productData);
-        const status = User.find
+        // const status = User.find
         if (user) {
             const userData = await User.findById(user);
             console.log(userData);
@@ -231,7 +231,7 @@ const loadShopping = async (req, res) => {
         const categories = await Category.find({ isListed: true });
         const categoryIds = categories.map((category) => category._id.toString());
         const page = parseInt(req.query.page) || 1;
-        const limit = 3;
+        const limit = 12;
         const skip = (page - 1) * limit;
         const products = await Product.find({
             isBlocked: false,

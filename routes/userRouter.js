@@ -7,6 +7,7 @@ const { userAuth } = require("../middlewares/auth");
 const userController = require("../controllers/user/userController");
 const profileController = require("../controllers/user/profileController");
 const productController = require("../controllers/user/productController");
+const personalController =require("../controllers/user/personalController")
 
 //TO DISPLAY PAGE NOT FOUND PAGE
 router.get("/pageNotFound", userController.pageNotFound);
@@ -50,6 +51,21 @@ router.post("/resend-forgot-otp", profileController.resendOtp);
 
 //Product amanagement
 
+router.get("/cart", userAuth, personalController.getCart)
+
+
+
 router.get("/productDetails",userAuth, productController.productDetails);
+
+
+
+
+
+router.get("/profile", userAuth, personalController.profilePage)
+router.post('/profile/update', userAuth, personalController.updateProfile);
+router.post("/profile/change-password", userAuth, personalController.changePassword)
+router.post('/profile/add-address', userAuth, personalController.addAddress);
+
+
 
 module.exports = router;
