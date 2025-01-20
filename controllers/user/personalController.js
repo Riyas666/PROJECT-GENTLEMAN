@@ -12,7 +12,7 @@ const profilePage = async(req,res)=>{
         const addressData = await Address.findOne({userId: userId});
         console.log("this is the userData", userData)
         
-        res.render("profile", {
+        res.render("userprofile", {
             user:userData,
             userAddress:addressData
         })
@@ -69,6 +69,19 @@ const getCart = async(req,res)=>{
 
     }
 }
+
+const getChangePassword = async(req,res) =>{
+    try{
+        const userId = req.session.user;
+        const userData = await User.findById(userId)
+        res.render("change-password", {
+            user:userData
+        })
+    }catch(error){
+        console.error("error for retrieve password page", error)
+        res.redirect("/pageNotFound")
+    }
+}
   
 const changePassword = async(req,res)=>{
     try{
@@ -113,12 +126,56 @@ const changePassword = async(req,res)=>{
 }
 }
 
+const getAddressPage = async(req,res)=>{
+    try{
+        const userId = req.session.user;
+        const userData = await User.findById(userId)
+        const currentPage = parseInt(req.query.page) || 1;
+        const itemsPerPage = 4; // Set how many addresses you want to show per page
+        const skip = (currentPage - 1) * itemsPerPage; 
+
+        const addressData = await Address.findOne({ userId: userId });
+        if (!addressData || addressData.address.length === 0) {
+            // If no addresses exist, render with empty data
+            return res.render('address', {
+                user: userData,
+                userAddress: [],
+                currentPage: 1,
+                totalPages: 1,
+            });
+        }
+        const totalAddresses = addressData.address.length;
+        const totalPages = Math.ceil(totalAddresses / itemsPerPage);
+
+        
+        const paginatedAddresses = addressData.address.slice(skip, skip + itemsPerPage);
+
+        
+        res.render('address', {
+            user: userData,
+            userAddress: { address: paginatedAddresses }, 
+            currentPage: currentPage,
+            totalPages: totalPages
+        });
+
+
+
+    }catch(error){
+        console.error("error for retrieve address page", error)
+        res.redirect("/pageNotFound")
+    }
+}
+
+
+
+
 const addAddress = async(req,res) =>{
    try{
-    const userId = req.session.user
-    const {name, city, state, pincode, landmark, phonenumber, addressType} = req.body;
-    console.log("this is name",name)
 
+    
+    const userId = req.session.user
+    const {name, city, state, pincode, landmark, phonenumber, addressType } = req.body;
+   
     const userAddress = await Address.findOne({userId:userId})
     if(!userAddress){
         const newAddress = new Address({
@@ -128,6 +185,7 @@ const addAddress = async(req,res) =>{
         await newAddress.save()
        
     }else{
+       
         userAddress.address.push({name, city, landmark, state, pincode, phonenumber, addressType})
         await userAddress.save()
     }
@@ -135,10 +193,6 @@ const addAddress = async(req,res) =>{
             success:true,
             message:"Address added successfully"
         })
-    
-   
-
-
    }catch(error){
       console.log("Error when adding the address",error)
     
@@ -148,6 +202,47 @@ const addAddress = async(req,res) =>{
       });
    }
 }
+const editAddress = async (req, res) => {
+    try {
+        const { addressId, name, city, state, pincode, landmark, phonenumber, addressType } = req.body;
+     
+
+        const userId = req.session.user;
+
+        const userAddress = await Address.findOne({ userId });
+        if (userAddress) {
+            const addressIndex = userAddress.address.findIndex((addr) => addr._id.toString() === addressId);
+            if (addressIndex !== -1) {
+                if (isPrimaryAddress) {
+                    // Unmark other addresses
+                    userAddress.address.forEach((addr) => (addr.isPrimary = false));
+                }
+
+                // Update address fields
+                userAddress.address[addressIndex] = {
+                    ...userAddress.address[addressIndex]._doc,
+                    name,
+                    city,
+                    state,
+                    pincode,
+                    landmark,
+                    phonenumber,
+                    addressType,
+                    
+                };
+
+                await userAddress.save();
+                return res.status(200).json({ success: true, message: "Address updated successfully" });
+            }
+        }
+
+        res.status(404).json({ success: false, message: "Address not found" });
+    } catch (error) {
+        console.error("Error updating address:", error);
+        res.status(500).json({ success: false, message: "Failed to update address" });
+    }
+};
+
 
 
 
@@ -160,6 +255,9 @@ module.exports = {
     profilePage,
     getCart,
     updateProfile,
+    getChangePassword,
     changePassword,
-    addAddress
+    getAddressPage,
+    addAddress,
+    editAddress
 }

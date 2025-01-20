@@ -219,13 +219,14 @@
             <p class="account__tab" data-target="#orders">
               <i class="fi fi-rs-shopping-bag"></i> Orders
             </p>
+            <p class="account__tab" data-target="#change-password">
+              <i class="fi fi-rs-settings-sliders"></i> Change Password
+            </p>
            
             <p class="account__tab" data-target="#address">
               <i class="fi fi-rs-marker"></i> My Address
             </p>
-            <p class="account__tab" data-target="#change-password">
-              <i class="fi fi-rs-settings-sliders"></i> Change Password
-            </p>
+           
             <p class="account__tab"><i class="fi fi-rs-exit"></i> Logout</p>
           </div>
           <div class="tabs__content ">
@@ -427,41 +428,67 @@
 
 
 
+             
+
+
+
+
+
+
+
+
+              
+           
               <div class="tab__content" content id="address" style="width: 40%;">
-                <div class="tab__header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                <% if (userAddress && userAddress.address.length > 0) { %>
+                  <% userAddress.address.forEach(address => { %>
+                <div class="tab__header" style="display: flex;justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
                   <h3 class="tab__headerr">Shipping Address</h3>
                   <div class="header__actions" style="display: flex;">
                     <button class="edit-btn" style="background-color: orange; border-radius: 3px; color: white; padding: 7px; margin-right: 15px;" data-target="#edit-btn">Edit</button>
                     <button class="delete-btn" style="background-color: red; border-radius: 3px; color: white; padding: 7px; ">Delete</button>
                   </div>
                 </div>
-                <div class="tab__body">
-                  <div class="address__item">
-                    <address class="address">
-                     name <br />
-                      city, <br />
-                      Landmark <br />
-                      pincode, kerala <br/>
-                      number
-                    </address>
-                    <p class="city">kerala</p>
-                  </div>
+
+                
+ <div class="tab__body">
+
+          <div class="address__item">
+              <address class="address">
+                  <%= address.name %><br />
+                  <%= address.city %>,<br />
+                  <%= address.landmark %><br />
+                  <%= address.pincode %>, <%= address.state %> <br />
+                  <%= address.phonenumber %>
+              </address>
+          </div>
+      <% }) %>
+  <% } else { %>
+      <p>No addresses found. Please add a new address.</p>
+  <% } %>
                   <!-- Add Address Button -->
-                  <div class="add__address">
-                    <button class="add-btn" style="background-color: blue; border-radius: 3px; color: white; padding: 10px; margin-top: 10px;" data-target="#add-btn">Add New Address</button>
-                  </div>
                 </div>
-              </div>    
+                <div class="add__address">
+                  <button class="add-btnn"  style="background-color: blue; border-radius: 3px; color: white; padding: 10px; margin-top: 10px;" data-target="#add-btn">Add New Address</button>
+                </div>   
+              </div>
 
 
 
 
-              <div  class="tab__content address-form-container" content id="add-btn">
+
+
+
+
+
+
+
+
+
+
+              <div class="tab__content address-form-container" content id="add-btn">
                 <h2>Add Address</h2>
                 <form method="post" id="addaddressform">
-                
-
-
                     <div class="mb-3">
                         <label for="fullname" class="form-label">Full Name</label>
                         <input
@@ -643,8 +670,7 @@
                             id="postalcode"
                             name="postalcode"
                             placeholder="Enter your postal code"
-                            
-                        />
+                            />
                     </div>
                     <div class="mb-3">
                         <label for="landmark" class="form-label">Landmark</label>
@@ -658,67 +684,19 @@
                             id="phonenumber"
                             name="phonenumber"
                             placeholder="Enter your phone number"
-                            
                         />
                     </div>
                     <p style="color: red"></p>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
               </div>
-              
-              
 
 
 
-
-
-
-
-
-            <div class="tab__content" content id="change-password">
-              <h3 class="tab__header">Change Password</h3>
-              <div class="tab__body">
-                <form class="form grid" action="/profile" id="changepasswordform">
-                  <input
-                    type="password"
-                    placeholder="Current Password"
-                    class="form__input"
-                    name="currentPassword"
-                    id="currentPassword"
-                  />
-                  <span class="error-message" id="passwordError"></span>
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    class="form__input"
-                    name="newPassword"
-                    id="newPassword"
-                  />
-                  <span class="error-message" id="newpasswordError"></span>
-                  <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    class="form__input"
-                    name="confirmPassword"
-                    id="confirmPassword"
-                  />
-                  <span class="error-message" id="confirmpasswordError"></span>
-                  <div class="form__btn">
-                    <button type="submit" class="btn btn--md">Save</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-
-
-
-          
-          
+           
           </div>
         </div>
       </section>
-
     </main>
     <%-include("../../views/partials/user/footer")%>
 

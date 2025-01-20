@@ -63,8 +63,30 @@ router.get("/productDetails",userAuth, productController.productDetails);
 
 router.get("/profile", userAuth, personalController.profilePage)
 router.post('/profile/update', userAuth, personalController.updateProfile);
+
+router.get("/profile/change-password", userAuth, personalController.getChangePassword)
 router.post("/profile/change-password", userAuth, personalController.changePassword)
+
+
+
+router.get("/profile/address", userAuth, personalController.getAddressPage)
+
 router.post('/profile/add-address', userAuth, personalController.addAddress);
+
+
+// Express.js route to handle address deletion
+router.delete('/deleteAddress/:id', (req, res) => {
+    const addressId = req.params.id;
+    
+    // Assuming you have a model for addresses, use it to delete the address
+    Address.findByIdAndDelete(addressId, (err) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: 'Error deleting address' });
+      }
+      res.status(200).json({ success: true, message: 'Address deleted successfully' });
+    });
+  });
+  
 
 
 

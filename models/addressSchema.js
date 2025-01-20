@@ -29,7 +29,7 @@ const addressSchema = new Schema({
             type: Number,
             required: true
         },
-        landmark: {
+        landmark: { 
             type: String,
             required: true
         },
