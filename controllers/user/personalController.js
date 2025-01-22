@@ -11,7 +11,6 @@ const profilePage = async(req,res)=>{
         const userData = await User.findById(userId)
         const addressData = await Address.findOne({userId: userId});
         console.log("this is the userData", userData)
-        
         res.render("userprofile", {
             user:userData,
             userAddress:addressData
@@ -62,13 +61,7 @@ console.log("this is the date",data)
         });
     }
 };
-const getCart = async(req,res)=>{
-    try{
-        res.render("cart")
-    }catch(error){
 
-    }
-}
 
 const getChangePassword = async(req,res) =>{
     try{
@@ -210,17 +203,21 @@ const editAddress = async (req, res) => {
         const userId = req.session.user;
 
         const userAddress = await Address.findOne({ userId });
-        if (userAddress) {
+
+
+        if (!userAddress) {
+            return res.status(404).json({ success: false, message: "User address not found" });
+        }
+       
             const addressIndex = userAddress.address.findIndex((addr) => addr._id.toString() === addressId);
-            if (addressIndex !== -1) {
-                if (isPrimaryAddress) {
-                    // Unmark other addresses
-                    userAddress.address.forEach((addr) => (addr.isPrimary = false));
-                }
+            if (addressIndex === -1) {
+                return res.status(404).json({ success: false, message: "Address not found" });
+            }
+               
 
                 // Update address fields
                 userAddress.address[addressIndex] = {
-                    ...userAddress.address[addressIndex]._doc,
+                    ...userAddress.address[addressIndex].toObject(),
                     name,
                     city,
                     state,
@@ -232,14 +229,52 @@ const editAddress = async (req, res) => {
                 };
 
                 await userAddress.save();
-                return res.status(200).json({ success: true, message: "Address updated successfully" });
-            }
-        }
-
-        res.status(404).json({ success: false, message: "Address not found" });
+                 return res.status(200).json({ success: true, message: "Address updated successfully" });
+        
     } catch (error) {
         console.error("Error updating address:", error);
-        res.status(500).json({ success: false, message: "Failed to update address" });
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, message: "Failed to update address" });
+        }
+    }
+};
+
+
+const deleteAddress = async (req, res) => {
+    try {
+        const { addressId } = req.params; // Get addressId from URL params
+        const userId = req.session.user; // Get userId from session
+        console.log("this is the delete reuqest", addressId, userId)
+
+        // Find the user's address list
+        const userAddress = await Address.findOne({ userId });
+
+        if (!userAddress) {
+            return res.status(404).json({ success: false, message: "User address not found" });
+        }
+
+        // Find the address index in the array
+        const addressIndex = userAddress.address.findIndex((addr) => addr._id.toString() === addressId);
+
+        if (addressIndex === -1) {
+            return res.status(404).json({ success: false, message: "Address not found" });
+        }
+
+        // Remove the address from the array
+        userAddress.address.splice(addressIndex, 1);
+
+        // Save the updated user address
+        await userAddress.save();
+
+        // Send a success response
+        res.status(200).json({ success: true, message: "Address deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting address:", error);
+
+        // Send error response
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, message: "Failed to delete address" });
+        }
     }
 };
 
@@ -253,11 +288,11 @@ const editAddress = async (req, res) => {
 
 module.exports = {
     profilePage,
-    getCart,
     updateProfile,
     getChangePassword,
     changePassword,
     getAddressPage,
     addAddress,
-    editAddress
+    editAddress,
+    deleteAddress
 }

@@ -1,5 +1,166 @@
 <%-include("../../views/partials/user/header")%>
+<style>
 
+.quantity-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.quantity-wrapper button {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quantity-wrapper button:hover {
+  background-color: #ffc107;
+  color: #fff;
+}
+
+.quantity-wrapper input {
+  width: 50px;
+  height: 30px;
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#stock-warning {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+
+  .detail-gallery {
+    width: 100%;
+    padding: 20px;
+    position: relative;
+  }
+
+  .main-image-container {
+    width: 120%;
+    height: 450px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    cursor: zoom-in;
+  }
+
+  .main-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .zoomed-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 150%;
+    height: 150%;
+    background-color: rgba(255, 255, 255, 0.5);
+    background-repeat: no-repeat;
+    background-size: 250%;
+    /* Adjust this value to change zoom level */
+    display: none;
+    pointer-events: none;
+    /* Prevent interactions with the zoomed image */
+    z-index: 10;
+  }
+
+  .thumbnail-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .thumbnail-image {
+    aspect-ratio: 1;
+    border: 2px solid #eee;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .thumbnail-image:hover {
+    border-color: #007bff;
+    transform: translateY(-2px);
+  }
+
+  .thumbnail-image.active {
+    border-color: #007bff;
+  }
+
+  .thumbnail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    padding: 5px;
+  }
+
+  /* Magnifying glass icon */
+  .zoom-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .zoom-icon i {
+    font-size: 16px;
+    color: #666;
+  }
+
+  .size__link {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    margin-right: 5px;
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+  }
+
+  .size__link.size-active {
+    background-color: #333;
+    color: #fff;
+    border-color: #333;
+  }
+  @media (max-width: 992px) {
+    .zoomed-image {
+      display: none !important;
+    }
+
+    .main-image-container {
+      height: 350px;
+    }
+  }
+</style>
 <!--=============== MAIN ===============-->
 <main class="main">
   <!--=============== BREADCRUMB ===============-->
@@ -7,7 +168,7 @@
     <ul class="breadcrumb__list flex container">
       <li><a href="/home" class="breadcrumb__link">Home</a></li>
       <li><span class="breadcrumb__link"></span>></li>
-      <li><span class="breadcrumb__link">Fashion</span></li>
+      <li><a href="/shop" class="breadcrumb__link" >Shop</a></li>
       <li><span class="breadcrumb__link"></span>></li>
       <li><span class="breadcrumb__link"><%=product.productName%></span></li>
     </ul>
@@ -16,48 +177,26 @@
   <!--=============== DETAILS ===============-->
   <section class="details section--lg">
     <div class="details__container container grid">
-
-
-      <!-- <div class="details__group">
-        <img src="/uploads/product-images/<%=product.productImage[0]%>" alt="" class="details__img" />
-        <div class="details__small-images grid">
-          <img src="/uploads/product-images/<%=product.productImage[1]%>" alt="" class="details__small-img" />
-          <img src="/uploads/product-images/<%=product.productImage[2]%>" alt="" class="details__small-img" />
-          <img src="/uploads/product-images/<%=product.productImage[0]%>" alt="" class="details__small-img" />
-        </div>
-      </div> -->
-
       <div class="col-md-6 col-sm-12 col-xs-12">
         <div class="detail-gallery">
-          <span class="zoom-icon"><i class="fi-rs-search"></i></span>
-          <div class="product-image-slider">
-            <figure class="border-radius-10">
-              <img src="/uploads/product-images/<%=product.productImage[0]%>" alt="">
-            </figure>
-            <figure class="border-radius-10">
-              <img src="/uploads/product-images/<%=product.productImage[1]%>" alt="">
-            </figure>
-            <figure class="border-radius-10">
-              <img src="/uploads/product-images/<%=product.productImage[2]%>" alt="">
-            </figure>
-            <figure class="border-radius-10">
-              <img src="/uploads/product-images/<%=product.productImage[3]%>" alt="">
-            </figure>
-            <figure class="border-radius-10">
-              <img src="" alt="">
-            </figure>
+          <!-- Main Image -->
+          <div class="main-image-container" id="mainImageContainer">
+            <img id="main-product-image" src="/uploads/product-images/<%=product.productImage[0]%>" alt="<%=product.productName%>">
+            <div class="zoomed-image" id="zoomedImage"></div>
           </div>
-          <div class="slider-nav-thumbnails pl-15 pr-15">
 
-            <div>
-              <img style="object-fit:contain ;" src="" alt="">
+          <!-- Thumbnail Images -->
+          <div class="thumbnail-container">
+            <% product.productImage.forEach((image, index) => { %>
+            <% if(image) { %>
+            <div class="thumbnail-image <%= index === 0 ? 'active' : '' %>" onclick="switchMainImage(this, '/uploads/product-images/<%=image%>')">
+              <img src="/uploads/product-images/<%=image%>" alt="Product thumbnail <%=index + 1%>">
             </div>
-
+            <% } %>
+            <% }) %>
           </div>
         </div>
       </div>
-
-
 
       <div class="details__group">
         <h3 class="details__title"><%=product.productName%></h3>
@@ -72,7 +211,7 @@
         </p>
         <ul class="products__list">
           <li class="list__item flex">
-            <i class="fi-rs-crown"></i> 1 Year Al Jazeera Brand Warranty
+            <i class="fi-rs-crown"></i> 1 Year Brand Warranty
           </li>
           <li class="list__item flex">
             <i class="fi-rs-refresh"></i> 30 Days Return Policy
@@ -86,34 +225,50 @@
         <div class="details__size flex">
           <span class="details__size-title">Size</span>
           <ul class="size__list">
+            <% sizes.forEach((sizeObj, index) => { %>
             <li>
-              <a href="#" class="size__link size-active">M</a>
+              <a href="#" class="size__link <%= index === 0 ? 'size-active' : '' %>" data-size="<%= sizeObj.size %>" data-quantity="<%= sizeObj.quantity %>">
+                <%= sizeObj.size %>
+              </a>
             </li>
-            <li>
-              <a href="#" class="size__link">L</a>
-            </li>
-            <li>
-              <a href="#" class="size__link">XL</a>
-            </li>
-            <li>
-              <a href="#" class="size__link">XXL</a>
-            </li>
+            <% }) %>
           </ul>
         </div>
+
+
+
+<!-- /////////////////////////want to check///////////////////// -->
+
+
+
         <div class="details__action">
-          <input type="number" class="quantity" value="3" />
-          <a href="#" class="btn btn--sm">Add To Card</a>
+          <div>
+            <!-- <label for="stock">Quantity:</label> -->
+            <div class="quantity-wrapper">
+              <button id="decrease" onclick="updateStock(-1)">-</button>
+              <input
+                type="number"
+                id="quantity"
+                value="1"
+                min="1"
+                readonly />
+              <button id="increase" onclick="updateStock(1)">+</button>
+            </div>
+            <p id="stock-warning" style="color: red; display: none;">Out of stock!</p>
+          </div>
+          <button id="addToCartBtn" data-product-id="product123" data-quantity="1">Add to Cart</button>
+
           <a href="#" class="details__action-btn">
             <i class="fi fi-rs-heart"></i>
           </a>
         </div>
         <ul class="details__meta">
-          <li class="meta__list flex"><span>SKU:</span>FWM15VKT</li>
           <li class="meta__list flex">
             <span>Tags:</span>Shoes, <%=category.name%>
           </li>
           <li class="meta__list flex">
-            <span>Availability:</span>8 Items in Stock
+            <span>Availability:</span>
+            <span id="stock-availability"><%= sizes[0]?.quantity || 'Out of Stock' %> Items in Stock</span>
           </li>
         </ul>
       </div>
@@ -147,14 +302,12 @@
           <tr>
             <th>Category</th>
             <td>
-
               <%=category.name%>
             </td>
           </tr>
           <th>Usage</th>
           <td><%=category.name === "Formal" ? "For Formal" : category.name==="Sneakers" ? "For Casual" : category.name === "Boots" ? "For Both Formal and Casual" : category.name === "Loafers" ? "For Both Formal and Casual" : ""%></td>
           </tr>
-
           <tr>
             <th>Warranty</th>
             <td>1 Year </td>
@@ -225,7 +378,6 @@
       </div>
     </div>
   </section>
-
   <!--=============== PRODUCTS ===============-->
   <section class="products container section--lg">
     <h3 class="section__title"><span>Related</span> Products</h3>
@@ -247,127 +399,6 @@
               <i class="fi fi-rs-shuffle"></i>
             </a>
           </div>
-          <div class="product__badge light-pink">Hot</div>
-        </div>
-        <div class="product__content">
-          <span class="product__category">Clothing</span>
-          <a href="details.html">
-            <h3 class="product__title">Colorful Pattern Shirts</h3>
-          </a>
-          <div class="product__rating">
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-          </div>
-          <div class="product__price flex">
-            <span class="new__price">$238.85</span>
-            <span class="old__price">$245.8</span>
-          </div>
-          <a href="#" class="action__btn cart__btn" aria-label="Add To Cart">
-            <i class="fi fi-rs-shopping-bag-add"></i>
-          </a>
-        </div>
-      </div>
-      <div class="product__item">
-        <div class="product__banner">
-          <a href="details.html" class="product__images">
-            <img src="assets/img/product-2-1.jpg" alt="" class="product__img default" />
-            <img src="assets/img/product-2-2.jpg" alt="" class="product__img hover" />
-          </a>
-          <div class="product__actions">
-            <a href="#" class="action__btn" aria-label="Quick View">
-              <i class="fi fi-rs-eye"></i>
-            </a>
-            <a href="#" class="action__btn" aria-label="Add to Wishlist">
-              <i class="fi fi-rs-heart"></i>
-            </a>
-            <a href="#" class="action__btn" aria-label="Compare">
-              <i class="fi fi-rs-shuffle"></i>
-            </a>
-          </div>
-          <div class="product__badge light-green">Hot</div>
-        </div>
-        <div class="product__content">
-          <span class="product__category">Clothing</span>
-          <a href="details.html">
-            <h3 class="product__title">Colorful Pattern Shirts</h3>
-          </a>
-          <div class="product__rating">
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-          </div>
-          <div class="product__price flex">
-            <span class="new__price">$238.85</span>
-            <span class="old__price">$245.8</span>
-          </div>
-          <a href="#" class="action__btn cart__btn" aria-label="Add To Cart">
-            <i class="fi fi-rs-shopping-bag-add"></i>
-          </a>
-        </div>
-      </div>
-      <div class="product__item">
-        <div class="product__banner">
-          <a href="details.html" class="product__images">
-            <img src="assets/img/product-3-1.jpg" alt="" class="product__img default" />
-            <img src="assets/img/product-3-2.jpg" alt="" class="product__img hover" />
-          </a>
-          <div class="product__actions">
-            <a href="#" class="action__btn" aria-label="Quick View">
-              <i class="fi fi-rs-eye"></i>
-            </a>
-            <a href="#" class="action__btn" aria-label="Add to Wishlist">
-              <i class="fi fi-rs-heart"></i>
-            </a>
-            <a href="#" class="action__btn" aria-label="Compare">
-              <i class="fi fi-rs-shuffle"></i>
-            </a>
-          </div>
-          <div class="product__badge light-orange">Hot</div>
-        </div>
-        <div class="product__content">
-          <span class="product__category">Clothing</span>
-          <a href="details.html">
-            <h3 class="product__title">Colorful Pattern Shirts</h3>
-          </a>
-          <div class="product__rating">
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-          </div>
-          <div class="product__price flex">
-            <span class="new__price">$238.85</span>
-            <span class="old__price">$245.8</span>
-          </div>
-          <a href="#" class="action__btn cart__btn" aria-label="Add To Cart">
-            <i class="fi fi-rs-shopping-bag-add"></i>
-          </a>
-        </div>
-      </div>
-      <div class="product__item">
-        <div class="product__banner">
-          <a href="details.html" class="product__images">
-            <img src="assets/img/product-4-1.jpg" alt="" class="product__img default" />
-            <img src="assets/img/product-4-2.jpg" alt="" class="product__img hover" />
-          </a>
-          <div class="product__actions">
-            <a href="#" class="action__btn" aria-label="Quick View">
-              <i class="fi fi-rs-eye"></i>
-            </a>
-            <a href="#" class="action__btn" aria-label="Add to Wishlist">
-              <i class="fi fi-rs-heart"></i>
-            </a>
-            <a href="#" class="action__btn" aria-label="Compare">
-              <i class="fi fi-rs-shuffle"></i>
-            </a>
-          </div>
-          <div class="product__badge light-blue">Hot</div>
         </div>
         <div class="product__content">
           <span class="product__category">Clothing</span>
@@ -392,10 +423,200 @@
       </div>
     </div>
   </section>
-
   <%-include("../../views/partials/user/footer")%>
   <!--=============== SWIPER JS ===============-->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-  <!--=============== MAIN JS ===============-->
   <script src="/js/main.js"></script>
+<script>
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const quantityInput = document.getElementById('quantity');
+  const decreaseButton = document.getElementById('decrease');
+  const increaseButton = document.getElementById('increase');
+
+  let selectedSizeStock = 5; // Replace this with the actual stock for the selected size
+
+  // Function to update the quantity
+  function updateStock(change) {
+    let currentQuantity = parseInt(quantityInput.value, 10);
+    const newQuantity = currentQuantity + change;
+
+    // Prevent quantity from going below 1 or exceeding stock
+    if (newQuantity < 1) {
+      alert("Minimum quantity is 1");
+      return;
+    }
+    if (newQuantity > selectedSizeStock) {
+      alert("Stock limit exceeded");
+      return;
+    }
+
+    // Update the input value
+    quantityInput.value = newQuantity;
+  }
+
+  // Attach event listeners to the buttons
+  decreaseButton.addEventListener('click', () => updateStock(-1));
+  increaseButton.addEventListener('click', () => updateStock(1));
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const addToCartButton = document.getElementById('addToCartBtn');
+  const quantityInput = document.getElementById('quantity');
+  const productId = '<%=product._id%>';
+  let selectedSizeStock = parseInt(document.querySelector('.size__link.size-active').getAttribute('data-quantity'), 10);
+
+  // Add to Cart Function
+  addToCartButton.addEventListener('click', (e) => {
+    e.preventDefault();
+
+
+    const selectedSizeElement = document.querySelector('.size__link.size-active');
+    const selectedSize = selectedSizeElement ? selectedSizeElement.getAttribute('data-size') : null;
+    const quantity = parseInt(quantityInput.value, 10);
+    const productId = '<%= product._id %>';
+    
+    if (!selectedSize) {
+      alert('Please select a size.');
+      return;
+    }
+
+    if (!quantity || quantity <= 0) {
+      alert('Please select a valid quantity.');
+      return;
+    }
+
+    // Make sure quantity doesn't exceed stock
+    if (quantity > selectedSizeStock) {
+      alert("Stock limit exceeded");
+      return;
+    }
+
+    fetch('/addToCart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId,size:selectedSize, quantity })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          alert('Item added to cart successfully!');
+          updateCartUI(data.cart);
+        }
+      })
+      .catch((error) => {
+        console.error('Error adding item to cart:', error);
+      });
+  });
+
+
+
+  // Handle Quantity Update and Size Selection
+  // function handleQuantityChange(change) {
+  //   const quantityInput = document.getElementById('quantity');
+  //   let currentQuantity = parseInt(quantityInput.value, 10);
+  //   const newQuantity = currentQuantity + change;
+
+  //   if (newQuantity < 1) return; // Prevent quantity < 1
+  //   if (newQuantity > selectedSizeStock) {
+  //     alert("Stock limit exceeded");
+  //     return;
+  //   }
+
+  //   quantityInput.value = newQuantity;
+
+  //   // Update the cart quantity on the server
+  //   updateCartOnServer(productId, newQuantity);
+  // }
+
+  // Handle size selection
+  document.querySelectorAll('.size__link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.size__link').forEach(size => size.classList.remove('size-active'));
+      link.classList.add('size-active');
+      selectedSizeStock = parseInt(link.getAttribute('data-quantity'), 10);
+      document.getElementById('stock-availability').textContent = `${selectedSizeStock} Items in Stock`;
+      quantityInput.value = 1;
+    });
+  });
+
+  // Update the Cart UI
+  function updateCartUI(cart) {
+    const cartIcon = document.getElementById('cart-icon');
+    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartIcon.textContent = `Cart (${cartCount})`;
+  }
+
+  // Update Cart Quantity on Server
+  function updateCartOnServer(productId, newQuantity) {
+    fetch("/cart/update", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ productId, quantity: newQuantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        console.log("Cart updated successfully!");
+        updateCartUI(data.cart); // Optionally update UI after server update
+      } else {
+        throw new Error(data.error || 'Update failed');
+      }
+    })
+    .catch(error => {
+      console.error("Error updating cart:", error);
+    });
+  }
+
+  // Switch the Main Product Image
+  function switchMainImage(element, imageUrl) {
+    const mainImage = document.getElementById('main-product-image');
+    mainImage.src = imageUrl;
+    const thumbnails = document.querySelectorAll('.thumbnail-image');
+    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  // Zoom Functionality
+  function initZoom() {
+    const mainContainer = document.getElementById('mainImageContainer');
+    const mainImage = document.getElementById('main-product-image');
+    const zoomedImage = document.getElementById('zoomedImage');
+    let isZoomed = false;
+
+    mainContainer.addEventListener('mousemove', function(e) {
+      if (!isZoomed) return;
+      const containerRect = mainContainer.getBoundingClientRect();
+      const x = e.clientX - containerRect.left;
+      const y = e.clientY - containerRect.top;
+      const xPercent = (x / containerRect.width) * 100;
+      const yPercent = (y / containerRect.height) * 100;
+
+      zoomedImage.style.backgroundImage = `url('${mainImage.src}')`;
+      zoomedImage.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+      zoomedImage.style.backgroundSize = '250%';
+    });
+
+    mainContainer.addEventListener('mouseenter', () => {
+      isZoomed = true;
+      zoomedImage.style.display = 'block';
+    });
+
+    mainContainer.addEventListener('mouseleave', () => {
+      isZoomed = false;
+      zoomedImage.style.display = 'none'; 
+    });
+  }
+
+  initZoom();
+}); 
+
+</script>

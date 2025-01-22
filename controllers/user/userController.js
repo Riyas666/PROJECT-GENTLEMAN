@@ -224,49 +224,6 @@ const login = async (req, res) => {
     }
 };
 
-const loadShopping = async (req, res) => {
-    try {
-        const user = req.session.user;
-        const userData = await User.findOne({ _id: user });
-        const categories = await Category.find({ isListed: true });
-        const categoryIds = categories.map((category) => category._id.toString());
-        const page = parseInt(req.query.page) || 1;
-        const limit = 12;
-        const skip = (page - 1) * limit;
-        const products = await Product.find({
-            isBlocked: false,
-            category: { $in: categoryIds },
-        })
-            .sort({ createdOn: -1 })
-            .skip(skip)
-            .limit(limit);
-
-        const totalProducts = await Product.countDocuments({
-            isBlocked: false,
-            category: { $in: categoryIds },
-            quantity: { $gt: 0 },
-        });
-        const totalPages = Math.ceil(totalProducts / limit);
-
-        const brands = await Brand.find({
-            isBlocked: false,
-        });
-        const categoriesWithIds = categories.map((category) => ({ _id: category._id, name: category.name }));
-
-        res.render("shop", {
-            user: userData,
-            products: products,
-            category: categoriesWithIds,
-            brand: brands,
-            totalProducts: totalProducts,
-            currentPage: page,
-            totalPages: totalPages,
-        });
-    } catch (error) {
-        console.log("Shopping page not loading", error);
-        res.status(500).send("Server Error");
-    }
-};
 
 //PAGE NOT FOUND
 const pageNotFound = async (req, res) => {
@@ -303,7 +260,6 @@ module.exports = {
     securePassword,
     loadLogin,
     login,
-    loadShopping,
     pageNotFound,
     logout,
 };

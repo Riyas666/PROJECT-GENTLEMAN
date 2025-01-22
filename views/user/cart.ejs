@@ -1,5 +1,150 @@
 <%-include("../../views/partials/user/header")%>
+<style>
+  .quantity-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
 
+.quantity-wrapper button {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quantity-wrapper button:hover {
+  background-color: #ffc107;
+  color: #fff;
+}
+
+.quantity-wrapper input {
+  width: 50px;
+  height: 30px;
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+
+
+
+
+.stock-popup {
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Ensures columns maintain proportionate widths */
+}
+
+.table th, .table td {
+  text-align: left;
+  padding: 10px;
+  white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.table img {
+  max-width: 50px;
+  height: auto;
+}
+
+.table__title {
+  font-size: 1rem;
+}
+
+.quantity-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.quantity-wrapper button {
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.quantity-wrapper input {
+  width: 50px;
+  text-align: center;
+}
+
+.subtotal {
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .table__title {
+    font-size: 0.9rem;
+  }
+
+  .table img {
+    max-width: 40px;
+  }
+
+  .quantity-wrapper input {
+    width: 40px;
+  }
+
+  .table th, .table td {
+    font-size: 0.8rem;
+    padding: 5px;
+  }
+}
+#image-table{
+  width: 10%;
+}
+
+
+#name-table{
+  width: 30%;
+}
+#size-table{
+  width: 10%;
+}
+#price-table{
+  width: 15%;
+}
+
+
+
+</style>
     <!--=============== MAIN ===============-->
     <main class="main">
       <!--=============== BREADCRUMB ===============-->
@@ -19,82 +164,56 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Price</th>
+                <th id="image-table">Image</th>
+                <th id="name-table">Name</th>
+                <th>size</th>
+                <th id="price-table">Price</th>
                 <th>Quantity</th>
                 <th>Subtotal</th>
                 <th>Rename</th>
               </tr>
             </thead>
             <tbody>
+              <%cartItems.forEach(item=>{%>
               <tr>
                 <td>
                   <img
-                    src="./assets//img/product-1-2.jpg"
-                    alt=""
+                    src="<%=item.productId.productImage[0]%>"
+                    alt="<%=item.productId.name%>"
                     class="table__img"
                   />
                 </td>
+                
                 <td>
                   <h3 class="table__title">
-                    Amazon Brand - Mens Shirt
+                    <%= item.productId.productName %>
                   </h3>
-                  <p class="table__description">
-                    Lorem ipsum dolor sit amet consectetur.
-                  </p>
+                 
                 </td>
                 <td>
-                  <span class="table__price">$110</span>
+                  <span><%=item.size%></span>
                 </td>
-                <td><input type="number" value="3" class="quantity" /></td>
-                <td><span class="subtotal">$220</span></td>
-                <td><i class="fi fi-rs-trash table__trash"></i></td>
+                <td>
+                  <span class="table__price">₹<%= item.price %></span>
+                </td>
+                           
+                <td> <div class="quantity-wrapper" data-product-id="<%= item.productId._id %>" data-stock="<%= item.productId.stock %>">
+                  <button class="decrease" onclick="updateStock('<%= item.productId._id %>', -1)">-</button>
+                  <input
+                    type="number"
+                    id="quantity-<%= item.productId._id %>"
+                    value="<%= item.quantity %>"
+                    min="1"
+                    readonly />
+                  <button class="increase" onclick="updateStock('<%= item.productId._id %>', 1)">+</button>
+                </div>
+                </td>
+                <td><span class="subtotal">₹<%= (item.quantity * item.price).toFixed(2) %></span></td>
+                <td><i class="fi fi-rs-trash table__trash"></i>
+                </td>
               </tr>
-              <tr>
-                <td>
-                  <img
-                    src="assets/img/product-9-2.jpg"
-                    alt=""
-                    class="table__img"
-                  />
-                </td>
-                <td>
-                  <h3 class="table__title">Amazon Essentials-Mens Shirt</h3>
-                  <p class="table__description">
-                    Lorem ipsum dolor sit amet consectetur.
-                  </p>
-                </td>
-                <td>
-                  <span class="table__price">$110</span>
-                </td>
-                <td><input type="number" value="3" class="quantity" /></td>
-                <td><span class="subtotal">$220</span></td>
-                <td><i class="fi fi-rs-trash table__trash"></i></td>
-              </tr>
-              <tr>
-                <td>
-                  <img
-                    src="./assets//img/product-2-1.jpg"
-                    alt=""
-                    class="table__img"
-                  />
-                </td>
-                <td>
-                  <h3 class="table__title">
-                    Amazon Brand - Mens Shirt
-                  </h3>
-                  <p class="table__description">
-                    Lorem ipsum dolor sit amet consectetur.
-                  </p>
-                </td>
-                <td>
-                  <span class="table__price">$110</span>
-                </td>
-                <td><input type="number" value="3" class="quantity" /></td>
-                <td><span class="subtotal">$220</span></td>
-                <td><i class="fi fi-rs-trash table__trash"></i></td>
-              </tr>
+              
+              <% }) %>
             </tbody>
           </table>
         </div>
@@ -164,3 +283,59 @@
     <!--=============== MAIN JS ===============-->
     <script src="/js/main.js"></script>
   
+    <script>
+      
+// Example stocks for each product (replace with your actual stock data)
+const stockData = {
+  product123: 5,
+  product456: 10,
+};
+function updateStock(productId, change) {
+  // Get the quantity input and the wrapper for the product
+  const quantityInput = document.getElementById(`quantity-${productId}`);
+  const quantityWrapper = document.querySelector(`[data-product-id="${productId}"]`);
+
+  // Dynamically retrieve stock limit from the server (if available in HTML)
+  const maxStock = parseInt(quantityWrapper.getAttribute("data-stock"), 10);
+
+  // Get the current quantity and calculate the new quantity
+  let currentQuantity = parseInt(quantityInput.value, 10);
+  currentQuantity = Math.max(1, Math.min(maxStock, currentQuantity + change));
+
+  // Update the input value
+  quantityInput.value = currentQuantity;
+
+  // Update subtotal dynamically
+  const subtotalElement = quantityWrapper.closest("tr").querySelector(".subtotal");
+  const pricePerItem = parseFloat(
+    quantityWrapper.closest("tr").querySelector(".table__price").textContent.replace("₹", "")
+  );
+  subtotalElement.textContent = `₹${(pricePerItem * currentQuantity).toFixed(2)}`;
+
+  // Optionally, send an AJAX request to update the server-side cart
+  updateCartOnServer(productId, currentQuantity);
+}
+
+// Example: Send updated quantity to the server
+function updateCartOnServer(productId, newQuantity) {
+  fetch("/cart/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ productId, quantity: newQuantity }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        console.log("Cart updated successfully!");
+      } else {
+        console.error("Failed to update cart:", data.error);
+      }
+    })
+    .catch((error) => console.error("Error updating cart:", error));
+  }
+
+
+
+
+
+    </script>

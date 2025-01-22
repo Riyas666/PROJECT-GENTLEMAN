@@ -7,9 +7,9 @@
   <section class="breadcrumb">
 
     <ul class="breadcrumb__list flex container">
-      <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+      <li><a href="/home" class="breadcrumb__link">Home</a></li>
       <li><span class="breadcrumb__link"></span>></li>
-      <li><span class="breadcrumb__link">Shop</span></li>
+      <li><a href="/shop" class="breadcrumb__link">Shop</a></li>
     </ul>
   </section>
 
@@ -40,7 +40,7 @@
           <!-- <div class="product__badge light-pink">Hot</div> -->
         </div>
         <div class="product__content">
-          <span class="product__category">Brand : <%=products[i].brand%></span>
+          <span class="product__category">Brand : <%=products[i].brand.brandName%></span>
           <a href="details.html">
             <h3 class="product__title"><%=products[i].productName%></h3>
           </a>

@@ -1,10 +1,10 @@
 const express = require("express")
 const router = express.Router()
-const { uploadProductImage } = require('../utils/multer');
-const productController = require("../controllers/admin/productController")
-const { adminAuth } = require("../middlewares/auth");
+const { uploadProductImage } = require('../../utils/multer');
+const productController = require("../../controllers/admin/productController")
+const { adminAuth } = require("../../middlewares/auth");
 const multer = require("multer");
-const storage = require("../utils/multer");
+const storage = require("../../utils/multer");
 const uploads = multer({brandStorage:storage});
 
 

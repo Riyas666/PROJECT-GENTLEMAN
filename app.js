@@ -9,11 +9,12 @@ dotenv.config();
 const db = require("./config/db");
 
 const userRouter = require("./routes/userRouter");
-const brandRouter = require("./routes/brandRouter");
-const adminRouter = require("./routes/adminRouter");
-const productRouter = require("./routes/productRouter");
-const categoryRouter = require("./routes/categoryRouter");
-const customerRouter = require("./routes/customerRouter");
+const profileRouter = require("./routes/user/profileRouter")
+const brandRouter = require("./routes/admin/brandRouter");
+const adminRouter = require("./routes/admin/adminRouter");
+const productRouter = require("./routes/admin/productRouter");
+const categoryRouter = require("./routes/admin/categoryRouter");
+const customerRouter = require("./routes/admin/customerRouter");
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
@@ -48,11 +49,14 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(logoutStatusMiddleware);
 
 app.use("/", userRouter);
+app.use("/profile", profileRouter)
 app.use("/admin", adminRouter);
 app.use("/admin/category", categoryRouter);
 app.use("/admin/products", productRouter);
 app.use("/admin/brands", brandRouter);
 app.use("/admin/users", customerRouter);
+
+
 
 const PORT = 3000 || process.env.PORT;
 app.listen(PORT, () => {

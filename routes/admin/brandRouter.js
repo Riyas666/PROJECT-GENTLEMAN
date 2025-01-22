@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const brandController = require("../controllers/admin/brandController")
-const {  uploadBrandImage } = require('../utils/multer');
-const { adminAuth } = require("../middlewares/auth");
+const brandController = require("../../controllers/admin/brandController")
+const {  uploadBrandImage } = require('../../utils/multer');
+const { adminAuth } = require("../../middlewares/auth");
 
 
 
