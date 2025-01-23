@@ -423,7 +423,6 @@
       </div>
     </div>
   </section>
-  <%-include("../../views/partials/user/footer")%>
   <!--=============== SWIPER JS ===============-->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
@@ -434,8 +433,9 @@
   const quantityInput = document.getElementById('quantity');
   const decreaseButton = document.getElementById('decrease');
   const increaseButton = document.getElementById('increase');
+  const addToCartButton = document.getElementById('addToCartBtn');
 
-  let selectedSizeStock = 5; // Replace this with the actual stock for the selected size
+  let maxStockQuantity = 5; // Replace this with the actual stock for the selected size
 
   // Function to update the quantity
   function updateStock(change) {
@@ -447,36 +447,35 @@
       alert("Minimum quantity is 1");
       return;
     }
-    if (newQuantity > selectedSizeStock) {
-      alert("Stock limit exceeded");
+    if (newQuantity > maxStockQuantity) {
+      alert("Stock limit exceenjjded");
       return;
     }
 
     // Update the input value
     quantityInput.value = newQuantity;
+
   }
 
+  
+    
   // Attach event listeners to the buttons
   decreaseButton.addEventListener('click', () => updateStock(-1));
   increaseButton.addEventListener('click', () => updateStock(1));
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const addToCartButton = document.getElementById('addToCartBtn');
-  const quantityInput = document.getElementById('quantity');
-  const productId = '<%=product._id%>';
-  let selectedSizeStock = parseInt(document.querySelector('.size__link.size-active').getAttribute('data-quantity'), 10);
-
-  // Add to Cart Function
-  addToCartButton.addEventListener('click', (e) => {
-    e.preventDefault();
 
 
-    const selectedSizeElement = document.querySelector('.size__link.size-active');
+
+  
+
+addToCartButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  const selectedSizeElement = document.querySelector('.size__link.size-active');
     const selectedSize = selectedSizeElement ? selectedSizeElement.getAttribute('data-size') : null;
     const quantity = parseInt(quantityInput.value, 10);
     const productId = '<%= product._id %>';
+
     
+
     if (!selectedSize) {
       alert('Please select a size.');
       return;
@@ -488,12 +487,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Make sure quantity doesn't exceed stock
-    if (quantity > selectedSizeStock) {
-      alert("Stock limit exceeded");
+    if (quantity > maxStockQuantity) {
+      alert("Stock limit exceedhgghfghed");
       return;
     }
-
-    fetch('/addToCart', {
+    fetch('/cart/addToCart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -503,36 +501,32 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          alert(data.error);
+          Swal.fire({
+          icon: 'error',
+          title: 'Error Adding to Cart',
+          text: data.error,
+        });
         } else {
-          alert('Item added to cart successfully!');
+          Swal.fire({
+          icon: 'success',
+          title: 'Item Added to Cart',
+          text: data.message || 'The item was added successfully!',
+          timer: 2000,
+          showConfirmButton: false,
+        });
           updateCartUI(data.cart);
         }
       })
       .catch((error) => {
         console.error('Error adding item to cart:', error);
+        Swal.fire({
+        icon: 'error',
+        title: 'Unexpected Error',
+        text: 'Something went wrong while adding the item to the cart. Please try again.',
+      });
       });
   });
-
-
-
-  // Handle Quantity Update and Size Selection
-  // function handleQuantityChange(change) {
-  //   const quantityInput = document.getElementById('quantity');
-  //   let currentQuantity = parseInt(quantityInput.value, 10);
-  //   const newQuantity = currentQuantity + change;
-
-  //   if (newQuantity < 1) return; // Prevent quantity < 1
-  //   if (newQuantity > selectedSizeStock) {
-  //     alert("Stock limit exceeded");
-  //     return;
-  //   }
-
-  //   quantityInput.value = newQuantity;
-
-  //   // Update the cart quantity on the server
-  //   updateCartOnServer(productId, newQuantity);
-  // }
+  
 
   // Handle size selection
   document.querySelectorAll('.size__link').forEach(link => {
@@ -552,6 +546,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
     cartIcon.textContent = `Cart (${cartCount})`;
   }
+
+
+});
+
 
   // Update Cart Quantity on Server
   function updateCartOnServer(productId, newQuantity) {
@@ -617,6 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   initZoom();
-}); 
+
 
 </script>
+
+<%-include("../../views/partials/user/footer")%>

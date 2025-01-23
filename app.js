@@ -9,7 +9,8 @@ dotenv.config();
 const db = require("./config/db");
 
 const userRouter = require("./routes/userRouter");
-const profileRouter = require("./routes/user/profileRouter")
+const profileRouter = require("./routes/user/profileRouter");
+const cartRouter = require("./routes/user/cartRouter");
 const brandRouter = require("./routes/admin/brandRouter");
 const adminRouter = require("./routes/admin/adminRouter");
 const productRouter = require("./routes/admin/productRouter");
@@ -49,7 +50,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(logoutStatusMiddleware);
 
 app.use("/", userRouter);
-app.use("/profile", profileRouter)
+app.use("/profile", profileRouter);
+app.use("/cart", cartRouter);
 app.use("/admin", adminRouter);
 app.use("/admin/category", categoryRouter);
 app.use("/admin/products", productRouter);

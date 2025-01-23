@@ -1,7 +1,7 @@
 const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Products = require("../../models/productSchema");
-const Brand = require("../../models/brandSchema");
+
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -154,13 +154,13 @@ const loadHomePage = async (req, res) => {
 
         productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
         productData = productData.slice(0, 4);
-        console.log(productData, "fdafdafdfdsfdsgf");
+       
 
-        console.log("Product data after sorting and slicing:", productData);
+        
         // const status = User.find
         if (user) {
             const userData = await User.findById(user);
-            console.log(userData);
+           
             res.render("home", { user: userData, products: productData });
         } else {
             return res.render("home", { products: productData });

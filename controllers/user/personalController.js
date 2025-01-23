@@ -23,7 +23,7 @@ const profilePage = async(req,res)=>{
 const updateProfile = async (req, res) => {
     try {
         const userId = req.session.user;
-console.log("thi is user id", userId)
+console.log("this is user id", userId)
         
 
 const data = req.body;

@@ -197,5 +197,5 @@ module.exports ={
     resetPassword,
     resendOtp,
     getResetPassPage
-
 }
+

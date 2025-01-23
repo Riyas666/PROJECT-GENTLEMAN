@@ -3,11 +3,11 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { userAuth } = require("../middlewares/auth");
 const userController = require("../controllers/user/userController");
 const profileController = require("../controllers/user/profileController");
 const productController = require("../controllers/user/productController");
 const cartController = require("../controllers/user/cartController");
+
 
 //TO DISPLAY PAGE NOT FOUND PAGE
 router.get("/pageNotFound", userController.pageNotFound);
@@ -52,21 +52,11 @@ router.post("/resend-forgot-otp", profileController.resendOtp);
 
 
 
-
-
-
 router.get("/productDetails", productController.productDetails);
 
 
 
 
-
-router.post("/addToCart", cartController.addToCartDetails);
-router.post("/cart/update", userAuth, cartController.updateCart);
-router.get("/cart", userAuth, cartController.getCart)
-router.get("/addToCart", userAuth, cartController.addToCart)
-
-
-
+router.get("/checkout", cartController.loadCheckoutPage);
 
 module.exports = router;
