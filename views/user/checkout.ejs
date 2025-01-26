@@ -20,12 +20,85 @@
   padding: 10px;
   border-bottom: 1px solid #ddd;
 }
+.add-btnn {
+    background-color:#D3B382;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .add-btnn:hover {
+    background-color:#e0b370;
+  }
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    padding: 20px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .address-modal {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+  }
+
+  .modal-overlay.active .address-modal {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover {
+    color: #333;
+  }
 
 </style>
     <main class="main">
       <section class="breadcrumb">
         <ul class="breadcrumb__list flex container">
-          <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+          <li><a href="/home" class="breadcrumb__link">Home</a></li>
           <li><span class="breadcrumb__link">></span></li>
           <li><span class="breadcrumb__link">Shop</span></li>
           <li><span class="breadcrumb__link">></span></li>
@@ -38,8 +111,12 @@
         <div class="checkout__container container grid">
           <div class="checkout__group">
             <section class="checkout__group">
-                <h3 class="section__title">Shipping Address</h3>
+              <h3 class="section__title">Shipping Address</h3>  
+                
                 <div class="existing-addresses">
+                  <div class="button-container">
+                    <button class="add-btnn ">Add New Address</button>
+                  </div>
                   <form class="address-form">
                     <ul class="address-list">
                       <% addresses.forEach(address => { %>
@@ -50,7 +127,7 @@
                             name="deliveryAddress" 
                             value="<%= address.id %>" 
                             class="address-radio" 
-                            <% if (address.isDefault) { %> checked <% } %>
+                           
                           />
                           <div class="address-details">
                             <address class="address-details">
@@ -64,8 +141,100 @@
                       </li>
                       <% }); %>
                     </ul>
-                    <button type="button" class="btn btn--md add-address-btn">Add New Address</button>
+                    
                   </form>
+                </div>
+                <div class="modal-overlay" id="addressModal">
+                  <div class="address-modal">
+                    <div class="modal-header">
+                      <h2>Add New Address</h2>
+                      <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="address-form-container">
+                      <form method="post" id="addaddressform">
+                        <div class="mb-3">
+                          <label for="fullname" class="form-label">Full Name</label>
+                          <input type="text" class="form-control" id="addname" name="name" placeholder="Enter your full name" />
+                          <span class="error-message" id="addnameError"></span>
+                        </div>
+      
+                        <div class="mb-3">
+                          <label for="city" class="form-label">City</label>
+                          <input type="text" class="form-control" id="city" name="city" placeholder="Enter your city" />
+                          <span class="error-message" id="cityError"></span>
+                        </div>
+      
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                          <span class="mb-3" style="flex: 1;">
+                            <label for="state" class="form-label" style="display: flex;">State</label>
+                            <select id="state" name="state" class="form-select">
+                              <option value="{{state}}" elected>state</option>
+                              <option value="Andhra Pradesh">Andhra Pradesh</option>
+                              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                              <option value="Assam">Assam</option>
+                              <option value="Bihar">Bihar</option>
+                              <option value="Chhattisgarh">Chhattisgarh</option>
+                              <option value="Goa">Goa</option>
+                              <option value="Gujarat">Gujarat</option>
+                              <option value="Haryana">Haryana</option>
+                              <option value="Himachal Pradesh">Himachal Pradesh</option>
+                              <option value="Jharkhand">Jharkhand</option>
+                              <option value="Karnataka">Karnataka</option>
+                              <option value="Kerala">Kerala</option>
+                              <option value="Madhya Pradesh">Madhya Pradesh</option>
+                              <option value="Maharashtra">Maharashtra</option>
+                              <option value="Manipur">Manipur</option>
+                              <option value="Meghalaya">Meghalaya</option>
+                              <option value="Mizoram">Mizoram</option>
+                              <option value="Nagaland">Nagaland</option>
+                              <option value="Odisha">Odisha</option>
+                              <option value="Punjab">Punjab</option>
+                              <option value="Rajasthan">Rajasthan</option>
+                              <option value="Sikkim">Sikkim</option>
+                              <option value="Tamil Nadu">Tamil Nadu</option>
+                              <option value="Telangana">Telangana</option>
+                              <option value="Tripura">Tripura</option>
+                              <option value="Uttar Pradesh">Uttar Pradesh</option>
+                              <option value="Uttarakhand">Uttarakhand</option>
+                              <option value="West Bengal">West Bengal</option>
+                              <option value="Chandigarh">Chandigarh</option>
+                              <option value="Delhi">Delhi</option>
+                              <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                              <option value="Ladakh">Ladakh</option>
+                            </select>
+                            <span class="error-message" id="stateError"></span>
+                          </span>
+                          <span class="mb-3" style="flex: 1;">
+                            <label for="postalcode" class="form-label" style="display: flex;">Postal Code</label>
+                            <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter your postal code" />
+                            <span class="error-message" id="pincodeError"></span>
+                          </span>
+                        </div>
+                        <div class="mb-3">
+                          <label for="landmark" class="form-label">Landmark</label>
+                          <input type="text" class="form-control" id="landmark" name="landmark" placeholder="Enter a landmark " />
+                          <span class="error-message" id="landmarkError"></span>
+                        </div>
+                        <div class="mb-3">
+                          <label for="phonenumber" class="form-label">Phone Number</label>
+                          <input type="text" class="form-control" id="addphone" name="phonenumber" placeholder="Enter your phone number" />
+                          <span class="error-message" id="addphoneError"></span>
+                        </div>
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                          <span class="mb-3" style="flex: 1;">
+                            <label for="addressType" class="form-label" style="display: flex;">Address Type</label>
+                            <select name="addressType" id="addressType" class="form-select">
+                              <option value="--none--" selected>--none--</option>
+                              <option value="Home Address">Home Address</option>
+                              <option value="Office Address">Office Address</option>
+                            </select>
+                            <span class="error-message" id="addressTypeError"></span>
+                          </span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
               </section>
               
@@ -104,7 +273,7 @@
               
                 <tr>
                   <td colspan="2"><span class="order__subtitle">Subtotal</span></td>
-                  <td colspan="3"><span class="table__price">$280.00</span></td>
+                  <td colspan="3"><span class="table__price">₹<%=totalAmount %></span></td>
                 </tr>
                 <tr>
                   <td colspan="2"><span class="order__subtitle">Shipping</span></td>
@@ -115,7 +284,7 @@
                 <tr>
                   <td colspan="2"><span class="order__subtitle">Total</span></td>
                   <td colspan="3">
-                    <span class="order__grand-total">$280.00</span>
+                    <span class="order__grand-total">₹<%=totalAmount %></span>
                   </td>
                 </tr>
                 
@@ -167,7 +336,7 @@
                 <label for="l3" class="payment__label">Razorpay</label>
               </div>
             </div>
-            <button class="btn btn--md">Place Order</button>
+            <button id="placeOrderBtn" class="btn btn--md">Place Order</button>
           </div>
         </div>
       </section> 
@@ -178,3 +347,303 @@
       
 
       <%-include("../../views/partials/user/footer")%>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', async () => {
+            try {
+               
+                
+                const selectedAddressId =  document.querySelector('input[name="deliveryAddress"]:checked')?.value
+               
+                const cartItems = getCartItems();
+                const selectedPaymentMethod = document.querySelector('input[name="radio"]:checked')?.id;
+
+                console.log("haii thi  the select address id", selectedPaymentMethod)
+                // Check if all required fields are filled
+                if (!cartItems || cartItems.length === 0) {
+                    return Swal.fire({
+                        title: 'Cart Empty',
+                        text: 'Your cart is empty. Please add items to the cart before placing an order.',
+                        icon: 'error',
+                        button: 'OK',
+                    });
+                }
+
+                if (!selectedAddressId) {
+                    return Swal.fire({
+                        title: 'Address Missing',
+                        text: 'Please select a shipping address before placing an order.',
+                        icon: 'error',
+                        button: 'OK',
+                    });
+                }
+
+                if (!selectedPaymentMethod) {
+                    return Swal.fire({
+                        title: 'Payment Method Missing',
+                        text: 'Please select a payment method to proceed.',
+                        icon: 'error',
+                        button: 'OK',
+                    });
+                }
+
+                // Send the order request to the server
+                const response = await fetch('/place', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      addressId: selectedAddressId,
+                        items: cartItems,
+                        paymentMethod: selectedPaymentMethod,
+                    }),
+                });
+
+                const data = await response.json();
+                console.log("Order Response Data:", data);
+                // Handle the response
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Order Placed Successfully!',
+                        text: data.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000,
+                    }).then(() => {
+                        // Redirect to success page
+                        window.location.href = data.redirectUrl;
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Order Failed',
+                        text: data.message,
+                        icon: 'error',
+                        button: 'Try Again',
+                    });
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An unexpected error occurred while placing the order. Please try again.',
+                    icon: 'error',
+                    button: 'OK',
+                });
+            }
+        });
+    }
+});
+
+function getCartItems() {
+  const cartItems = [];
+  
+  document.querySelectorAll(".order__table tbody tr").forEach((row) => {
+    // Skip rows that don't have the product details
+    if (!row.querySelector(".order__img")) return;
+
+    const productId = row.querySelector("img").getAttribute("src").split("/").pop(); // Extract product ID from image source
+    const quantityText = row.querySelector(".table__quantity")?.textContent || "";
+    const quantity = parseInt(quantityText.replace("x ", "").trim()) || 0; // Extract quantity
+    const size = row.querySelector("td:nth-child(3) span")?.textContent?.trim() || "N/A"; // Default size to 'N/A'
+    const priceText = row.querySelector("td:nth-child(4) span")?.textContent || "₹0";
+    const price = parseFloat(priceText.replace("₹", "").trim()) || 0; // Convert price to a float
+    const totalPriceText = row.querySelector(".table__price")?.textContent || "₹0";
+    const totalPrice = parseFloat(totalPriceText.replace("₹", "").trim()) || 0; // Convert total price to a float
+
+    if (productId && quantity > 0) {
+      cartItems.push({
+        productId,
+        quantity,
+        size,
+        price,
+        totalPrice,
+      });
+    }
+  });
+
+  return cartItems;
+}
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const addButton = document.querySelector('.add-btnn');
+    const modal = document.getElementById('addressModal');
+    const closeButton = modal.querySelector('.modal-close');
+    const form = document.getElementById('addaddressform');
+
+    // Function to reset form and clear error messages
+    function resetForm() {
+      form.reset(); // Reset all form fields
+
+      // Clear all error messages
+      const errorElements = document.querySelectorAll('.error-message');
+      errorElements.forEach(error => {
+        error.textContent = '';
+      });
+    }
+    addButton.addEventListener('click', function() {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      resetForm();
+    }
+
+    closeButton.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  });
+  document.getElementById("addaddressform").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const addname = document.getElementById("addname").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const state = document.getElementById("state").value
+    const pincode = document.getElementById("pincode").value.trim();
+    const landmark = document.getElementById("landmark").value.trim();
+    const addphone = document.getElementById("addphone").value.trim();
+    const addressType = document.getElementById("addressType").value
+    const addnameError = document.getElementById("addnameError");
+    const cityError = document.getElementById("cityError");
+    const stateError = document.getElementById("stateError");
+    const pincodeError = document.getElementById("pincodeError");
+    const landmarkError = document.getElementById("landmarkError");
+    const addphoneError = document.getElementById("addphoneError");
+    const addressTypeError = document.getElementById("addressTypeError")
+
+    addnameError.textContent = "";
+    cityError.textContent = "";
+    stateError.textContent = "";
+    pincodeError.textContent = "";
+    landmarkError.textContent = "";
+    addphoneError.textContent = "";
+    addressTypeError.textContent = "";
+
+
+    let isValid = true;
+
+    if (addname === "") {
+      addnameError.textContent = "Field is Required"
+      addnameError.style.color = "red";
+      isValid = false
+    }
+    const cityRegex = /^[A-Za-z\s]+$/;
+    if (city === "") {
+      cityError.textContent = "Field is Required"
+      cityError.style.color = "red";
+      isValid = false
+    }
+    if (!cityRegex.test(city)) {
+      cityError.textContent = "Enter valid city name"
+      cityError.style.color = "red";
+      isValid = false
+    }
+    if (state === "state") {
+      stateError.textContent = "Select any state"
+      stateError.style.color = "red";
+      isValid = false
+    }
+    const pincodeRegex = /^\d{6}$/
+    if (!pincodeRegex.test(pincode)) {
+      pincodeError.textContent = "Enter Valid Pincode"
+      pincodeError.style.color = "red";
+      isValid = false
+    }
+    if (landmark === "") {
+      landmarkError.textContent = "Field is Required"
+      landmarkError.style.color = "red";
+      isValid = false
+    }
+    const phoneRegex = /^\d{10}$/; // Example: Only allows 10-digit numbers
+    if (!phoneRegex.test(addphone)) {
+      addphoneError.textContent = "Please Enter a valid Phone Number";
+      addphoneError.style.color = "red";
+      isValid = false;
+    }
+
+    if (addressType === "--none--") {
+      addressTypeError.textContent = "Select any Address Type"
+      addressTypeError.style.color = "red";
+      isValid = false
+    }
+    if (isValid) {
+      try {
+        const response = await fetch("/profile/add-address", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: addname,
+            city,
+            state,
+            pincode,
+            landmark,
+            phonenumber: addphone,
+            addressType,
+
+          })
+        })
+        const result = await response.json()
+        if (result.success) {
+          swal({
+            title: "Success!",
+            text: result.message,
+            icon: "success",
+            button: "OK"
+          }).then(() => {
+            window.location.href = '/checkout'
+          })
+        } else {
+          swal({
+            title: "Error",
+            text: result.message,
+            icon: "error",
+            button: "Try again"
+          })
+        }
+      }catch (error) {
+        console.log("Error", error)
+        swal({
+          title: "Error",
+          text: "An unexpected error occured",
+          icon: "error",
+          button: "ok"
+        })
+      }
+    }
+  })
+  const inputs = ['addname', 'city', 'state', 'pincode', 'landmark', 'addphone', 'addressType'];
+
+  inputs.forEach(inputId => {
+    document.getElementById(inputId).addEventListener('input', function() {
+      const error = document.getElementById(inputId + 'Error');
+      error.textContent = '';
+    });
+  });
+      </script>

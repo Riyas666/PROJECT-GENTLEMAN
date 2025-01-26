@@ -10,6 +10,7 @@ router.get("/", userAuth, personalController.profilePage)
 router.post('/update', userAuth, personalController.updateProfile);
 router.get("/change-password", userAuth, personalController.getChangePassword)
 router.post("/change-password", userAuth, personalController.changePassword)
+router.get("/orders", userAuth, personalController.getOrders)
 
 
 //ADDRESS SECTION
@@ -18,6 +19,9 @@ router.post('/add-address', userAuth, personalController.addAddress);
 router.post('/edit-address', userAuth, personalController.editAddress);
 router.delete('/profile/delete-address/:addressId',userAuth, personalController. deleteAddress);
 
+
+
+router.delete('/cart/remove-product/:productId/:size', userAuth, personalController.removeProduct);
 
 
 module.exports = router;

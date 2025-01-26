@@ -3,6 +3,7 @@ const Category = require("../../models/categorySchema");
 const Address = require("../../models/addressSchema")
 const Products = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
+const Order = require("../../models/orderSchema");
 const bcrypt = require("bcrypt");
 
 const profilePage = async(req,res)=>{
@@ -32,10 +33,8 @@ console.log("this is the date",data)
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { 
-                
                     name: data.name,
                     phone: data.phone,
-                
             },
             { new: true }
         );
@@ -124,12 +123,11 @@ const getAddressPage = async(req,res)=>{
         const userId = req.session.user;
         const userData = await User.findById(userId)
         const currentPage = parseInt(req.query.page) || 1;
-        const itemsPerPage = 4; // Set how many addresses you want to show per page
+        const itemsPerPage = 4;
         const skip = (currentPage - 1) * itemsPerPage; 
 
         const addressData = await Address.findOne({ userId: userId });
         if (!addressData || addressData.address.length === 0) {
-            // If no addresses exist, render with empty data
             return res.render('address', {
                 user: userData,
                 userAddress: [],
@@ -215,7 +213,6 @@ const editAddress = async (req, res) => {
             }
                
 
-                // Update address fields
                 userAddress.address[addressIndex] = {
                     ...userAddress.address[addressIndex].toObject(),
                     name,
@@ -242,36 +239,30 @@ const editAddress = async (req, res) => {
 
 const deleteAddress = async (req, res) => {
     try {
-        const { addressId } = req.params; // Get addressId from URL params
-        const userId = req.session.user; // Get userId from session
+        const { addressId } = req.params; 
+        const userId = req.session.user; 
         console.log("this is the delete reuqest", addressId, userId)
 
-        // Find the user's address list
         const userAddress = await Address.findOne({ userId });
 
         if (!userAddress) {
             return res.status(404).json({ success: false, message: "User address not found" });
         }
 
-        // Find the address index in the array
         const addressIndex = userAddress.address.findIndex((addr) => addr._id.toString() === addressId);
 
         if (addressIndex === -1) {
             return res.status(404).json({ success: false, message: "Address not found" });
         }
 
-        // Remove the address from the array
         userAddress.address.splice(addressIndex, 1);
 
-        // Save the updated user address
         await userAddress.save();
 
-        // Send a success response
         res.status(200).json({ success: true, message: "Address deleted successfully" });
     } catch (error) {
         console.error("Error deleting address:", error);
 
-        // Send error response
         if (!res.headersSent) {
             res.status(500).json({ success: false, message: "Failed to delete address" });
         }
@@ -279,11 +270,74 @@ const deleteAddress = async (req, res) => {
 };
 
 
+const removeProduct = async (req, res) => {
+    try {
+        const { productId, size } = req.params;
+        const userId = req.session.user; 
+        console.log("Remove product request:", productId, size, userId);
+
+        const userCart = await Cart.findOne({ userId });
+
+        if (!userCart) {
+            return res.status(404).json({ success: false, message: "Cart not found" });
+        }
+
+        
+        const productIndex = userCart.items.findIndex(
+            (item) => item.productId.toString() === productId && item.size === size
+        );
+
+        if (productIndex === -1) {
+            return res.status(404).json({ success: false, message: "Product not found in the cart" });
+        }
+
+        userCart.items.splice(productIndex, 1);
+
+        await userCart.save();
+
+        res.status(200).json({ success: true, message: "Product removed from cart successfully" });
+    } catch (error) {
+        console.error("Error removing product from cart:", error);
+
+        
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, message: "Failed to remove product from cart" });
+        }
+    }
+};
 
 
 
-
-
+const getOrders = async (req, res) => {
+    try {
+      const userId = req.session.user;  
+      const orders = await Order.find({ userId })
+      .populate({
+        path: 'orderedItems.products',
+        model: 'Product' 
+      }).exec()
+      console.log(JSON.stringify(orders[0].orderedItems, null, 2))
+  
+      if (orders.length === 0) {
+        return res.status(404).render("orders", {
+          success: false,
+          message: "No orders found.",
+        });
+      }
+  
+      res.render("orders", {
+        success: true,
+        orders,  
+      });
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).render("orders", {
+        success: false,
+        message: "An error occurred while fetching orders.",
+      });
+    }
+  };
+  
 
 
 module.exports = {
@@ -294,5 +348,8 @@ module.exports = {
     getAddressPage,
     addAddress,
     editAddress,
-    deleteAddress
+    deleteAddress,
+    removeProduct,
+    getOrders,
+   
 }

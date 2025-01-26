@@ -4,6 +4,9 @@
 
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
    <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-3.2.6.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-3.2.6.min.js"></script>
+
  </head>
  <style>
    .error-message {
@@ -421,7 +424,7 @@
      const currentRows = container.getElementsByClassName('row').length;
 
      if (currentRows >= 3) {
-       alert('You can only add up to 3 rows.');
+      Notiflix.Notify.failure('You can only add up to 3 rows.');
        return;
      }
 

@@ -24,7 +24,9 @@
     "otp-generator": "^4.0.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "toastr": "^2.1.4",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "eslint": "^8.52.0",

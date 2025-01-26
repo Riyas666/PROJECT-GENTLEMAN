@@ -37,7 +37,7 @@
                 </a> -->
 
           </div>
-          <!-- <div class="product__badge light-pink">Hot</div> -->
+        
         </div>
         <div class="product__content">
           <span class="product__category">Brand : <%=products[i].brand.brandName%></span>
@@ -55,9 +55,6 @@
             <span class="new__price">₹<%=products[i].salePrice.toLocaleString('en-IN')%></span>
             <span class="old__price">₹<%=products[i].regularPrice%></span>
           </div>
-          <a href="/cart/addToCart?id=<%=products[i]._id%>" class="action__btn cart__btn" aria-label="Add To Cart">
-            <i class="fi fi-rs-shopping-bag-add"></i>
-          </a>
         </div>
       </div>
       <%}%>

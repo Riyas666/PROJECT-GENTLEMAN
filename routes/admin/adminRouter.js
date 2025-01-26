@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 const adminController = require("../../controllers/admin/adminController");
 const { adminAuth } = require("../../middlewares/auth");
+const orderController = require("../../controllers/admin/orderController")
 
 
 
@@ -20,6 +21,7 @@ router.get("/logout",adminAuth, adminController.logout);
 router.get("/pageerror",adminAuth, adminController.pageerror);
 
 
+router.get("/admin/orders", orderController.getOrderList )
 
 
 //EXPORTING

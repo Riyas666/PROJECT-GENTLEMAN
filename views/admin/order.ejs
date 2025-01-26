@@ -1,0 +1,220 @@
+<%- include("../../views/partials/admin/header") %>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<link rel="stylesheet" href="/admin-assets/css/orderManagement.css">
+<!-- Main Content -->
+<div class="container-fluid" style="width: 80%; margin-left: auto;">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-lg border-0 mt-4">
+        <div class="card-body">
+          <h4 class="card-title text-center">Order Management</h4>
+
+          <div class="table-responsive">
+            <table class="table " style="background-color: rgb(48, 48, 48);">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Order Date</th>
+                  <th>Status</th>
+                  <th>Total Price</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orderList">
+                <% orders.forEach(order => { %>
+                <tr style="background-color: rgb(48, 48, 48);">
+                  <td><%= order._id %></td>
+                  <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                  <td id="order_<%= order._id %>" class="status-cell">
+                    <p><%= order.status %></p>
+                    <form id="statusForm_<%= order._id %>" onsubmit="submitStatusChange(event)">
+                      <select name="status">
+                        <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                        <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                        <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+
+                      </select>
+
+                      <button type="submit" data-order-id="<%= order._id %>">Change Status</button>
+                    </form>
+                  </td>
+                  <td>₹<%= order.totalPrice.toFixed(2) %></td>
+                  <td>
+                    <!-- View Order Details Button -->
+                    <button class="btn btn-primary btn-sm" onclick="viewOrderDetails('<%= order._id %>')">Details</button>
+                  </td>
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="orderDetailsLabel">Order Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Order Information -->
+        <h6><strong>Order Information</strong></h6>
+        <ul class="list-unstyled mb-3">
+          <li><strong>Order ID:</strong> <span id="orderId"></span></li>
+          <li><strong>Status:</strong> <span id="orderStatus"></span></li>
+          <li><strong>Payment Method:</strong> <span id="paymentMethod"></span></li>
+          <li><strong>Total Price:</strong> <span id="totalPrice"></span></li>
+          <li><strong>Created At:</strong> <span id="createdAt"></span></li>
+        </ul>
+
+        <!-- Products Table -->
+        <!-- <h6><strong>Products in Order</strong></h6>
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+              <thead class="table-dark">
+                <tr>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody id="orderProducts">
+                
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            
+              </tbody>
+            </table>
+          </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+
+    function searchOrders() {
+      const searchInput = document.getElementById('searchInput').value;
+      window.location.href =` /admin/orders?search=${searchInput}`;
+    }
+
+    function viewOrderDetails(id) {
+  fetch(`/admin/orders/${id}`)
+    .then(response => response.json())
+    .then(order => {
+    
+      document.getElementById('orderId').innerText = `${order.orderId}`;
+      document.getElementById('orderStatus').innerText =` ${order.status}`;
+      document.getElementById('paymentMethod').innerText = `${order.paymentMethod}`;
+      document.getElementById('totalPrice').innerText = ` ₹${order.totalPrice}`;
+      document.getElementById('createdAt').innerText = `${new Date(order.createdAt).toLocaleDateString()}`;
+
+      const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+      orderDetailsModal.show();
+    })
+    .catch(error => {
+      console.error('Error fetching order details:', error);
+      alert('Failed to fetch order details.');
+    });
+}
+
+
+
+
+
+
+const changeOrderStatus = async (orderId, newStatus) => {
+  try {
+  
+    Swal.fire({
+      title: "Processing...",
+      text: "Updating order status",
+      icon: "info",
+      allowOutsideClick: false,
+      showConfirmButton: false
+    });
+    
+    const response = await fetch('/admin/orders/change-status', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderId, newStatus }),
+    });
+
+
+    Swal.close();
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to update order status');
+    }
+
+    await Swal.fire({
+  title: "Success!",
+  text: "Order status has been updated successfully",
+  icon: "success",
+  confirmButtonText: "OK"
+})
+ .then((result) => {
+  if (result.isConfirmed) {
+    location.reload(); 
+  }
+});
+    const statusCell = document.querySelector(`#order_${orderId}`);
+    if (statusCell) {
+
+      const selectElement = statusCell.querySelector('select');
+      if (selectElement) {
+        selectElement.value = newStatus;
+      }
+    }
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    
+  
+    await Swal.fire({
+      title: "Error!",
+      text: error.message || "Something went wrong while updating the order status",
+      icon: "error",
+      confirmButtonText: "OK"
+    });
+  }
+};
+
+
+const submitStatusChange = async (event) => {
+  event.preventDefault();
+  const form = event.target;
+  const orderId = form.querySelector('button').getAttribute('data-order-id');
+  const status = form.querySelector('select[name="status"]').value;
+  await changeOrderStatus(orderId, status);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const statusForms = document.querySelectorAll('[id^="statusForm_"]');
+  statusForms.forEach(form => {
+    form.addEventListener('submit', submitStatusChange);
+  });
+});
+  </script>

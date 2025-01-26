@@ -9,9 +9,9 @@ const cartController = require("../../controllers/user/cartController");
 
 router.get("/", userAuth, cartController.getCart)
 router.post("/update", userAuth, cartController.updateCart);
-router.get("/addToCart", userAuth, cartController.addToCart)
-router.post("/addToCart", cartController.addToCartDetails);
+router.post('/delete', cartController.deleteCartItem);
 
+router.post("/addToCart", userAuth, cartController.addToCartDetails);
 
 
 

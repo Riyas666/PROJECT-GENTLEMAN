@@ -16,6 +16,7 @@ const adminRouter = require("./routes/admin/adminRouter");
 const productRouter = require("./routes/admin/productRouter");
 const categoryRouter = require("./routes/admin/categoryRouter");
 const customerRouter = require("./routes/admin/customerRouter");
+const orderRouter = require("./routes/admin/orderRouter");
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
@@ -57,6 +58,7 @@ app.use("/admin/category", categoryRouter);
 app.use("/admin/products", productRouter);
 app.use("/admin/brands", brandRouter);
 app.use("/admin/users", customerRouter);
+app.use("/admin/orders", orderRouter)
 
 
 

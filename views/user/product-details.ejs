@@ -1,4 +1,5 @@
 <%-include("../../views/partials/user/header")%>
+
 <style>
 
 .quantity-wrapper {
@@ -77,10 +78,8 @@
     background-color: rgba(255, 255, 255, 0.5);
     background-repeat: no-repeat;
     background-size: 250%;
-    /* Adjust this value to change zoom level */
     display: none;
     pointer-events: none;
-    /* Prevent interactions with the zoomed image */
     z-index: 10;
   }
 
@@ -160,6 +159,20 @@
       height: 350px;
     }
   }
+  
+    .btnn {
+  background-color: #D3B382;
+  border: 2px solid #D3B382;
+  color: white;
+  padding-inline: 1rem;
+  height: 2rem;
+  font-family: "League Spartan" sans-serif;
+  font-size:  0.875rem;
+  font-weight: 700;
+  border-radius: 0.25rem;
+  
+}
+  
 </style>
 <!--=============== MAIN ===============-->
 <main class="main">
@@ -179,13 +192,11 @@
     <div class="details__container container grid">
       <div class="col-md-6 col-sm-12 col-xs-12">
         <div class="detail-gallery">
-          <!-- Main Image -->
           <div class="main-image-container" id="mainImageContainer">
             <img id="main-product-image" src="/uploads/product-images/<%=product.productImage[0]%>" alt="<%=product.productName%>">
             <div class="zoomed-image" id="zoomedImage"></div>
           </div>
 
-          <!-- Thumbnail Images -->
           <div class="thumbnail-container">
             <% product.productImage.forEach((image, index) => { %>
             <% if(image) { %>
@@ -256,8 +267,7 @@
             </div>
             <p id="stock-warning" style="color: red; display: none;">Out of stock!</p>
           </div>
-          <button id="addToCartBtn" data-product-id="product123" data-quantity="1">Add to Cart</button>
-
+          <button class="btnn" id="addToCartBtn" data-product-id="product123" data-quantity="1">Add to Cart</button>
           <a href="#" class="details__action-btn">
             <i class="fi fi-rs-heart"></i>
           </a>
@@ -427,7 +437,24 @@
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <script src="/js/main.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/notiflix/dist/notiflix-3.2.6.min.js"></script>
+
+
 <script>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   document.addEventListener('DOMContentLoaded', () => {
   const quantityInput = document.getElementById('quantity');
@@ -435,31 +462,40 @@
   const increaseButton = document.getElementById('increase');
   const addToCartButton = document.getElementById('addToCartBtn');
 
-  let maxStockQuantity = 5; // Replace this with the actual stock for the selected size
+  let maxStockQuantity = 5; 
 
-  // Function to update the quantity
   function updateStock(change) {
     let currentQuantity = parseInt(quantityInput.value, 10);
     const newQuantity = currentQuantity + change;
 
-    // Prevent quantity from going below 1 or exceeding stock
     if (newQuantity < 1) {
-      alert("Minimum quantity is 1");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Minimum Quantity',
+        text: 'Minimum quantity is 1.',
+      });
+      return;
       return;
     }
     if (newQuantity > maxStockQuantity) {
-      alert("Stock limit exceenjjded");
+      Notiflix.Notify.warning("You can only add upto 5 of this Item", {
+    timeout: 3000,           
+    position: 'right-top',       
+    clickToClose: true,           
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',          
+    borderRadius: '10px',        
+    showOnlyTheLastOne: true,     
+  });
       return;
     }
 
-    // Update the input value
     quantityInput.value = newQuantity;
 
   }
 
   
     
-  // Attach event listeners to the buttons
   decreaseButton.addEventListener('click', () => updateStock(-1));
   increaseButton.addEventListener('click', () => updateStock(1));
 
@@ -477,18 +513,29 @@ addToCartButton.addEventListener('click', (e) => {
     
 
     if (!selectedSize) {
-      alert('Please select a size.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Size Not Selected',
+        text: 'Please select a size.',
+      });
       return;
     }
 
     if (!quantity || quantity <= 0) {
-      alert('Please select a valid quantity.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Quantity',
+        text: 'Please select a valid quantity.',
+      });
       return;
     }
 
-    // Make sure quantity doesn't exceed stock
     if (quantity > maxStockQuantity) {
-      alert("Stock limit exceedhgghfghed");
+      Swal.fire({
+        icon: 'error',
+        title: 'Stock Limit Exceeded',
+        text: 'You cannot add more than the available stock.',
+      });
       return;
     }
     fetch('/cart/addToCart', {
@@ -500,23 +547,65 @@ addToCartButton.addEventListener('click', (e) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.error) {
+        if (data.success) {
+          Notiflix.Notify.success(data.message, {
+    timeout: 3000,                // Time before it disappears (ms)
+    position: 'right-top',        // Position: top-right corner
+    clickToClose: true,           // Allow users to close by clicking
+    cssAnimationStyle: 'zoom',    // Smooth zoom-in/out animation
+    fontSize: '16px',             // Font size for the message
+    borderRadius: '10px',         // Rounded corners for the toast
+    showOnlyTheLastOne: true,     // Ensures no duplicate notifications
+  });
+        // updateCartUI(data.cart);
+      }else if (data.message.includes('You can only add up to')) {
+          Notiflix.Notify.warning(data.message, {
+    timeout: 3000,                // Time before it disappears (ms)
+    position: 'right-top',        // Position: top-right corner
+    clickToClose: true,           // Allow users to close by clicking
+    cssAnimationStyle: 'zoom',    // Smooth zoom-in/out animation
+    fontSize: '16px',             // Font size for the message
+    borderRadius: '10px',         // Rounded corners for the toast
+    showOnlyTheLastOne: true,     // Ensures no duplicate notifications
+  });
+        } else if (data.message.includes('Not enough stock')) {
+          Notiflix.Notify.failure(data.message, {
+    timeout: 3000,                // Time before it disappears (ms)
+    position: 'right-top',        // Position: top-right corner
+    clickToClose: true,           // Allow users to close by clicking
+    cssAnimationStyle: 'zoom',    // Smooth zoom-in/out animation
+    fontSize: '16px',             // Font size for the message
+    borderRadius: '10px',         // Rounded corners for the toast
+    showOnlyTheLastOne: true,     // Ensures no duplicate notifications
+  });
+        } else if (data.message.includes('Product not found')) {
           Swal.fire({
-          icon: 'error',
-          title: 'Error Adding to Cart',
-          text: data.error,
-        });
-        } else {
-          Swal.fire({
-          icon: 'success',
-          title: 'Item Added to Cart',
-          text: data.message || 'The item was added successfully!',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-          updateCartUI(data.cart);
+            icon: 'error',
+            title: 'Error',
+            text: data.message,
+          });
+        // }else if(data.message.includes('Item')){
+        //   Swal.fire({
+        //     icon: 'success',
+        //     title: 'Item Added to Cart',
+        //     text: data.message || 'The item was added successfully!',
+        //     timer: 2000,
+        //     showConfirmButton: false,
+        // });
         }
-      })
+         else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error Adding to Cart',
+            text: data.error,
+          
+         
+        });
+          // updateCartUI(data.cart);
+          // console.log('jh');
+          
+        }
+ } )
       .catch((error) => {
         console.error('Error adding item to cart:', error);
         Swal.fire({
@@ -541,11 +630,11 @@ addToCartButton.addEventListener('click', (e) => {
   });
 
   // Update the Cart UI
-  function updateCartUI(cart) {
-    const cartIcon = document.getElementById('cart-icon');
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartIcon.textContent = `Cart (${cartCount})`;
-  }
+  // function updateCartUI(cart) {
+  //   const cartIcon = document.getElementById('cart-icon');
+  //   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  //   cartIcon.textContent = `Cart (${cartCount})`;
+  // }
 
 
 });

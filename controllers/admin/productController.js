@@ -4,7 +4,6 @@ const Brand = require("../../models/brandSchema")
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
-const { category } = require("./categoryController");
 const { uploadProductImage } = require("../../utils/multer");
 const { error } = require("console");
 const { isArgumentsObject } = require("util/types");
@@ -24,7 +23,6 @@ const getProductAddPage = async (req, res) => {
 };
 
 //FOR ADD THE PRODUCT
-
 
 const addProducts = async (req, res) => {
 

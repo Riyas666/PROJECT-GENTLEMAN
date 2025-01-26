@@ -3,7 +3,12 @@ const {Schema} = mongoose
 const {v4:uuidv4} = require("uuid")
 
 
-const orderScehema = new Schema({
+const orderSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User", 
+        required: true
+    },
     orderId: {
         type: String,
         default: ()=>uuidv4(),
@@ -14,6 +19,10 @@ const orderScehema = new Schema({
             type: Schema.Types.ObjectId,
             ref: "Product",
             required: true
+        },
+        size:{
+            type:Number,
+            required:true
         },
         quantity: {
             type: Number,
@@ -37,9 +46,36 @@ const orderScehema = new Schema({
         required: true
     },
     address:{
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true
+        addressType: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        city: {
+            type: String,
+            required: true
+        },
+        state: {
+            type: String,
+            required: true
+        },
+        pincode: {
+            type: Number,
+            required: true
+        },
+        landmark: { 
+            type: String,
+            required: true
+        },
+        phonenumber: {
+            type: String,
+            required: true
+        },
+        
+       
     },
     invoiceDate: {
         type: Date
@@ -49,11 +85,7 @@ const orderScehema = new Schema({
         required:true,
         enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return Request", "Returned"]
     },
-    createdOn: {
-        type: Date,
-        default: Date.now,
-        required: true
-    },
+   
     couponApplied: {
         type: Boolean,
         default: false

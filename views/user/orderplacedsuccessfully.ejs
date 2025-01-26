@@ -1,0 +1,35 @@
+<%-include("../../views/partials/user/header")%>
+<style>
+  .order-success {
+    background-color: #FCEDC0;
+  }
+
+  .order-summary {
+    background-color: #D3B382;
+  }
+</style>
+
+<main class="main">
+  <!--=============== BREADCRUMB ===============-->
+
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 text-center">
+        <div class="alert order-success" role="alert">
+          <h1 class="fw-bold "><i class="bi bi-check-circle"></i> Order Placed Successfully!</h1>
+          <p class="text-muted">Thank you for shopping with us. Your order has been placed successfully.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row justify-content-center mt-4">
+      <div class="col-md-6 text-center">
+        <a href="/shop" class="btn  btn-lg">Continue Shopping</a>
+        <a href="/profile/orders" class="btn btn-lg ms-3">View Order Details</a>
+      </div>
+    </div>
+  </div>
+</main>
+<%-include("../../views/partials/user/footer")%>

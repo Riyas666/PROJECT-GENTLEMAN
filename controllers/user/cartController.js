@@ -1,91 +1,39 @@
 const Product = require("../../models/productSchema");
-const Category = require("../../models/categorySchema");
-const User = require("../../models/categorySchema");
 const Cart = require("../../models/cartSchema");
-const Address = require("../../models/addressSchema");
-
-
-
-
-
-
 
 
 const getCart = async (req, res) => {
-    try {
-      const userId = req.session.user;
-  
+  try {
+    const userId = req.session.user;
+    const cart = await Cart.findOne({ userId }).populate('items.productId');
 
-      const cart = await Cart.findOne({ userId }).populate('items.productId');
-  
-      if (!cart) {
-        return res.render('cart', { cartItems: [], total: 0 });
-      }
-  
-      
-      const total = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-  
-      res.render('cart', { cartItems: cart.items, total });
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-      res.status(500).send('Error fetching cart');
+    if (!cart) {
+      return res.render('cart', { cartItems: [], total: 0 });
     }
-  };
 
+    // Ensure total price is being calculated correctly on each item
+    cart.items.forEach(item => {
+      item.totalPrice = item.quantity * item.productId.price;
+    });
 
-  const addToCart = async (req, res) => {
-    try {
-      const userId = req.session.user;
-      const productId = req.query.id;
-  
-      const product = await Product.findById(productId);
-      if (!product) return res.status(404).send('Product not found');
-  
-      const maxQuantity = 5;
+    const total = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+    res.render('cart', { cartItems: cart.items, total });
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    res.status(500).send('Error fetching cart');
+  }
+};
 
-      let cart = await Cart.findOne({ userId });
-      if (!cart) cart = new Cart({ userId, items: [] });
-  
-
-      const existingItem = cart.items.find(item => item.productId.toString() === productId);
-
-      console.log("This is the existing item", existingItem);
-      if (existingItem) {
-        if (existingItem.quantity >= maxQuantity) {
-          return res.status(400).send('Maximum quantity reached');
-        }
-        existingItem.quantity += 1;
-        existingItem.totalPrice = existingItem.quantity * product.salePrice;
-      } else {
-        cart.items.push({
-          productId: product._id,
-          quantity: 1,
-          size: size, 
-          price: product.salePrice,
-          totalPrice: product.salePrice,
-        });
-      }
-
-  
-      await cart.save();
-      res.redirect('/cart');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      res.status(500).send('Error adding item to cart');
-    }
-  };
   
   
 
-  
   const addToCartDetails = async (req, res, next) => {
     const { productId, size, quantity } = req.body;
     console.log("This is the product id", size);
     const userId = req.session.user;
+
     const maxQuantity = 5;
-    
   
-    
     if (!productId || !size || !quantity || quantity <= 0) {
       return res.status(400).json({ error: 'Invalid product, size, or quantity' });
     }
@@ -99,27 +47,21 @@ const getCart = async (req, res) => {
       
 
       const sizeObject = product.sizes.find(item => item.size === size);
-      
-
       const availableStock = sizeObject.quantity;
-
-      
 
       if (availableStock < quantity) {
                   return res.status(400).json({ success: false, message: `Not enough stock for size ${size}` });
                }
 
-
                if (quantity > maxQuantity) {
                      return res.status(400).json({ success: false, message:` You can only add up to ${maxQuantity} of this item. `});
                        }         
-      
-  
 
       let cart = await Cart.findOne({ userId });
-      if (!cart) {
-        const effectiveQuantity = Math.min(quantity, maxQuantity, availableStock);
 
+      if (!cart) {
+
+        const effectiveQuantity = Math.min(quantity, maxQuantity, availableStock);
         console.log("This is the effective quantity", effectiveQuantity);
 
          cart = new Cart({
@@ -132,25 +74,17 @@ const getCart = async (req, res) => {
                     price: product.salePrice,
                     totalPrice:product.salePrice * effectiveQuantity,
                 }],
-                // cartSubtotal: product.regularPrice * effectiveQuantity, 
-                // totalOffer: totalOfferForProduct,
-                // cartTotal: product.salePrice * effectiveQuantity 
+                
             });
-            console.log("This is the cart", cart);
-  
-            
-       
+           
             await cart.save();
+            console.log("This is the cart", cart);
             return res.status(200).json({ success: true, message: 'Item added to cart successfully!' });
         }
         if (Array.isArray(cart.items)) {
           console.log("This is the cart items", cart.items);
 
-          
             const existingProduct = cart.items.find(item => item.productId.toString() == productId && item.size == size);
-
-console.log("This is the existing product", existingProduct);
-
 
             if (existingProduct) {
                 const newQuantity = existingProduct.quantity + quantity; 
@@ -163,235 +97,118 @@ console.log("this is the existinggggggggg existing product", existingProduct);
                     return res.status(400).json({ success: false, message: 'Not enough stock available for this size' });
                 }
                 existingProduct.quantity = newQuantity;
+              
                 existingProduct.totalPrice = existingProduct.price * existingProduct.quantity; 
             } else {
                 const allowedQuantity = Math.min(quantity, maxQuantity,availableStock);
+
                 cart.items.push({
                     productId: productId,
                     size: size, 
           quantity: allowedQuantity,
           price: product.salePrice, 
-          totalPrice: product.salePrice*quantity,
+          totalPrice: product.salePrice*allowedQuantity,
                     
                 });
             } 
             await cart.save(); 
-            return res.status(200).json({ success: true, message: 'Item added to cart successfully!' });
+            return res.status(200).json({ success: true, message: `Item added to cart successfully!` });
         } else {
-            return res.status(500).json({ success: false, message: 'Cart products are not available' });
+            return res.status(500).json({ success: false,message: 'Error occured',
+            });
         }
     } catch (error) {
         next(error);
       } 
   };
 
-    
-      
-      
-
-
-  
-     
-
-
-
   const updateCart = async (req, res) => {
     try {
       const { productId, quantity } = req.body;
       const userId = req.session.user;
   
-      const maxQuantity = 5;
-      if (quantity <= 0) return res.status(400).json({ error: 'Invalid quantity' });
-        if (quantity > maxQuantity) return res.status(400).json({ error: 'Maximum quantity reached' });
-  
+      // Find the user's cart
       const cart = await Cart.findOne({ userId });
-      if (!cart) return res.status(404).json({ error: 'Cart not found' });
+      if (!cart) {
+        console.error("Cart not found for user:", userId);
+        return res.status(404).json({ success: false, error: 'Cart not found' });
+      }
   
-      const item = cart.items.find(item => item.productId.toString() === productId);
-      if (!item) return res.status(404).json({ error: 'Product not in cart' });
+      // Find the specific cart item to update
+      const cartItem = cart.items.find(item => item.productId.toString() === productId);
+      if (!cartItem) {
+        console.error("Item not found in cart for product ID:", productId);
+        return res.status(404).json({ success: false, error: 'Item not found in cart' });
+      }
   
-      item.quantity = quantity;
-      item.totalPrice = quantity * item.price;
+      // Fetch product details
+      const product = await Product.findById(productId);
+      if (!product) {
+        console.error("Product not found for ID:", productId);
+        return res.status(404).json({ success: false, error: 'Product not found' });
+      }
   
+      const sizeObject = product.sizes.find(item => item.size === cartItem.size);
+      const availableStock = sizeObject?.quantity;
+      const maxQuantity = 5; // Max limit
+  
+      // Check if the requested quantity exceeds max allowed
+      if (quantity > maxQuantity) {
+        console.error(`Requested quantity ${quantity} exceeds max limit of ${maxQuantity}`);
+        return res.status(400).json({ success: false, message: `You can only add up to ${maxQuantity} items of this product.` });
+      }
+  
+      // Check if there's enough stock available
+      if (quantity > availableStock) {
+        console.error(`Requested quantity ${quantity} exceeds available stock of ${availableStock}`);
+        return res.status(400).json({ success: false, message: `Not enough stock available. Only ${availableStock} items available for this size.` });
+      }
+  
+      // Update the cart item quantity and total price
+      cartItem.quantity = quantity;
+      cartItem.totalPrice = cartItem.price * quantity;
+  
+      // Save updated cart
       await cart.save();
-      res.json({ success: true, message: 'Cart updated', cart });
+      console.log("Cart updated successfully:", cart);
+  
+      res.json({ success: true, cart: cart });
     } catch (error) {
-      console.error('Error updating cart:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error("Error updating cart:", error);
+      res.status(500).json({ success: false, error: 'Failed to update cart' });
     }
   };
-
-
-
-
-
-
-
-
-
-
-
-  // const addToCart = async (req, res,next) => {
-  //   try {
-  //       const { productId,quantity,size } = req.body;
-  //       const userId = req.session.user
-  //       const CART_LIMIT = 5;
-  
-  //       if (!userId) {
-  //           return res.status(401).json({ success: false, message: 'User not authenticated' });
-  //       }
-  //       const product = await Product.findById(productId);
-  //       if (!product) {
-  //           return res.status(404).json({ success: false, message: 'Product not found' });
-  //       }
-       
-  //       const sizeObject = product.sizes.find(item => item.size === size);
-        
-  //       const availableStock = sizeObject.quantity;
-        
-  //       if (availableStock < quantity) {
-  //           return res.status(400).json({ success: false, message: Not enough stock for size ${size} });
-  //       }
-  
-  //       if (quantity > CART_LIMIT) {
-  //         return res.status(400).json({ success: false, message: You can only add up to ${CART_LIMIT} of this item. });
-  //       }
   
   
-  //       const productImage = product.productImage && product.productImage.length > 0 ? product.productImage[0] : null;
-  //       if (!productImage) {
-  //           return res.status(400).json({ success: false, message: 'Product image not available' });
-  //       }
-  //       let cart = await Cart.findOne({ userId: userId });
-       
-  //       if (!cart) {
-  //           const effectiveQuantity = Math.min(quantity, CART_LIMIT, availableStock);
-  //           const discountPerUnit = product.regularPrice - product.salePrice;
-  //           const totalOfferForProduct = discountPerUnit * effectiveQuantity;
-        
-  //           cart = new Cart({
-  //               userId: userId,
-  //               items: [{
-  //                   productId: productId,
-  //                   quantity: effectiveQuantity,
-  //                   size: size,
-  //                   productName: product.productName,
-  //                   salePrice: product.salePrice,
-  //                   regularPrice: product.regularPrice,
-  //                   productImage: product.productImage[0],
-  //                   totalPrice: product.regularPrice * effectiveQuantity,
-  //                   productOffer: discountPerUnit
-  //               }],
-  //               cartSubtotal: product.regularPrice * effectiveQuantity, 
-  //               totalOffer: totalOfferForProduct,
-  //               cartTotal: product.salePrice * effectiveQuantity 
-  //           });
-  
-            
-       
-  //           await cart.save();
-  //           return res.status(200).json({ success: true, message: 'Item added to cart successfully!' });
-  //       }
-  //       if (Array.isArray(cart.items)) {
-  //           const existingProduct = cart.items.find(item => item.productId.toString() === productId && item.size === size);
-  //           if (existingProduct) {
-  //               const newQuantity = existingProduct.quantity + quantity; 
-  //               if (newQuantity > CART_LIMIT ) {
-  //                   return res.status(400).json({ success: false, message: You can only add up to ${CART_LIMIT} of this item. });
-  //               }
-  //               if (newQuantity > availableStock) {
-  //                   return res.status(400).json({ success: false, message: 'Not enough stock available for this size' });
-  //               }
-  //               existingProduct.quantity = newQuantity;
-  //               existingProduct.totalPrice = existingProduct.salePrice * existingProduct.quantity; 
-  //           } else {
-  //               const allowedQuantity = Math.min(quantity, CART_LIMIT,availableStock);
-  //               cart.items.push({
-  //                   productId: productId,
-  //                   quantity: allowedQuantity,
-  //                   size: size,
-  //                   productName:product.productName,  
-  //                   salePrice:product.salePrice,
-  //                   regularPrice:product.regularPrice, 
-  //                   productImage:product.productImage[0],
-  //                   totalPrice:product.salePrice*quantity,
-  //                   productOffer:product.regularPrice-product.salePrice,
-                    
-  //               });
-  //           } 
-  
-  //       const cartSubtotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-  //       cart.totalOffer=product.regularPrice-product.salePrice
-  //       cart.cartSubtotal = cartSubtotal;
-  //       cart.cartTotal = cartSubtotal; 
-  
-  //           await cart.save(); 
-  //           return res.status(200).json({ success: true, message: 'Item added to cart successfully!' });
-  //       } else {
-  //           return res.status(500).json({ success: false, message: 'Cart products are not available' });
-  //       }
-  //   } catch (error) {
-  //       // console.error('Error:', error);
-  //       // return res.status(500).json({ success: false, message: 'An error occurred while adding the item to the cart' });
-  //       next(error);
-  //     } 
-  // };
+      const deleteCartItem = async (req, res) => {
+        try {
+          const { productId } = req.body;
+      
+          // Remove the product from the cart
+          const updatedCart = await Cart.findOneAndUpdate(
+            { userId: req.session.user },
+            { $pull: { items: { productId } } },
+            { new: true }
+          );
+      
+          if (!updatedCart) {
+            return res.status(404).json({ success: false, error: 'Cart item not found' });
+          }
+      
+          res.json({ success: true, cart: updatedCart });
+        } catch (error) {
+          console.error('Error deleting cart item:', error);
+          res.status(500).json({ success: false, error: 'Internal server error' });
+        }
+      };
+      
 
-
-
-
-
-
-
-
-
-
-
-
-// Load Checkout Page
-const loadCheckoutPage = async (req, res) => {
-  try {
-    const userId = req.session.user;
-
-    // Fetch cart
-    const cart = await Cart.findOne({ userId }).populate("items.productId");
-    if (!cart || cart.items.length === 0) {
-      return res.render("checkout", { cart: [], totalAmount: 0, addresses: [] });
-    }
-
-    const totalAmount = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-    console.log("this is cart items",cart.items)
-
-    
-   
-    // Fetch addresses
-    const userAddresses = await Address.findOne({ userId });
-
-
-    res.render("checkout", {
-      cart: cart.items, 
-      totalAmount,
-      addresses: userAddresses ? userAddresses.address : [], // Pass the addresses to the template
-    });
-  } catch (error) {
-    console.error("Error loading checkout page:", error);
-    res.status(500).send("An error occurred while loading the checkout page.");
-  }
-};
-
-
-
-
-
-
-
+      
 
 
   module.exports = {
     getCart,
-    addToCart,
     addToCartDetails,
     updateCart,
-    loadCheckoutPage
-   
+    deleteCartItem
   }

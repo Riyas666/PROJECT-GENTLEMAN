@@ -1,0 +1,85 @@
+<%-include("../../views/partials/user/userprofile")%>
+<main class="main">
+  <!--=============== BREADCRUMB ===============-->
+  <section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+      <li><a href="/home" class="breadcrumb__link">Home</a></li>
+      <li><span class="breadcrumb__link">></span></li>
+      <li><a href="/profile" class="breadcrumb__link">Profile</a></li>
+      <li><span class="breadcrumb__link">></span></li>
+      <li><a href="/profile/change-password" class="breadcrumb__link">Orders</a></li>
+    </ul>
+  </section>
+  <!--=============== ACCOUNTS ===============-->
+  <section class="accounts section--lg">
+    <div class="accounts__container container grid">
+      <div class="account__tabs">
+
+        <a href="/profile">
+          <p class="account__tab ">
+            <i class="fi fi-rs-user"></i> Update Profile
+          </p>
+        </a>
+        <a href="/profile/wallet">
+          <p class="account__tab ">
+            <i class="fi fi-rs-settings-sliders"></i> Wallet
+          </p>
+        </a>
+        <a href="/profile/orders">
+          <p class="account__tab active-tab">
+            <i class="fi fi-rs-shopping-bag"></i> Orders
+          </p>
+
+        </a>
+        <a href="/profile/change-password">
+          <p class="account__tab ">
+            <i class="fi fi-rs-settings-sliders"></i> Change Password
+          </p>
+        </a>
+        <a href="/profile/address">
+          <p class="account__tab">
+            <i class="fi fi-rs-marker"></i> My Address
+          </p>
+        </a>
+
+
+      </div>
+
+
+      <div class="tab__content  active-tab">
+        <h3 class="tab__header">Your Orders</h3>
+        <div class="tab__body">
+          <table class="placed__order-table">
+            <thead>
+              <tr>
+                <th>Orders</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Totals</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (orders && orders.length > 0) { %>
+              <% orders.forEach((order, index) => { %>
+              <tr>
+                <td>#<%= order.orderId.slice(-7) %></td>
+                <td><%= order.createdAt.toLocaleDateString() %></td>
+                <td><%= order.status %></td>
+                <td>₹<%= order.finalAmount.toFixed(2) %></td>
+                <td><a href="/order-details/<%=order._id%>" class="view__order">View</a></td>
+              </tr>
+
+              <% }); %>
+              <% } else { %>
+              <tr>
+                <td colspan="5">No orders found.</td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </section>
+</main>
+<%-include("../../views/partials/user/footer")%>
