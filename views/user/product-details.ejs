@@ -268,7 +268,7 @@
             <p id="stock-warning" style="color: red; display: none;">Out of stock!</p>
           </div>
           <button class="btnn" id="addToCartBtn" data-product-id="product123" data-quantity="1">Add to Cart</button>
-          <a href="#" class="details__action-btn">
+          <a onclick="addToWishlist('<%=product._id%>')"  class="details__action-btn">
             <i class="fi fi-rs-heart"></i>
           </a>
         </div>
@@ -549,34 +549,33 @@ addToCartButton.addEventListener('click', (e) => {
       .then((data) => {
         if (data.success) {
           Notiflix.Notify.success(data.message, {
-    timeout: 3000,                // Time before it disappears (ms)
-    position: 'right-top',        // Position: top-right corner
-    clickToClose: true,           // Allow users to close by clicking
-    cssAnimationStyle: 'zoom',    // Smooth zoom-in/out animation
-    fontSize: '16px',             // Font size for the message
-    borderRadius: '10px',         // Rounded corners for the toast
-    showOnlyTheLastOne: true,     // Ensures no duplicate notifications
+    timeout: 3000,                
+    position: 'right-top',       
+    clickToClose: true,          
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',            
+    borderRadius: '10px',         
+    showOnlyTheLastOne: true,    
   });
-        // updateCartUI(data.cart);
       }else if (data.message.includes('You can only add up to')) {
           Notiflix.Notify.warning(data.message, {
-    timeout: 3000,                // Time before it disappears (ms)
-    position: 'right-top',        // Position: top-right corner
-    clickToClose: true,           // Allow users to close by clicking
-    cssAnimationStyle: 'zoom',    // Smooth zoom-in/out animation
-    fontSize: '16px',             // Font size for the message
-    borderRadius: '10px',         // Rounded corners for the toast
-    showOnlyTheLastOne: true,     // Ensures no duplicate notifications
+    timeout: 3000,                
+    position: 'right-top',       
+    clickToClose: true,          
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',            
+    borderRadius: '10px',       
+    showOnlyTheLastOne: true,    
   });
         } else if (data.message.includes('Not enough stock')) {
           Notiflix.Notify.failure(data.message, {
-    timeout: 3000,                // Time before it disappears (ms)
-    position: 'right-top',        // Position: top-right corner
-    clickToClose: true,           // Allow users to close by clicking
-    cssAnimationStyle: 'zoom',    // Smooth zoom-in/out animation
-    fontSize: '16px',             // Font size for the message
-    borderRadius: '10px',         // Rounded corners for the toast
-    showOnlyTheLastOne: true,     // Ensures no duplicate notifications
+    timeout: 3000,               
+    position: 'right-top',       
+    clickToClose: true,          
+    cssAnimationStyle: 'zoom',
+    fontSize: '16px',        
+    borderRadius: '10px',       
+    showOnlyTheLastOne: true,   
   });
         } else if (data.message.includes('Product not found')) {
           Swal.fire({
@@ -584,14 +583,7 @@ addToCartButton.addEventListener('click', (e) => {
             title: 'Error',
             text: data.message,
           });
-        // }else if(data.message.includes('Item')){
-        //   Swal.fire({
-        //     icon: 'success',
-        //     title: 'Item Added to Cart',
-        //     text: data.message || 'The item was added successfully!',
-        //     timer: 2000,
-        //     showConfirmButton: false,
-        // });
+     
         }
          else {
           Swal.fire({
@@ -601,8 +593,7 @@ addToCartButton.addEventListener('click', (e) => {
           
          
         });
-          // updateCartUI(data.cart);
-          // console.log('jh');
+        
           
         }
  } )
@@ -617,7 +608,7 @@ addToCartButton.addEventListener('click', (e) => {
   });
   
 
-  // Handle size selection
+  // SIZE SELECT
   document.querySelectorAll('.size__link').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -629,18 +620,11 @@ addToCartButton.addEventListener('click', (e) => {
     });
   });
 
-  // Update the Cart UI
-  // function updateCartUI(cart) {
-  //   const cartIcon = document.getElementById('cart-icon');
-  //   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  //   cartIcon.textContent = `Cart (${cartCount})`;
-  // }
 
 
 });
 
 
-  // Update Cart Quantity on Server
   function updateCartOnServer(productId, newQuantity) {
     fetch("/cart/update", {
       method: "POST",
@@ -653,7 +637,7 @@ addToCartButton.addEventListener('click', (e) => {
     .then(data => {
       if (data.success) {
         console.log("Cart updated successfully!");
-        updateCartUI(data.cart); // Optionally update UI after server update
+        
       } else {
         throw new Error(data.error || 'Update failed');
       }
@@ -663,7 +647,6 @@ addToCartButton.addEventListener('click', (e) => {
     });
   }
 
-  // Switch the Main Product Image
   function switchMainImage(element, imageUrl) {
     const mainImage = document.getElementById('main-product-image');
     mainImage.src = imageUrl;
@@ -671,8 +654,7 @@ addToCartButton.addEventListener('click', (e) => {
     thumbnails.forEach(thumb => thumb.classList.remove('active'));
     element.classList.add('active');
   }
-
-  // Zoom Functionality
+////ZOOM FUCTIONALITY////////
   function initZoom() {
     const mainContainer = document.getElementById('mainImageContainer');
     const mainImage = document.getElementById('main-product-image');
@@ -704,6 +686,39 @@ addToCartButton.addEventListener('click', (e) => {
   }
 
   initZoom();
+
+
+
+
+
+
+
+  function addToWishlist(productId){
+    const selectedSize = document.querySelector(".size__link").value;
+    fetch("/addToWishlist", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ productId, size: selectedSize }), // Send the selected size
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status) {
+        Swal.fire("Success", data.message, "success");
+      } else {
+        Swal.fire("Error", data.message, "error");
+      }
+    })
+    .catch((error) => {
+      console.error("Error adding to wishlist:", error);
+      Swal.fire("Error", "Something went wrong. Please try again.", "error");
+    });
+}
+
+
+
+
+
+
 
 
 </script>

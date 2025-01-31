@@ -89,7 +89,19 @@ const orderSchema = new Schema({
     couponApplied: {
         type: Boolean,
         default: false
-    }
+    },
+
+    paymentType: {
+        type: String,
+        enum: ["Razorpay", "COD", "Wallet",], // Add payment types as required
+        required: true
+    },
+    paymentStatus: {
+        type: String,
+        enum: ["Pending", "Failed", "Success"],
+        default: "Pending"
+    },
+    
 },{timestamps:true})
 
 const Order = mongoose.model("Order", orderSchema)

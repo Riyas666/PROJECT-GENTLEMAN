@@ -3,17 +3,21 @@ const Cart = require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
 const { v4: uuidv4 } = require('uuid'); 
-
+const Coupon = require("../../models/couponSchema")
+const User = require("../../models/userSchema");
 
 
 
 const loadCheckoutPage = async (req, res) => {
     try {
       const userId = req.session.user;
+      const user = await User.findOne({_id:userId});
+      console.log("userrrrrrrrrrrrrrr",user)
       const cart = await Cart.findOne({ userId }).populate("items.productId");
+      const coupons = await Coupon.find({})
 
       if (!cart || cart.items.length === 0) {
-        return res.render("checkout", { cart: [], totalAmount: subtotal, addresses: [] });
+        return res.render("checkout", { user,cart: [], totalAmount: 0, addresses: [],coupons:[] });
       }
   
       const totalAmount = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -21,9 +25,11 @@ const loadCheckoutPage = async (req, res) => {
       const userAddresses = await Address.findOne({ userId });
   
       res.render("checkout", {
+        user,
         cart: cart.items, 
         totalAmount,
         addresses: userAddresses ? userAddresses.address : [], 
+        coupons
       });
 
     } catch (error) {
@@ -35,9 +41,9 @@ const loadCheckoutPage = async (req, res) => {
   const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user; 
-        const { items, addressId, paymentMethod } = req.body; 
+        const { addressId, paymentMethod } = req.body; 
 
-        if (!items || items.length === 0 || !addressId || !paymentMethod) {
+        if (!addressId || !paymentMethod) {
             return res.status(400).json({ success: false, message: "Invalid order details" });
         }
   
@@ -53,7 +59,7 @@ const loadCheckoutPage = async (req, res) => {
             if (!product) {
                 return res.status(404).json({ success: false, message: `Product with ID ${item.productId} not found` });
             }
-  
+  console.log("This is the product", product)
             const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
   
             if (!sizeObject || sizeObject.quantity < item.quantity) {
@@ -85,6 +91,8 @@ const loadCheckoutPage = async (req, res) => {
   if (!selectedAddress) {
       return res.status(404).json({ success: false, message: "Address not found" });
   }
+
+
   
         const newOrder = new Order({
           userId,
@@ -99,7 +107,7 @@ const loadCheckoutPage = async (req, res) => {
           totalPrice,
           finalAmount,
           status: 'Pending',
-         
+          paymentType:paymentMethod,
         });
   
         await newOrder.save();
@@ -110,7 +118,8 @@ const loadCheckoutPage = async (req, res) => {
           success: true, 
           message: "Order placed successfully!", 
           redirectUrl: "/order/success", 
-          orderId: newOrder.orderId 
+          orderId: newOrder.orderId ,
+          amount: finalAmount * 100,
       });
     } catch (error) {
         console.error("Error placing order:", error);
@@ -153,14 +162,12 @@ const cancelOrder = async (req, res) => {
 
   try {
     const order = await Order.findOne({ orderId }).populate('orderedItems.products');
-    console.log("This is the Oorders", order) // Populate product details
+    console.log("This is the Oorders", order) 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Update stock only if the order is being canceled
     if (status === 'Cancelled') {
-       // Iterate through ordered items to return stock
     for (const item of order.orderedItems) {
       const product = await Product.findById(item.products);
       console.log("This is product", product)
@@ -181,8 +188,8 @@ const cancelOrder = async (req, res) => {
     }
     }
 
-    order.status = status; // Update the order status
-    await order.save(); // Save the updated order
+    order.status = status;
+    await order.save(); 
 
     res.status(200).json({ message: 'Order cancelled successfully, and stock updated' });
   } catch (error) {

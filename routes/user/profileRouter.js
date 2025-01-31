@@ -17,7 +17,7 @@ router.get("/orders", userAuth, personalController.getOrders)
 router.get("/address", userAuth, personalController.getAddressPage)
 router.post('/add-address', userAuth, personalController.addAddress);
 router.post('/edit-address', userAuth, personalController.editAddress);
-router.delete('/profile/delete-address/:addressId',userAuth, personalController. deleteAddress);
+router.delete('/delete-address/:addressId',userAuth, personalController. deleteAddress);
 
 
 

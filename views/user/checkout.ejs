@@ -93,6 +93,7 @@
   .modal-close:hover {
     color: #333;
   }
+ 
 
 </style>
     <main class="main">
@@ -141,9 +142,35 @@
                       </li>
                       <% }); %>
                     </ul>
-                    
                   </form>
                 </div>
+                <div class="cart__coupon">
+                  <h3 class="section__title">Apply Coupon</h3>
+                  <form id="couponForm" class="coupon__form form grid">
+                    <div class="form__group grid">
+                      <select id="couponSelect" class="form__input">
+                        <option value="">Select a Coupon</option>
+                    <% coupons.forEach(coupon => { %>
+                          <option value="<%= coupon._id %>" data-discount="<%= coupon.offerPrice %>" data-min-price="<%= coupon.minimumPrice %>">
+                            <%= coupon.name %> - ₹<%= coupon.offerPrice %> OFF (Min: ₹<%= coupon.minimumPrice %>)
+                          </option>
+                        <% }) %>
+                      </select>
+                      <div class="form__btn">
+                        <button type="button" id="applyCouponBtn" class="btn flex btn--sm">
+                          <i class="fi-rs-label"></i> Apply
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                  <p id="couponMessage" style="color: green; display: none;">Coupon applied successfully!</p>
+                </div>
+
+
+
+
+
+
                 <div class="modal-overlay" id="addressModal">
                   <div class="address-modal">
                     <div class="modal-header">
@@ -282,9 +309,15 @@
                   </td>
                 </tr>
                 <tr>
+                  <td colspan="2"><span class="order__subtitle">Discount</span></td>
+                  <td colspan="3">
+                    <span class="table__price" id="discountAmount">₹0</span>
+                  </td>
+                </tr>
+                <tr>
                   <td colspan="2"><span class="order__subtitle">Total</span></td>
                   <td colspan="3">
-                    <span class="order__grand-total">₹<%=totalAmount %></span>
+                    <span class="order__grand-total" id="finalAmount">₹<%=totalAmount %></span>
                   </td>
                 </tr>
                 
@@ -348,66 +381,144 @@
 
       <%-include("../../views/partials/user/footer")%>
 
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-    const placeOrderBtn = document.getElementById('placeOrderBtn');
+       <script>
+//         document.addEventListener('DOMContentLoaded', () => {
+//     const placeOrderBtn = document.getElementById('placeOrderBtn');
 
-    if (placeOrderBtn) {
-        placeOrderBtn.addEventListener('click', async () => {
-            try {
+//     if (placeOrderBtn) {
+//         placeOrderBtn.addEventListener('click', async () => {
+//             try {
                
                 
-                const selectedAddressId =  document.querySelector('input[name="deliveryAddress"]:checked')?.value
+//                 const selectedAddressId =  document.querySelector('input[name="deliveryAddress"]:checked')?.value
                
-                const cartItems = getCartItems();
-                const selectedPaymentMethod = document.querySelector('input[name="radio"]:checked')?.id;
+//                 const cartItems = getCartItems();
+//                 const selectedPaymentMethod = document.querySelector('input[name="radio"]:checked')?.id;
+                
+//                 console.log("haii thi  the select address id", selectedPaymentMethod)
+//                 if (!cartItems || cartItems.length === 0) {
+//                     return Swal.fire({
+//                         title: 'Cart Empty',
+//                         text: 'Your cart is empty. Please add items to the cart before placing an order.',
+//                         icon: 'error',
+//                         button: 'OK',
+//                     });
+//                 }
 
-                console.log("haii thi  the select address id", selectedPaymentMethod)
-                // Check if all required fields are filled
-                if (!cartItems || cartItems.length === 0) {
-                    return Swal.fire({
-                        title: 'Cart Empty',
-                        text: 'Your cart is empty. Please add items to the cart before placing an order.',
-                        icon: 'error',
-                        button: 'OK',
-                    });
-                }
+//                 if (!selectedAddressId) {
+//                     return Swal.fire({
+//                         title: 'Address Missing',
+//                         text: 'Please select a shipping address before placing an order.',
+//                         icon: 'error',
+//                         button: 'OK',
+//                     });
+//                 }
 
-                if (!selectedAddressId) {
-                    return Swal.fire({
-                        title: 'Address Missing',
-                        text: 'Please select a shipping address before placing an order.',
-                        icon: 'error',
-                        button: 'OK',
-                    });
-                }
+//                 if (!selectedPaymentMethod) {
+//                     return Swal.fire({
+//                         title: 'Payment Method Missing',
+//                         text: 'Please select a payment method to proceed.',
+//                         icon: 'error',
+//                         button: 'OK',
+//                     });
+//                 }
 
-                if (!selectedPaymentMethod) {
-                    return Swal.fire({
-                        title: 'Payment Method Missing',
-                        text: 'Please select a payment method to proceed.',
-                        icon: 'error',
-                        button: 'OK',
-                    });
-                }
+//                 const response = await fetch('/place', {
+//                     method: 'POST',
+//                     headers: {
+//                         'Content-Type': 'application/json',
+//                     },
+//                     body: JSON.stringify({
+//                       addressId: selectedAddressId,
+//                         items: cartItems,
+//                         paymentMethod: selectedPaymentMethod,
+//                     }),
+//                 });
 
-                // Send the order request to the server
-                const response = await fetch('/place', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      addressId: selectedAddressId,
-                        items: cartItems,
-                        paymentMethod: selectedPaymentMethod,
-                    }),
-                });
+//                 const data = await response.json();
+//                 console.log("Order Response Data:", data);
+//                 if (data.success) {
+//                     Swal.fire({
+//                         title: 'Order Placed Successfully!',
+//                         text: data.message,
+//                         icon: 'success',
+//                         showConfirmButton: false,
+//                         timer: 2000,
+//                     }).then(() => {
+//                         window.location.href = data.redirectUrl;
+//                     });
+//                 } else {
+//                     Swal.fire({
+//                         title: 'Order Failed',
+//                         text: data.message,
+//                         icon: 'error',
+//                         button: 'Try Again',
+//                     });
+//                 }
+//             } catch (error) {
+//                 console.error('Error placing order:', error);
+//                 Swal.fire({
+//                     title: 'Error',
+//                     text: 'An unexpected error occurred while placing the order. Please try again.',
+//                     icon: 'error',
+//                     button: 'OK',
+//                 });
+//             }
+//         });
+//     }
+// });
 
-                const data = await response.json();
-                console.log("Order Response Data:", data);
-                // Handle the response
-                if (data.success) {
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const placeOrderBtn = document.getElementById('placeOrderBtn');
+
+  placeOrderBtn.addEventListener('click', async function () {
+    // Get the selected payment method
+    const paymentMethod = document.querySelector('input[name="radio"]:checked').id;
+
+    // Get cart items
+    const cartItems = getCartItems();  // Assuming this function fetches the cart items
+
+    if (!cartItems || cartItems.length === 0) {
+      return Swal.fire({
+        title: 'Cart Empty',
+        text: 'Your cart is empty. Please add items to the cart before placing an order.',
+        icon: 'error',
+        button: 'OK',
+      });
+    }
+
+    // Get the selected delivery address
+    const selectedAddressId = document.querySelector('input[name="deliveryAddress"]:checked')?.value;
+    if (!selectedAddressId) {
+      return Swal.fire({
+        title: 'Address Missing',
+        text: 'Please select a shipping address before placing the order.',
+        icon: 'error',
+        button: 'OK',
+      });
+    }
+
+    if (paymentMethod === 'l1') {
+      try {
+        const response = await fetch('/place', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentMethod: 'COD',
+            addressId: selectedAddressId,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
                     Swal.fire({
                         title: 'Order Placed Successfully!',
                         text: data.message,
@@ -415,7 +526,6 @@
                         showConfirmButton: false,
                         timer: 2000,
                     }).then(() => {
-                        // Redirect to success page
                         window.location.href = data.redirectUrl;
                     });
                 } else {
@@ -426,34 +536,153 @@
                         button: 'Try Again',
                     });
                 }
-            } catch (error) {
-                console.error('Error placing order:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'An unexpected error occurred while placing the order. Please try again.',
-                    icon: 'error',
-                    button: 'OK',
-                });
-            }
+      } catch (error) {
+        console.error('Error placing order with COD:', error);
+        alert('An error occurred while placing the order. Please try again.');
+      }
+    } else if (paymentMethod === 'l2') {
+     
+      try {
+        const response = await fetch('/place', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentMethod: 'Wallet',
+            addressId: selectedAddressId,
+            items: cartItems,
+          }),
         });
+
+        const data = await response.json();
+
+        if (data.success) {
+          window.location.href = '/order-success';
+        } else {
+          alert('Failed to place the order. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error placing order with Wallet:', error);
+        alert('An error occurred while placing the order. Please try again.');
+      }
+    } else if (paymentMethod === 'l3') {
+     const amount =  Number('<%=totalAmount%>') * 100;
+      try {
+        const response = await fetch('/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: amount, 
+            addressId: selectedAddressId,
+            paymentMethod:"Razorpay"
+          }),
+        });
+        console.log("2");
+        if (!response.ok) {
+          const errorData = await response.json();
+    Swal.fire({
+        title: 'Order Failed',
+        text: errorData.message || 'Failed to create the order.',
+        icon: 'error',
+    });
+    return;
+}
+        console.log("3")
+
+        const order = await response.json();
+       
+        console.log(`orderrrrrrrrr:${order}`)
+        console.log("4")
+
+        if (!order ||  !order.razorpayOrder || !order.razorpayOrder.id ) {
+          return Swal.fire({
+            title: 'Order Failed',
+            text: 'Failed to create the order. Please try again.',
+            icon: 'error',
+            button: 'OK',
+          });
+        }
+        console.log("5")
+        // 2️⃣ Initialize Razorpay Payment Modal
+        const options = {
+          key: 'rzp_test_rry7kkHDgndyCv', // Your Razorpay API Key
+          amount: order.amount, // Amount in paise
+          currency: 'INR',
+          order_id: order.razorpayOrder.id, // Generated Order ID
+          name: 'Your Store',
+          description: 'Payment for your order',
+          handler: async function (response) {
+            console.log("6")
+            try {
+              // 3️⃣ Verify payment on the backend
+              const verifyResponse = await fetch('/verify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  paymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                  signature: response.razorpay_signature,
+                }),
+              });
+              console.log("7")
+              const verifyData = await verifyResponse.json();
+              console.log("8")
+
+              if (verifyData.success) {
+                    Swal.fire({
+                        title: 'Order Placed Successfully!',
+                        text: verifyData.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000,
+                    }).then(() => {
+                        window.location.href = '/order/success';
+                    });
+                // ✅ Payment successful, redirect to success page
+              } else {
+                alert('Payment verification failed. Please try again.');
+              }
+            } catch (error) {
+              console.error('Error verifying Razorpay payment:', error);
+              alert('An error occurred while verifying the payment. Please try again.');
+            }
+          },
+          prefill: {
+            name: '<%=user.name%>',
+            email: '<%=user.email%>',
+            contact: '<%=user.phone%>',
+          },
+          theme: { color: '#3399cc' },
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } catch (error) {
+        console.error('Error creating order with Razorpay:', error);
+        alert('An error occurred while creating the order. Please try again.');
+      }
+    } else {
+      alert('Please select a payment method.');
     }
-});
+  });
+
+
+
+
 
 function getCartItems() {
   const cartItems = [];
   
   document.querySelectorAll(".order__table tbody tr").forEach((row) => {
-    // Skip rows that don't have the product details
     if (!row.querySelector(".order__img")) return;
 
-    const productId = row.querySelector("img").getAttribute("src").split("/").pop(); // Extract product ID from image source
+    const productId = row.querySelector("img").getAttribute("src").split("/").pop(); 
     const quantityText = row.querySelector(".table__quantity")?.textContent || "";
-    const quantity = parseInt(quantityText.replace("x ", "").trim()) || 0; // Extract quantity
-    const size = row.querySelector("td:nth-child(3) span")?.textContent?.trim() || "N/A"; // Default size to 'N/A'
+    const quantity = parseInt(quantityText.replace("x ", "").trim()) || 0; 
+    const size = row.querySelector("td:nth-child(3) span")?.textContent?.trim() || "N/A"; 
     const priceText = row.querySelector("td:nth-child(4) span")?.textContent || "₹0";
-    const price = parseFloat(priceText.replace("₹", "").trim()) || 0; // Convert price to a float
+    const price = parseFloat(priceText.replace("₹", "").trim()) || 0; 
     const totalPriceText = row.querySelector(".table__price")?.textContent || "₹0";
-    const totalPrice = parseFloat(totalPriceText.replace("₹", "").trim()) || 0; // Convert total price to a float
+    const totalPrice = parseFloat(totalPriceText.replace("₹", "").trim()) || 0; 
 
     if (productId && quantity > 0) {
       cartItems.push({
@@ -472,10 +701,10 @@ function getCartItems() {
 
 
 
+})
 
 
-
-
+//////ADDRESS PART//////////////
 
 document.addEventListener('DOMContentLoaded', function() {
     const addButton = document.querySelector('.add-btnn');
@@ -483,11 +712,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeButton = modal.querySelector('.modal-close');
     const form = document.getElementById('addaddressform');
 
-    // Function to reset form and clear error messages
+  
     function resetForm() {
-      form.reset(); // Reset all form fields
+      form.reset(); 
 
-      // Clear all error messages
+     
       const errorElements = document.querySelectorAll('.error-message');
       errorElements.forEach(error => {
         error.textContent = '';
@@ -579,7 +808,7 @@ document.addEventListener('DOMContentLoaded', function() {
       landmarkError.style.color = "red";
       isValid = false
     }
-    const phoneRegex = /^\d{10}$/; // Example: Only allows 10-digit numbers
+    const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(addphone)) {
       addphoneError.textContent = "Please Enter a valid Phone Number";
       addphoneError.style.color = "red";
@@ -647,3 +876,56 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
       </script>
+       <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+       <script>
+        document.getElementById('applyCouponBtn').addEventListener('click', function() {
+          const couponSelect = document.getElementById('couponSelect');
+          const selectedCoupon = couponSelect.options[couponSelect.selectedIndex];
+      
+          // Get coupon details
+          const couponId = selectedCoupon.value;
+          const discount = parseFloat(selectedCoupon.getAttribute('data-discount'));
+          const minPrice = parseFloat(selectedCoupon.getAttribute('data-min-price'));
+      
+          if (couponId) {
+            const subtotal = parseFloat('<%= totalAmount %>'); // Assuming you pass totalAmount to JS
+            if (subtotal >= minPrice) {
+              const discountAmount = discount;
+              const finalAmount = subtotal - discountAmount;
+      
+              // Update the discount and total in the table
+              document.getElementById('discountAmount').textContent = `₹${discountAmount}`;
+              document.getElementById('finalAmount').textContent = `₹${finalAmount}`;
+      
+             
+              fetch(`/apply-coupon`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ couponId, discountAmount, finalAmount })
+              })
+              .then(response => response.json())
+              .then(data => {
+                console.log('Coupon applied successfully:', data);
+              })
+              .catch(error => {
+                console.error('Error applying coupon:', error);
+              });
+            } else {
+              alert('Your subtotal is too low for this coupon.');
+            }
+          } else {
+            alert('Please select a coupon.');
+          }
+        });
+      </script>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+
+
+
+

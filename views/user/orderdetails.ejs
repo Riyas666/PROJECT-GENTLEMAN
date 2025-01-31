@@ -71,7 +71,6 @@
   <div class="container py-5">
 
 
-    <!-- Order Details -->
 
 
     <div class="order-details-container">
@@ -96,7 +95,8 @@
           <p><strong>Total Amount:</strong>₹<%= orders.finalAmount %></p>
           <p><strong>Estimated Delivery:</strong> <%= new Date(orders.deliveryDate).toLocaleDateString() %></p>
           <p><strong>Status:</strong> <span class="badge bg-<%= orders.status === 'Delivered' ? 'success' : 'warning' %>"><%= orders.status %></span></p>
-
+          <p><strong>Payment Type:</strong><%=orders.paymentType%></p>
+          <p><strong>Payment Status:</strong><span class="badge bg-<%=orders.paymentStatus === 'Success'? 'success': orders.paymentStatus==='Pending'? 'warning':orders.paymentStatus==='Failed'?'danger':'secondary' %>"> <%=orders.paymentStatus%></span></p>
           <div class="mt-4">
             <h6>Products:</h6>
             <% orders.orderedItems.forEach(item => { %>
@@ -156,6 +156,8 @@
         document.getElementById("return-order").style.display = "inline-block";
       }
     });
+
+    ////////FOR CANCELLATION////////
 
     document.addEventListener("DOMContentLoaded", () => {
   const cancelOrderButton = document.getElementById("cancel-order");

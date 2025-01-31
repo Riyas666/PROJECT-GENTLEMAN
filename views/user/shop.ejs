@@ -1,4 +1,61 @@
 <%-include("../../views/partials/user/header")%>
+<style>
+  /* Shop Controls Styling */
+.shop-controls {
+  margin-bottom: 2rem;
+}
+
+.controls__container {
+  display: grid;
+  grid-template-columns: 1fr 200px 200px;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.search__wrapper {
+  position: relative;
+}
+
+.search__form {
+  display: flex;
+  align-items: center;
+}
+
+.search__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  font-size: 0.938rem;
+}
+
+.search__button {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.filter__select,
+.sort__select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  font-size: 0.938rem;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .controls__container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+</style>
 
 <!--=============== MAIN ===============-->
 
@@ -12,7 +69,54 @@
       <li><a href="/shop" class="breadcrumb__link">Shop</a></li>
     </ul>
   </section>
-
+  <section class="shop-controls container">
+    <div class="controls__container grid">
+      <!-- Search Bar -->
+      <div class="search__wrapper">
+        <form action="/shop" method="GET" class="search__form">
+          <input 
+            type="text" 
+            name="search" 
+            placeholder="Search products..." 
+            class="search__input"
+            value="<%= searchQuery || '' %>"
+          >
+          <button type="submit" class="search__button">
+            <i class="fi fi-rs-search"></i>
+          </button>
+        </form>
+      </div>
+  
+      <!-- Category Filter -->
+      <div class="filter__wrapper">
+        <select name="category" id="categoryFilter" class="filter__select">
+          <option value="">All Categories</option>
+          <% categories.forEach(function(category) { %>
+            <option value="<%= category._id %>" 
+              <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
+              <%= category.name %>
+            </option>
+          <% }); %>
+        </select>
+      </div>
+  
+      <!-- Sort Options -->
+      <div class="sort__wrapper">
+        <select name="sort" id="sortProducts" class="sort__select">
+          <option value="">Sort By</option>
+          <option value="price_asc" <%= sortBy === 'price_asc' ? 'selected' : '' %>>
+            Price: Low to High
+          </option>
+          <option value="price_desc" <%= sortBy === 'price_desc' ? 'selected' : '' %>>
+            Price: High to Low
+          </option>
+          <option value="newest" <%= sortBy === 'newest' ? 'selected' : '' %>>
+            Newest First
+          </option>
+        </select>
+      </div>
+    </div>
+  </section>
   <!--=============== PRODUCTS ===============-->
   <section class="products container section--lg">
     <!-- <p class="total__products">We found <span>688</span> items for you!</p> -->
@@ -28,7 +132,7 @@
             <a href="#" class="action__btn" aria-label="Quick View">
               <i class="fi fi-rs-eye"></i>
             </a>
-            <a href="/addToWishlist?id=<%products[i]._id%>" class="action__btn" aria-label="Add to Wishlist">
+            <a onclick="addToWishlist('<%=products[i]._id%>')"  class="action__btn" aria-label="Add to Wishlist">
               <i class="fi fi-rs-heart"></i>
             </a>
 
@@ -120,3 +224,85 @@
 
 <!--=============== MAIN JS ===============-->
 <script src="/js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const categoryFilter = document.getElementById('categoryFilter');
+  const sortProducts = document.getElementById('sortProducts');
+  
+  // Function to update URL with filter parameters
+  function updateFilters() {
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    // Get current search query if it exists
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      searchParams.set('search', searchQuery);
+    }
+    
+    // Update category
+    if (categoryFilter.value) {
+      searchParams.set('category', categoryFilter.value);
+    } else {
+      searchParams.delete('category');
+    }
+    
+    // Update sort
+    if (sortProducts.value) {
+      searchParams.set('sort', sortProducts.value);
+    } else {
+      searchParams.delete('sort');
+    }
+    
+    // Update URL and reload page
+    window.location.href = `${window.location.pathname}?${searchParams.toString()}`;
+  }
+  
+  // Add event listeners
+  categoryFilter.addEventListener('change', updateFilters);
+  sortProducts.addEventListener('change', updateFilters);
+});
+
+
+
+function addToWishlist(productId){
+  $.ajax({
+    url:"/addToWishlist",
+    method:"POST",
+    data:{productId:productId},
+    success: (response) => {
+      
+      if (response.status) {
+        Notiflix.Notify.success("Product added to wishlist!", {
+          timeout: 3000,
+          position: 'right-top',
+          clickToClose: true,
+          cssAnimationStyle: 'zoom',
+          fontSize: '16px',
+          borderRadius: '10px',
+          showOnlyTheLastOne: true,
+        });
+        // You can also update the UI to reflect that the item was added
+      } else {
+        Notiflix.Notify.warning(response.message, {
+          timeout: 3000,
+          position: 'right-top',
+          clickToClose: true,
+          cssAnimationStyle: 'zoom',
+          fontSize: '16px',
+          borderRadius: '10px',
+          showOnlyTheLastOne: true,
+        });
+      }
+    },
+    error:(error)=>{
+      console.log("Error", error);
+      alert("an error occured")
+    },
+  })
+}
+
+
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/notiflix/dist/notiflix-3.2.6.min.js"></script>

@@ -201,8 +201,7 @@
       height: 2rem;
     }
   }
-</style>
-<style>
+
   .container {
     padding: 1rem;
   }
@@ -312,7 +311,7 @@
       </div>
       <div class="tab__body">
         <div class="address-container">
-          <!-- Add Address Button -->
+        <!---------------------ADD ADDRESSS BUTTTONNNN----------------------->>
           <div class="button-container">
             <button class="add-btnn">Add New Address</button>
           </div>
@@ -367,6 +366,10 @@
               </ul>
             </nav>
           </div>
+
+        <!--------------------ADD ADDRESS MODALLL--------------------------------->
+
+
           <div class="modal-overlay" id="addressModal">
             <div class="address-modal">
               <div class="modal-header">
@@ -459,7 +462,7 @@
               </div>
             </div>
           </div>
-
+ <!--------------------EDIT ADDRESS MODALLL--------------------------------->>
           <div class="modal-overlay" id="editAddressModal">
             <div class="address-modal">
               <div class="modal-header">
@@ -561,7 +564,7 @@
 <!--=============== SWIPER JS ===============-->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-<!--=============== MAIN JS ===============-->
+
 
 
 
@@ -570,17 +573,18 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
+
+//////////FOR OPENNG ADD ADDRESS MODAL
   document.addEventListener('DOMContentLoaded', function() {
     const addButton = document.querySelector('.add-btnn');
     const modal = document.getElementById('addressModal');
     const closeButton = modal.querySelector('.modal-close');
     const form = document.getElementById('addaddressform');
 
-    // Function to reset form and clear error messages
     function resetForm() {
-      form.reset(); // Reset all form fields
+      form.reset(); 
 
-      // Clear all error messages
+    
       const errorElements = document.querySelectorAll('.error-message');
       errorElements.forEach(error => {
         error.textContent = '';
@@ -605,16 +609,22 @@
       }
     });
 
-    // Handle ESC key press
+   
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && modal.classList.contains('active')) {
         closeModal();
       }
     });
 
-    // Form submission handling
+   
 
   });
+
+
+
+
+
+  ////////////ADD ADDRESS MODAL VALIDATION////////////////////
   document.getElementById("addaddressform").addEventListener("submit", async function(e) {
     e.preventDefault();
 
@@ -680,7 +690,7 @@
       isValid = false
     }
 
-    const phoneRegex = /^\d{10}$/; // Example: Only allows 10-digit numbers
+    const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(addphone)) {
       addphoneError.textContent = "Please Enter a valid Phone Number";
       addphoneError.style.color = "red";
@@ -756,11 +766,10 @@
     const closeButton = modal.querySelector('.modal-close');
     const form = document.getElementById('editAddressForm');
 
-    // Function to reset form and clear error messages
+   
     function resetForm() {
-      form.reset(); // Reset all form fields
+      form.reset(); 
 
-      // Clear all error messages
       const errorElements = document.querySelectorAll('.error-message');
       errorElements.forEach(error => {
         error.textContent = '';
@@ -785,7 +794,6 @@
       }
     });
 
-    // Handle ESC key press
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && modal.classList.contains('active')) {
         closeModal();
@@ -795,11 +803,11 @@
   })
 
 
-  //FOR DELETE
+  //FOR EDITT
 
 
   function openEditModal(id, name, city, state, pincode, landmark, phone, addressType) {
-    document.getElementById('editAddressId').value = id; // Set the hidden ID field
+    document.getElementById('editAddressId').value = id; 
     document.getElementById('editName').value = name;
     document.getElementById('editCity').value = city;
     document.getElementById('editState').value = state;
@@ -812,18 +820,17 @@
     document.getElementById('editAddressModal').classList.add('active');
   }
 
-  // Close Edit Address Modal
   document.getElementById('closeEditModal').onclick = function() {
     document.getElementById('editAddressModal').classList.remove('active');
   };
 
 
-
+//////////////EDIT ADDRESS VALIDATIONS/////////////
 
   document.getElementById("editAddressForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    // Get form values
+    
     const editName = document.getElementById("editName").value.trim();
     const editCity = document.getElementById("editCity").value.trim();
     const editState = document.getElementById("editState").value;
@@ -833,7 +840,6 @@
     const editAddressType = document.getElementById("editAddressType").value;
     const addressId = document.getElementById("editAddressId").value;
 
-    // Get error elements
     const editNameError = document.getElementById("editNameError");
     const editCityError = document.getElementById("editCityError");
     const editStateError = document.getElementById("editStateError");
@@ -842,7 +848,6 @@
     const editPhoneError = document.getElementById("editPhoneNumberError");
     const editAddressTypeError = document.getElementById("editAddressTypeError");
 
-    // Clear previous error messages
     editNameError.textContent = "";
     editCityError.textContent = "";
     editStateError.textContent = "";
@@ -853,7 +858,6 @@
 
     let isValid = true;
 
-    // Validation checks
     if (editName === "") {
       editNameError.textContent = "Field is Required";
       editNameError.style.color = "red";
@@ -953,7 +957,9 @@
     }
   });
 
-  // Clear error messages on input
+
+
+  /////////CLEAR THE EXISTIGN ERROR MESSAGE////////////
   const editInputs = ['editName', 'editCity', 'editState', 'editPincode', 'editLandmark', 'editPhone', 'editAddressType'];
 
   editInputs.forEach(inputId => {

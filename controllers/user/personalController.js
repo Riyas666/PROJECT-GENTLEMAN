@@ -239,7 +239,8 @@ const editAddress = async (req, res) => {
 
 const deleteAddress = async (req, res) => {
     try {
-        const { addressId } = req.params; 
+        console.log(req.params)
+        const  addressId  = req.params.addressId; 
         const userId = req.session.user; 
         console.log("this is the delete reuqest", addressId, userId)
 

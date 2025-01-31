@@ -14,6 +14,4 @@ router.post('/delete', cartController.deleteCartItem);
 router.post("/addToCart", userAuth, cartController.addToCartDetails);
 
 
-
-
 module.exports = router;

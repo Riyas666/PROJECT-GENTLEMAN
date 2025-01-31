@@ -1405,11 +1405,6 @@ table {
   border-bottom: 1px solid var(--border-color-alt);
 }
 
-.table thead tr th:nth-child(1),
-.table tbody tr td:nth-child(1) {
-  width: 216px;
-}
-
 .table thead tr th:nth-child(2),
 .table tbody tr td:nth-child(2) {
   width: 400px;
@@ -1992,10 +1987,10 @@ table {
     padding: 1.25rem;
   }
 
-  .table thead tr th:nth-child(1),
+  /* .table thead tr th:nth-child(1),
   .table tbody tr td:nth-child(1) {
     width: 140px;
-  }
+  } */
 
   .table thead tr th:nth-child(2),
   .table tbody tr td:nth-child(2) {

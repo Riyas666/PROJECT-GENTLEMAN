@@ -1,5 +1,6 @@
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
+const User = require("../../models/userSchema")
 
 
 const getCart = async (req, res) => {
@@ -202,13 +203,182 @@ console.log("this is the existinggggggggg existing product", existingProduct);
         }
       };
       
+const getWishlist = async(req,res)=>{
+  try{
+    const userId = req.session.user;
+    const user = await User.findById(userId).populate("wishlist.productId");
+  console.log("heheheh", user)
+    res.render("wishlist", {
+      user,
+      wishlist:user.wishlist,
+    })
+  }catch(error){
+   console.error(error)
+   res.redirect("/pageNotFound")
+  }
+  
+}
 
-      
+const addToWishlist = async(req,res)=>{
+  try{
+    const {productId,size} = req.body;
+    const userId = req.session.user;
+                                               
+    if (!productId) {
+      return res.status(400).json({ status: false, message: "Product ID is required" });
+    }
+
+    const user = await User.findById(userId) 
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ status: false, message: "Product not found" });
+    }
+
+
+  let selectedSize;
+    if (size) {
+      // If the user has selected a size, use that
+      selectedSize = size;
+    } else {
+      // If no size is selected (shop page), use the first available size as default
+      selectedSize = product.sizes.length > 0 ? product.sizes[0].size : null;
+    }
+
+
+
+    if (!selectedSize) {
+      return res.status(400).json({ status: false, message: "No valid size available for this product" });
+    }
+
+    if (user.wishlist?.some((item) => item.productId?.toString() === productId &&item.size===selectedSize)) {
+      return res.status(200).json({ status: false, message: "Product already in wishlist" });
+    }
+    
+    const sizeObject = product.sizes.find((item) => item.size === selectedSize);
+    if (!sizeObject) {
+      return res.status(400).json({ status: false, message: "Invalid size selected" });
+    }
+    
+    const stockStatus = sizeObject.quantity > 0 ? 'In Stock' : 'Out of Stock';
+    
+console.log("44444444444", stockStatus)
+   
+
+   
+    user.wishlist.push ({
+      name:product.productName,
+      price:product.salePrice,
+      productId, 
+      size: selectedSize, 
+      stockStatus 
+    })
+    await user.save()
+    res.status(200).json({ status: true, message: "Product added to wishlist" });
+
+  }catch(error){
+    console.error(error);
+
+    res.status(500).json({ status: false, message: "Internal server error" });
+  }
+}
+
+
+const deleteWishlistItem = async (req, res) => {
+  try {
+    const { productId } = req.body; // Get the productId from the request body
+    const userId = req.session.user; // Get the userId from the session
+
+    if (!productId) {
+      return res.status(400).json({ success: false, message: "Product ID is required" });
+    }
+
+    // Find the user and remove the item from the wishlist
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { wishlist: { productId } } }, // Remove the product with the specified ID
+      { new: true } // Return the updated document
+    ).populate("wishlist.productId"); // Optionally repopulate the wishlist for response
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Item removed from wishlist successfully",
+      wishlist: updatedUser.wishlist, // Optionally send the updated wishlist back
+    });
+  } catch (error) {
+    console.error("Error deleting wishlist item:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+const removeFromWishlist = async (req, res) => {
+  try {
+      const { productId } = req.body;
+      const userId = req.session.user; // Assuming session stores the logged-in user's ID
+
+      if (!userId) {
+          return res.status(401).json({ success: false, message: "User not authenticated" });
+      }
+
+      // Find the user and update their wishlist by removing the product
+      const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { $pull: { wishlist: { productId: productId } } },
+          { new: true }
+      );
+
+      if (!updatedUser) {
+          return res.status(404).json({ success: false, message: "User not found" });
+      }
+
+      return res.json({ success: true, message: "Item removed from wishlist" });
+
+  } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+const applyCoupon = async (req, res) => {
+  try {
+    const { couponId, discountAmount, finalAmount } = req.body;
+    const userId = req.session.user;
+
+    // Find the coupon
+    const coupon = await Coupon.findById(couponId);
+    
+    if (!coupon) {
+      return res.status(400).json({ message: 'Invalid coupon.' });
+    }
+
+    // You can save the coupon details and the new totalAmount in the session or cart
+    // Example: Save it in session for later use
+    req.session.coupon = { couponId, discountAmount, finalAmount };
+
+    res.json({ success: true, message: 'Coupon applied successfully', discountAmount, finalAmount });
+  } catch (error) {
+    console.error('Error applying coupon:', error);
+    res.status(500).json({ message: 'An error occurred while applying the coupon.' });
+  }
+};
+
+
 
 
   module.exports = {
     getCart,
     addToCartDetails,
     updateCart,
-    deleteCartItem
+    deleteCartItem,
+    getWishlist,
+    addToWishlist,
+    deleteWishlistItem,
+    removeFromWishlist,
+    applyCoupon
   }

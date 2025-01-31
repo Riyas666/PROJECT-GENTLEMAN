@@ -237,6 +237,7 @@
 
 
 <script>
+  //////////////FORM VALIDATION//////////////
     function handleFormSubmit(event){
         event.preventDefault()
             if(!validateForm()){
@@ -279,7 +280,7 @@
 }
             
         
-    
+    //////////////VALIDATE FORM//////////////
     function validateForm(){
         clearErrorMessages()
         const name = document.getElementsByName("name")[0].value.trim()
@@ -303,12 +304,13 @@
         return isValid;
     }
 
+
     function displayErrorMessage(elementId,message){
         var errorElement = document.getElementById(elementId);
         errorElement.innerText = message;
         errorElement.style.display = "block"
     }
-
+///////////ERROR MESSAGE CLEAR///////////
 
     function clearErrorMessages(){
         const errorElements = document.getElementsByClassName("error-message");
@@ -317,10 +319,6 @@
             element.style.display = "none"
         })
     }
-
-
-
-
 
 
 </script>

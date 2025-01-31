@@ -1,11 +1,20 @@
 const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Products = require("../../models/productSchema");
-
+const Order = require("../../models/orderSchema");
+const Address = require("../../models/addressSchema")
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const Product = require("../../models/productSchema");
+const Razorpay  = require("razorpay")
+const crypto = require('crypto');
+const Cart = require("../../models/cartSchema");
+
+const razorpayInstance  = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 //FOR RENDER THE SIGNUP PAGE IF HAVE SESSION THEN TO THE HOME PAGE
 const loadSignup = async (req, res) => {
@@ -155,9 +164,6 @@ const loadHomePage = async (req, res) => {
         productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
         productData = productData.slice(0, 4);
        
-
-        
-        // const status = User.find
         if (user) {
             const userData = await User.findById(user);
            
@@ -250,6 +256,130 @@ const logout = async (req, res) => {
     }
 };
 
+
+
+
+const createOrder = async (req, res) => {
+    try {
+      const { amount, addressId,  paymentMethod } = req.body;
+      const userId = req.session.user; 
+const cart = await Cart.findOne({userId})
+if (!cart || cart.items.length === 0) {
+    return res.status(404).json({ success: false, message: "Cart is empty" });
+}
+
+const productIds = cart.items.map((item) => item.productId);
+const products = await Product.find({ _id: { $in: productIds } });
+for (const item of cart.items) {
+    const product = products.find((prod) => prod._id.toString() === item.productId.toString());
+    if (!product) {
+        return res.status(404).json({ success: false, message: `Product with ID ${item.productId} not found` });
+    }
+    const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
+  
+            if (!sizeObject || sizeObject.quantity < item.quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Stock not available for ${product.productName} (Size: ${item.size})`,
+                });
+            }         
+        }
+        
+        for (const item of cart.items) {
+            const product = products.find((prod) => prod._id.toString() === item.productId.toString());
+            const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
+            sizeObject.quantity -= item.quantity;
+
+            await product.save();
+        }
+        const totalPrice = cart.items.reduce((acc, item) => acc + item.totalPrice, 0);
+        const finalAmount = totalPrice; 
+        const address = await Address.findOne({ userId, "address._id": addressId });
+        const selectedAddress = address.address.find(addr => addr._id == addressId);
+        console.log("this is address", selectedAddress)
+      const options = {
+        amount: amount, 
+        currency: 'INR',
+        receipt: `order_rcptid_${Math.floor(Math.random() * 10000)}`,
+      };
+
+      console.log("Creating order with options:", options);
+  console.log("hahahaha", razorpayInstance)
+      const razorpayOrder = await razorpayInstance.orders.create(options);
+  
+   const order = new Order({
+    userId: userId,
+    orderId: razorpayOrder.id,
+    orderedItems : cart.items.map((item) => ({
+        products: item.productId,
+        size: item.size,
+        quantity: item.quantity,
+        price: item.totalPrice,
+    })),
+    address: selectedAddress,
+    totalPrice: amount / 100, // Convert to INR
+    finalAmount,
+    status: "Pending", // Initial order status
+    paymentType: paymentMethod, 
+    paymentStatus: "Pending", // Initial payment status
+  });
+
+
+  console.log("this is the orders", order)
+
+  await order.save();
+  cart.items = [];
+  await cart.save();
+
+
+
+
+  console.log("this is razzzzzzzzz", razorpayOrder)
+
+  res.json({ success: true, razorpayOrder });     //   res.json(order);
+    } catch (error) {
+      console.error('Error creating Razorpay order:', error);
+      res.status(500).json({ error: 'Failed to create order' });
+    }
+  };
+  const verifyPayment = async (req, res) => {
+
+
+    const verifyPaymentSignature = (orderId, paymentId, signature) => {
+        const generatedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET) 
+            .update(`${orderId}|${paymentId}`)
+            .digest('hex');
+    
+        return generatedSignature === signature;
+    };
+    try {
+        const { paymentId, orderId, signature } = req.body;
+
+        // Step 1: Verify payment signature manually
+        const isValidSignature = verifyPaymentSignature(orderId, paymentId, signature);
+        console.log("Is valid signature:", isValidSignature);
+
+        if (!isValidSignature) {
+            return res.status(400).json({ error: 'Payment verification failed' });
+        }
+
+        // Step 2: Update the order status in database after successful payment verification
+        const order = await Order.findOne({ orderId: orderId });
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        order.paymentStatus = 'Success'; // Update the status to 'Paid'
+        await order.save();
+
+        // Step 3: Send a success response
+        res.json({ success: true, message: 'Payment verified successfully' });
+    } catch (error) {
+        console.error('Error verifying Razorpay payment:', error);
+        res.status(500).json({ error: 'Payment verification failed' });
+    }
+};
+
 //EXPORTING..
 module.exports = {
     loadSignup,
@@ -262,4 +392,8 @@ module.exports = {
     login,
     pageNotFound,
     logout,
+
+
+    createOrder,
+    verifyPayment
 };

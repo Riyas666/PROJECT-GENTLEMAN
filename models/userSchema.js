@@ -44,10 +44,15 @@ const userSchema = new Schema({
         type: Number,
         default: 0
     }, 
-    wishlist: [{
-        type: Schema.Types.ObjectId,
-        ref: "Wishlist"
-    }],
+    wishlist: [
+        {
+          productId: { type: Schema.Types.ObjectId, ref: "Product" },
+          size: { type: String },
+          price:{ type : Number },
+          name: {type: String},
+          stockStatus: { type: String },
+        },
+      ],
     orderHistory: [{
         type: Schema.Types.ObjectId,
         ref: "Order"

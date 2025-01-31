@@ -36,39 +36,55 @@ const productDetails = async (req, res) => {
 
   const loadShopping = async (req, res) => {
     try {
-        const user = req.session.user;
-        const userData = await User.findOne({ _id: user });
-        const categories = await Category.find({ isListed: true });
-        const categoryIds = categories.map((category) => category._id.toString());
         const page = parseInt(req.query.page) || 1;
         const limit = 12;
         const skip = (page - 1) * limit;
-        const products = await Product.find({
-            isBlocked: false,
-            category: { $in: categoryIds },
-        })
-            .populate("brand")
-            .sort({ createdOn: -1 })
-            .skip(skip)
-            .limit(limit)
-           
 
-        const totalProducts = await Product.countDocuments({
-            isBlocked: false,
-            category: { $in: categoryIds },
-            quantity: { $gt: 0 },
-        });
+
+        let query = {}
+
+        if(req.query.search){
+            query.productName = {$regex:req.query.search, $options:'i'}
+        }
+        if(req.query.category){
+            query.category = req.query.category;
+        }
+
+        let productsQuery = Product.find(query).populate('brand')
+
+        if(req.query.sort){
+            switch(req.query.sort){
+                case 'price_asc':
+                    productsQuery = productsQuery.sort({salePrice:1});
+                    break;
+                    case 'price_desc':
+                        productsQuery = productsQuery.sort({salePrice:-1});
+                        break;
+                        case 'newest':
+                            productsQuery = productsQuery.sort({createdAt:-1});
+                            break;
+            }
+        }
+
+
+
+        
+        const products = await productsQuery.skip(skip).limit(limit);
+        const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / limit);
+        const categories = await Category.find({ isListed: true });
 
-        const brands = await Brand.find({
-            isBlocked: false,
-        });
-        const categoriesWithIds = categories.map((category) => ({ _id: category._id, name: category.name }));
+
+        
 
         res.render("shop", {
-            user: userData,
+          
+
             products: products,
-            category: categoriesWithIds,
+            categories: categories,
+            searchQuery: req.query.search || '',
+            selectedCategory: req.query.category || '',
+            sortBy: req.query.sort || '',
             brand: products.brand,
             totalProducts: totalProducts,
             currentPage: page,
@@ -81,7 +97,7 @@ const productDetails = async (req, res) => {
     }
 };
 
-
+ 
 
 module.exports = {
     productDetails,

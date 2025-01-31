@@ -13,7 +13,7 @@ const couponSchema = new mongoose.Schema({
         default: Date.now,
         required: true
     },
-    expiredOn: {
+    expireOn: {
         type: Date,
         required: true
     },
@@ -25,11 +25,11 @@ const couponSchema = new mongoose.Schema({
         type: Number,
         required: true
     }, 
-    isList: {
+    isActive: {
         type: Boolean,
         default: true
     },
-    userId: [{
+    usedBy: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }]

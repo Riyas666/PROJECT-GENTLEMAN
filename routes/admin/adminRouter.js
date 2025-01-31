@@ -5,6 +5,7 @@ const router = express.Router();
 const adminController = require("../../controllers/admin/adminController");
 const { adminAuth } = require("../../middlewares/auth");
 const orderController = require("../../controllers/admin/orderController")
+const couponController = require("../../controllers/admin/couponController")
 
 
 
@@ -23,6 +24,16 @@ router.get("/pageerror",adminAuth, adminController.pageerror);
 
 router.get("/admin/orders", orderController.getOrderList )
 
+
+
+//coupon management
+
+router.get("/coupon", adminAuth, couponController.getCoupon)
+
+router.post("/createCoupon", adminAuth, couponController.createCoupon)
+router.get("/editCoupon", adminAuth, couponController.editCoupon);
+router.post("/updateCoupon", adminAuth, couponController.updateCoupon);
+router.get("/deleteCoupon", adminAuth,couponController.deleteCoupon)
 
 //EXPORTING
 module.exports = router;

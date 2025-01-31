@@ -1,0 +1,230 @@
+<%-include("../../views/partials/user/header")%>
+
+
+    <!--=============== MAIN ===============-->
+    <main class="main">
+      <!--=============== BREADCRUMB ===============-->
+      <section class="breadcrumb">
+        <ul class="breadcrumb__list flex container">
+          <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+          <li><span class="breadcrumb__link"></span>></li>
+          <li><span class="breadcrumb__link">Shop</span></li>
+          <li><span class="breadcrumb__link"></span>></li>
+          <li><span class="breadcrumb__link">Wishlist</span></li>
+        </ul>
+      </section>
+
+      <!--=============== WISHLIST ===============-->
+      <section class="wishlist section--lg container">
+        <div class="table__container">
+          <table class="table">
+            <%if(wishlist.length>0){%>
+                
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Price</th>
+                <th>Stock Status</th>
+                <th>Action</th>
+                <th>Rename</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% wishlist.forEach(item => { %>
+              <tr >
+                <td>
+                 <img src="/uploads/product-images/<%=item.productImage%>" alt="">
+                </td>
+                <td>
+                  <h3 class="table__title">
+                    <%=item.name%>
+                  </h3>
+                  <!-- <p class="table__description">
+                    Lorem ipsum dolor sit amet consectetur.
+                  </p> -->
+                </td>
+                <td>
+                    <span class="table__size"><%= item.size%></span>
+                  </td>
+                <td>
+                  <span class="table__price"><%=item.price%></span>
+                </td>
+                <td><span class="table__stock"><%= item.stockStatus %></span></td>
+                <td>
+                    <input type="hidden" class="product-id" value="<%= item.productId._id %>" />
+                    <a  class="btn btn--sm add-to-cart-from-wishlist">Add to Cart</a></td>
+                <td><i class="fi fi-rs-trash table__trash" onclick="deleteProduct('<%=item.productId._id%>')"  id="delete-button"></i></td>
+              </tr>
+              <%})%>
+              <%}else{%>
+              <tr colspan="5" class="text-center">
+                <td>
+                    <p class="lead mb-4">No items found in wishlist</p>
+                </td>
+              </tr>
+              <%}%>
+            </tbody>
+          </table>
+        </div>
+      </section>
+         
+    </main>
+
+   
+    <%-include("../../views/partials/user/footer")%>
+
+
+    <!--=============== MAIN JS ===============-->
+    <script src="/js/main.js"></script>
+    <script>
+        function deleteProduct(productId) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to delete this item from your Wishlist?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+       
+        fetch('/wishlist/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ productId }), 
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            Swal.fire('Deleted!', 'The item has been removed from your cart.', 'success').then((res)=>{
+              if(res.isConfirmed){
+                  window.location.href="/wishlist"
+              }
+          });
+        } else {
+            // Handle errors
+            Swal.fire('Error!', data.error || 'Failed to delete the product.', 'error');
+            }
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
+          });
+      }
+    });
+  }
+  
+
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const addToCartButton = document.querySelectorAll('.add-to-cart-from-wishlist');
+
+  if(addToCartButton.length>0){
+
+  addToCartButton.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Get the row corresponding to the clicked "Add to Cart" button
+      const row = e.target.closest('tr');
+      const productId = row.querySelector('.product-id').value; // Assuming you have a hidden input or some identifier for product ID
+      const selectedSize = row.querySelector('.table__size').textContent; // Get the size directly from the table row
+      const quantity = 1; 
+  
+    fetch('/cart/addToCart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId, size: selectedSize, quantity })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        Notiflix.Notify.success(data.message, {
+          timeout: 3000,
+          position: 'right-top',
+          clickToClose: true,
+          cssAnimationStyle: 'zoom',
+          fontSize: '16px',
+          borderRadius: '10px',
+          showOnlyTheLastOne: true,
+        });
+
+
+
+
+
+fetch("/wishlist/remove", {
+    method:"POST",
+    headers:{
+        'Content-Type':'application/json',
+    },
+    body:JSON.stringify({productId})
+})
+
+.then((response)=>response.json())
+.then((removeData)=>{
+    if(removeData.success){
+        row.remove()
+    }else{
+        Notiflix.Notify.failure(removeData.message, {
+                  timeout: 3000,
+                  position: 'right-top',
+                  clickToClose: true,
+                  cssAnimationStyle: 'zoom',
+                  fontSize: '16px',
+                  borderRadius: '10px',
+                  showOnlyTheLastOne: true,
+                });
+              }
+            })
+            .catch((error) => {
+              console.error('Error removing item from wishlist:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Unexpected Error',
+                text: 'Something went wrong while removing the item from the wishlist. Please try again.',
+              });
+            });
+          }else {
+        Notiflix.Notify.failure(data.message, {
+          timeout: 3000,
+          position: 'right-top',
+          clickToClose: true,
+          cssAnimationStyle: 'zoom',
+          fontSize: '16px',
+          borderRadius: '10px',
+          showOnlyTheLastOne: true,
+        });
+      }
+    })
+    .catch((error) => {
+      console.error('Error adding item to cart:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Unexpected Error',
+        text: 'Something went wrong while adding the item to the cart. Please try again.',
+      });
+    });
+  });
+});
+  }else{
+    console.log("NO add to cart button found in the wihlist")
+  }
+
+
+
+  })
+
+ 
+  
+    </script>
+<script src="https://cdn.jsdelivr.net/npm/notiflix/dist/notiflix-3.2.6.min.js"></script>
