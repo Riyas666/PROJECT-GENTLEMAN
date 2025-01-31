@@ -11,7 +11,7 @@ const uploads = multer({brandStorage:storage});
 
 //RELATED TO PRODUCT MANAGEMENT
 router.get("/",adminAuth,productController.getAllProducts)
-router.get("/addProducts", adminAuth,productController.getProductAddPage)
+router.get("/addProducts", adminAuth,productController.productAddPage)
 router.post('/addProducts',adminAuth, uploadProductImage.array('productImage', 4), productController.addProducts);
 
 
@@ -24,15 +24,6 @@ router.patch("/unblockProduct",adminAuth, productController.unblockProduct);
 router.get("/editProduct",adminAuth, productController.getEditProduct)
 router.post("/editProduct/:id",adminAuth, uploadProductImage.array('images', 4), productController.editProduct)
 router.post("/deleteImage",adminAuth, productController.deleteSingleImage)
-
-
-
-
-
-
-
-
-
 
 
 module.exports = router

@@ -312,7 +312,7 @@ const removeProduct = async (req, res) => {
 const getOrders = async (req, res) => {
     try {
       const userId = req.session.user;  
-      const orders = await Order.find({ userId })
+      const order = await Order.find({ userId })
       .populate({
         path: 'orderedItems.products',
         model: 'Product' 
@@ -325,7 +325,7 @@ const getOrders = async (req, res) => {
           message: "No orders found.",
         });
       }
-  
+  const orders = order.reverse()
       res.render("orders", {
         success: true,
         orders,  

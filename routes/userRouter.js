@@ -9,6 +9,7 @@ const profileController = require("../controllers/user/profileController");
 const productController = require("../controllers/user/productController");
 const orderController = require("../controllers/user/orderController");
 const cartController = require("../controllers/user/cartController")
+const wishlistController = require("../controllers/user/wishlistController")
 
 
 //TO DISPLAY PAGE NOT FOUND PAGE
@@ -75,19 +76,19 @@ router.post('/profile/cancel-order', orderController.cancelOrder);
 
 
 
-router.get("/wishlist", cartController.getWishlist)
-router.post("/addToWishlist", userAuth,cartController.addToWishlist)
-router.post('/wishlist/delete', cartController.deleteWishlistItem);
-router.post("/wishlist/remove", cartController.removeFromWishlist)
+router.get("/wishlist", wishlistController.getWishlist)
+router.post("/addToWishlist", userAuth,wishlistController.addToWishlist)
+router.post('/wishlist/delete', wishlistController.deleteWishlistItem);
+// router.post("/wishlist/remove", wishlistController.removeFromWishlist)
 
 
 
 
 router.post("/apply-coupon",userAuth, cartController.applyCoupon)
 
-router.post('/create-order', userController.createOrder);
+router.post('/create-order', orderController.createOrder);
 
-router.post('/verify-payment', userController.verifyPayment); 
+router.post('/verify-payment', orderController.verifyPayment); 
 
 
 

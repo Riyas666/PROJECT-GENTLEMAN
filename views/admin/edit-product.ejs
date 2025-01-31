@@ -37,6 +37,8 @@
       <div class="card mb-4">
         <div class="card-body">
           <form method="post" action="/admin/products/editProduct/<%=product._id%>" enctype="multipart/form-data" onsubmit=" return validateForm()">
+            
+  <input type="hidden" name="existingImages" value="<%= product.productImage.join(',') %>">
             <div class="mb-4">
               <label for="product_name" class="form-label">Product Name</label>
               <input type="text" name="productName" value="<%=product.productName%>" class="form-control border" id="product_name">
@@ -126,14 +128,12 @@
                   <div class="col-sm-6 mb-3">
                     <label class="form-label">Category</label>
                     <select class="form-select border" style="width: 150px;" name="category">
-
-                      <%for(let i = 0; i < cat.length; i++ ){%>
-
-                      <option value="<%=cat[i].name%>">
-                        <%=cat[i].name%>
-                      </option>
-                      <%}%>    
-                                           </select>
+                      <% for (let i = 0; i < cat.length; i++) { %>
+                        <option value="<%= cat[i]._id %>" <%= product.category && cat[i]._id.toString() === product.category.toString() ? 'selected' : '' %>>
+                          <%= cat[i].name %>
+                        </option>
+                      <% } %>
+                    </select>
 
 
                                            <div id="category-error" class="error-message"></div>
@@ -463,5 +463,4 @@
             })
            }
        </script>
-       
 <%- include("../../views/partials/admin/footer") %>

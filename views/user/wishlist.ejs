@@ -6,7 +6,7 @@
       <!--=============== BREADCRUMB ===============-->
       <section class="breadcrumb">
         <ul class="breadcrumb__list flex container">
-          <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+          <li><a href="/home" class="breadcrumb__link">Home</a></li>
           <li><span class="breadcrumb__link"></span>></li>
           <li><span class="breadcrumb__link">Shop</span></li>
           <li><span class="breadcrumb__link"></span>></li>
@@ -17,9 +17,8 @@
       <!--=============== WISHLIST ===============-->
       <section class="wishlist section--lg container">
         <div class="table__container">
-          <table class="table">
+          <table class="table" >
             <%if(wishlist.length>0){%>
-                
             <thead>
               <tr>
                 <th>Image</th>
@@ -34,16 +33,13 @@
             <tbody>
                 <% wishlist.forEach(item => { %>
               <tr >
-                <td>
-                 <img src="/uploads/product-images/<%=item.productImage%>" alt="">
+                <td >
+                 <img style="width: 5rem;" src="/uploads/product-images/<%=item.productId.productImage[0]%>" alt="">
                 </td>
                 <td>
                   <h3 class="table__title">
                     <%=item.name%>
                   </h3>
-                  <!-- <p class="table__description">
-                    Lorem ipsum dolor sit amet consectetur.
-                  </p> -->
                 </td>
                 <td>
                     <span class="table__size"><%= item.size%></span>
@@ -159,9 +155,6 @@
         });
 
 
-
-
-
 fetch("/wishlist/remove", {
     method:"POST",
     headers:{
@@ -228,3 +221,4 @@ fetch("/wishlist/remove", {
   
     </script>
 <script src="https://cdn.jsdelivr.net/npm/notiflix/dist/notiflix-3.2.6.min.js"></script>
+

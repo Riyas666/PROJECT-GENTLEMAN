@@ -10,7 +10,7 @@ const { isArgumentsObject } = require("util/types");
 const { BASE_UPLOAD_PATH } = require("../../utils/multer");
 
 //FOR GETTING THE PRODUCT PAGE
-const getProductAddPage = async (req, res) => {
+const productAddPage = async (req, res) => {
     try {
         const category = await Category.find({ isListed: true });
         console.log(category)
@@ -139,6 +139,7 @@ const getAllProducts = async (req, res) => {
         });
 
         const totalPages = Math.ceil(totalProducts / limit);
+    
 
         res.render("products", {
             data: productsWithImages,
@@ -206,14 +207,16 @@ const editProduct = async (req, res) => {
     try {
         const id = req.params.id;
         const data = req.body;
-        const product = await Product.findById(id);
+        // const product = await Product.findById(id);
        
-        const images = [];
-        if (req.files && req.files.length > 0) {
-            for (let i = 0; i < req.files.length; i++) {
-                images.push(req.files[i].filename);
-            }
-        }
+        // const images = [];
+        // if (req.files && req.files.length > 0) {
+        //     for (let i = 0; i < req.files.length; i++) {
+        //         images.push(req.files[i].filename);
+        //     }
+        // }
+
+    
 
         const existingImages = Array.isArray(data.existingImages)
             ? data.existingImages
@@ -221,42 +224,49 @@ const editProduct = async (req, res) => {
             ? [data.existingImages]
             : [];
 
-        const deletedImages = Array.isArray(data.deletedImages) ? data.deletedImages : [];
+        const deletedImages = Array.isArray(data.deletedImages) //? data.deletedImages : [];
+        ? data.deletedImages
+      : data.deletedImages
+      ? [data.deletedImages]
+      : [];
 
-        const updatedImages = [...existingImages.filter((img) => !deletedImages.includes(img)), ...images];
-        let sizes = [];
-        if (data.sizes && data.quantities) {
-            const sizeArray = data.sizes;
-            const quantityArray = data.quantities;
+        const updatedImages = [...existingImages.filter((img) => !deletedImages.includes(img)),  ...(req.files ? req.files.map((file) => file.filename) : []),
+    ];
+        // let sizes = [];
+        // if (data.sizes && data.quantities) {
+        //     const sizeArray = data.sizes;
+        //     const quantityArray = data.quantities;
 
-            for (let i = 0; i < sizeArray.length; i++) {
-                if (sizeArray[i] && quantityArray[i]) {
-                    sizes.push({ size: sizeArray[i], quantity: Number(quantityArray[i]) });
-                }
-            }
-        }
+        //     for (let i = 0; i < sizeArray.length; i++) {
+        //         if (sizeArray[i] && quantityArray[i]) {
+        //             sizes.push({ size: sizeArray[i], quantity: Number(quantityArray[i]) });
+        //         }
+        //     }
+        // }
         const updateFields = {
             productName: data.productName,
             description: data.description,
             brand: data.brand,
-            category: product.category,
+            category: data.category,
             regularPrice: data.regularPrice,
             salePrice: data.salePrice,
             productImage: updatedImages,
-            sizes: sizes,
-        };
+            sizes: data.sizes.map((size, index) => ({
+              size: size,
+              quantity: Number(data.quantities[index]),
+            })),
+          };
+      
 
-        await Product.findByIdAndUpdate(id, updateFields, { new: true });
+          await Product.findByIdAndUpdate(id, updateFields, { new: true });
 
-        console.log("Product updated successfully:", updateFields);
-
-        res.redirect("/admin/products");
-    } catch (error) {
-        console.error("Error updating product:", error);
-        return res.redirect("/admin/pageerror");
-    }
-};
-
+          console.log("Product updated successfully:", updateFields);
+          res.redirect("/admin/products");
+        } catch (error) {
+          console.error("Error updating product:", error);
+          res.redirect("/admin/pageerror");
+        }
+      };
 const deleteSingleImage = async (req, res) => {
     try {
         const { imageNameToServer, productIdToServer } = req.body;
@@ -280,7 +290,7 @@ const deleteSingleImage = async (req, res) => {
 
 //EXPORTING..
 module.exports = {
-    getProductAddPage,
+    productAddPage,
     addProducts,
     getAllProducts,
     blockProduct,

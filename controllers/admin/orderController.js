@@ -1,17 +1,13 @@
 const Order = require("../../models/orderSchema")
 
-const getOrderList = async (req,res)=>{
+const allOrders = async (req,res)=>{
 
-   const orders = await Order.find({}).populate("orderedItems.products")
-   console.log("this is the orders", orders)
-
-   console.log("this is the orders", orders)
+   const orderdetails = await Order.find({}).populate("orderedItems.products")
+   const orders = orderdetails.reverse()
    res.render("order", {orders})
-
-
 }
 
-const getOrderDetails = async (req, res) => {
+const orderDetails = async (req, res) => {
    try {
      const {id}   = req.params;
      console.log("zzz", id)
@@ -37,7 +33,6 @@ const getOrderDetails = async (req, res) => {
  const changeOrderStatus = async (req, res) => {
    const { orderId, newStatus } = req.body;
    try {
-
      const order = await Order.findById(orderId);
      if (!order) {
        return res.status(404).json({ message: 'Order not found' });
@@ -45,7 +40,6 @@ const getOrderDetails = async (req, res) => {
 
      order.status = newStatus;
      await order.save();
-
      return res.status(200).json({ message: 'Order status updated successfully' });
    } catch (error) {
      console.error('Error updating order status:', error);
@@ -55,7 +49,7 @@ const getOrderDetails = async (req, res) => {
  
  
 module.exports = {
-   getOrderList,
-   getOrderDetails,
+   allOrders,
+   orderDetails,
    changeOrderStatus
 }
