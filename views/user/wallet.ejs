@@ -1,0 +1,105 @@
+<%-include("../../views/partials/user/userprofile")%>
+
+
+
+
+
+<main class="main">
+    <!--=============== BREADCRUMB ===============-->
+    <section class="breadcrumb">
+      <ul class="breadcrumb__list flex container">
+        <li><a href="/home" class="breadcrumb__link">Home</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><a href="/profile" class="breadcrumb__link">Profile</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><a href="/profile/wallet" class="breadcrumb__link">Wallet</a></li>
+      </ul>
+    </section>
+    <!--=============== ACCOUNTS ===============-->
+    <section class="accounts section--lg">
+      <main class="accounts__container container grid">
+        <div class="account__tabs">
+  
+          <a href="/profile">
+            <p class="account__tab ">
+              <i class="fi fi-rs-user"></i> Update Profile
+            </p>
+          </a>
+          <a href="/profile/wallet">
+            <p class="account__tab active-tab">
+              <i class="fi fi-rs-settings-sliders"></i> Wallet
+            </p>
+          </a>
+          <a href="/profile/orders">
+            <p class="account__tab ">
+              <i class="fi fi-rs-shopping-bag"></i> Orders
+            </p>
+  
+          </a>
+          <a href="/profile/change-password">
+            <p class="account__tab ">
+              <i class="fi fi-rs-settings-sliders"></i> Change Password
+            </p>
+          </a>
+          <a href="/profile/address">
+            <p class="account__tab">
+              <i class="fi fi-rs-marker"></i> My Address
+            </p>
+          </a>
+        </div>
+
+
+<div class="tab__content active-tab" content id="dashboard">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-md-12 text-center mb-4">
+          <h1 class="fw-bold">My Wallet</h1>
+          <p class="text-muted">Manage your wallet balance and transactions here.</p>
+        </div>
+      </div>
+  
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow">
+            <div class="card-body text-center">
+              <h5 class="text-muted">Current Balance</h5>
+              <h2 class="fw-bold text-success">₹<%=user.wallet.balance%></h2>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="row mt-5">
+        <div class="col-md-12">
+          <h4 class="mb-3">Recent Transactions</h4>
+          <table class="table table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+                <%user.wallet.transactions.forEach(transaction=>{%>
+              <tr>
+                <td>1</td>
+                <td><%=transaction.type%></td>
+                <td><%=transaction.description%></td>
+                <td><%=transaction.date.toLocaleDateString()%></td>
+                <td><%=transaction.amount%></td>
+              </tr>
+             <%})%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+
+<%-include("../../views/partials/user/footer")%>

@@ -5,7 +5,14 @@ const Order = require("../../models/orderSchema");
 const { v4: uuidv4 } = require('uuid'); 
 const Coupon = require("../../models/couponSchema")
 const User = require("../../models/userSchema");
+const Razorpay  = require("razorpay")
+const crypto = require('crypto');
 
+
+const razorpayInstance  = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 
 const loadCheckoutPage = async (req, res) => {
@@ -166,7 +173,26 @@ const cancelOrder = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
+    if (order.paymentType === 'Razorpay' && status === 'Cancelled') {
+      const user = await User.findById(order.userId);
+      if (user) {
+        // Credit the wallet balance (refund)
+        user.wallet.balance += order.finalAmount;
+        // Add a transaction record (credit)
 
+
+        user.wallet.transactions.push({
+          type: 'Credit',
+          amount: order.finalAmount,
+          description: `Refund for Order #${orderId}`,
+        });
+
+        await user.save();  // Save the updated wallet balance and transaction history
+        console.log(`Refunded ₹${order.finalAmount} to user wallet`);
+      } else {
+        return res.status(404).json({ message: 'User not found' });
+      }
+    }
     if (status === 'Cancelled') {
     for (const item of order.orderedItems) {
       const product = await Product.findById(item.products);

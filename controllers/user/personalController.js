@@ -317,15 +317,16 @@ const getOrders = async (req, res) => {
         path: 'orderedItems.products',
         model: 'Product' 
       }).exec()
-      console.log(JSON.stringify(orders[0].orderedItems, null, 2))
+      console.log(JSON.stringify(order[0].orderedItems, null, 2))
   
-      if (orders.length === 0) {
+      if (order.length === 0) {
         return res.status(404).render("orders", {
           success: false,
           message: "No orders found.",
+          order
         });
       }
-  const orders = order.reverse()
+      const orders = order.reverse()
       res.render("orders", {
         success: true,
         orders,  
@@ -341,6 +342,18 @@ const getOrders = async (req, res) => {
   
 
 
+
+
+  const wallet = async(req,res)=>{
+    const userId = req.session.user;
+    try{
+        const user = await User.findById(userId)
+res.render("wallet", {user})
+    }catch(error){
+console.error(error)
+    }
+  }
+
 module.exports = {
     profilePage,
     updateProfile,
@@ -352,5 +365,5 @@ module.exports = {
     deleteAddress,
     removeProduct,
     getOrders,
-   
+   wallet
 }

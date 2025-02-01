@@ -7,14 +7,9 @@ const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const Product = require("../../models/productSchema");
-const Razorpay  = require("razorpay")
-const crypto = require('crypto');
 const Cart = require("../../models/cartSchema");
 
-const razorpayInstance  = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+
 
 //FOR RENDER THE SIGNUP PAGE IF HAVE SESSION THEN TO THE HOME PAGE
 const loadSignup = async (req, res) => {

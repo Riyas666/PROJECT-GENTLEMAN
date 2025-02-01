@@ -41,9 +41,30 @@ const userSchema = new Schema({
         ref: "Cart"
     }],
     wallet: {
-        type: Number,
-        default: 0
-    }, 
+        balance: {
+          type: Number,
+          default: 0,  // Starting wallet balance
+        },
+        transactions: [{
+          type: {
+            type: String,  // 'credit' or 'debit'
+            required: true,
+            enum: ["Credit", "Debit"],
+          },
+          amount: {
+            type: Number,
+            required: true,
+          },
+          description: {
+            type: String,  // Description of the transaction (e.g., "Refund for Order #1234")
+            required: true,
+          },
+          date: {
+            type: Date,
+            default: Date.now,  // Timestamp of the transaction
+          },
+        }],
+      },
     wishlist: [
         {
           productId: { type: Schema.Types.ObjectId, ref: "Product" },

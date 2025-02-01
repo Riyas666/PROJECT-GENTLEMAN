@@ -24,4 +24,9 @@ router.delete('/delete-address/:addressId',userAuth, personalController. deleteA
 router.delete('/cart/remove-product/:productId/:size', userAuth, personalController.removeProduct);
 
 
+//WALLET 
+
+router.get("/wallet", userAuth, personalController.wallet)
+
+
 module.exports = router;
