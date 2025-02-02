@@ -216,7 +216,7 @@
       <a href="/cart" class="btn flex btn__md">
         <i class="fi-rs-shuffle"></i> Update Cart
       </a>
-      <a href="#" class="btn flex btn__md">
+      <a href="/home" class="btn flex btn__md">
         <i class="fi-rs-shopping-bag"></i> Continue Shopping
       </a>
     </div>
@@ -229,13 +229,12 @@
       
       </div>
 
-      <div class="cart__total">
+      <div class="cart__total w-50">
         <h3 class="section__title">Cart Totals</h3>
         <table class="cart__total-table">
-          <%cartItems.forEach(item=>{%>
           <tr>
             <td><span class="cart__total-title">Cart Subtotal</span></td>
-            <td><span class="cart__total-price">₹<%= (item.quantity * item.price).toFixed(2) %></span></td>
+            <td><span class="cart__total-price">₹<%=total %></span></td>
           </tr>
           <tr>
             <td><span class="cart__total-title">Shipping</span></td>
@@ -243,9 +242,9 @@
           </tr>
           <tr>
             <td><span class="cart__total-title">Total</span></td>
-            <td><span class="cart__total-price">₹<%= (item.quantity * item.price).toFixed(2) %></span></td>
+            <td><span class="cart__total-price">₹<%=total %></span></td>
           </tr>
-          <% }) %>
+         
         </table>
         <a href="/checkout" class="btn flex btn--md">
           <i class="fi fi-rs-box-alt"></i> Proceed To Checkout

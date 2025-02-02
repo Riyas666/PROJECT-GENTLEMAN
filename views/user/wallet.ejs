@@ -75,21 +75,31 @@
           <table class="table table-striped">
             <thead class="table-dark">
               <tr>
-                <th>#</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Amount</th>
+                <th class="text-center w-20">#</th>
+                <th class="text-center w-25">Date</th>
+                <th class="text-center w-25">Description</th>
+                <th class="text-center w-25">Type</th>
+               
+                
+                <th class="text-center w-25">Amount</th>
               </tr>
             </thead>
             <tbody>
-                <%user.wallet.transactions.forEach(transaction=>{%>
+                <%wallet.forEach((transaction, index)=>{%>
               <tr>
-                <td>1</td>
-                <td><%=transaction.type%></td>
-                <td><%=transaction.description%></td>
+                <td><%=index+1%></td>
                 <td><%=transaction.date.toLocaleDateString()%></td>
-                <td><%=transaction.amount%></td>
+                <td><%=transaction.description%></td>
+                <%if(transaction.type==="Credit"){%>
+                <td style="color: green; font-size: large;"><%=transaction.type%></td>
+                <td style="color: green; font-size: large;">+ ₹<%=transaction.amount%></td>
+                <%}else{%>
+                  <td style="color: red;"><%=transaction.type%></td>
+                  <td style="color: red;">- ₹<%=transaction.amount%></td>
+                  <%}%>
+               
+              
+                
               </tr>
              <%})%>
             </tbody>

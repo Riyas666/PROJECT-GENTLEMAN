@@ -38,7 +38,8 @@
         <div class="card-body">
           <form method="post" action="/admin/products/editProduct/<%=product._id%>" enctype="multipart/form-data" onsubmit=" return validateForm()">
             
-  <input type="hidden" name="existingImages" value="<%= product.productImage.join(',') %>">
+            <input type="hidden" name="existingImages" value='<%= JSON.stringify(product.productImage) %>'>
+
             <div class="mb-4">
               <label for="product_name" class="form-label">Product Name</label>
               <input type="text" name="productName" value="<%=product.productName%>" class="form-control border" id="product_name">
@@ -159,10 +160,9 @@
                         </div>
                       </div>
                       <%}%>
-
                                <div class="row">
                                    <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                       <img src="" alt="" id="imgView1">
+                                       <img src="<%= product.productImage[0] ? '/uploads/product-images/'+product.productImage[0] : '' %>" alt="" id="imgView1">
                                        <input class="form-control" type="file" name="images" id="input1"
                                            accept="image/png, image/jpeg, image/jpg"
                                            onchange="viewImage1(event), viewImage(event, 1)">
@@ -170,23 +170,23 @@
                                    </div>
                                    <div class="image-cropper d-flex align-items-center"
                                    style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                   <img src="" id="croppedImg1" alt="">
+                                   <img src="<%= product.productImage[0] ? '/uploads/product-images/'+product.productImage[0] : '' %>" id="croppedImg1" alt="">
                                    <button type="button" id="saveButton1" class="btn-sm btn-primary">Save</button>
                                </div>
                               </div>
                                 <div class="row">
                                 <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                    <img src="" alt="" id="imgView2">
+                                    <img src="<%=product.productImage[1] ? '/uploads/product-images/'+product.productImage[1] : ''%>" alt="" id="imgView2">
                                     <input class="form-control" type="file" name="images" id="input2" accept = "image/png, image/jpeg, image/jpg" onchange = "viewImage2(event),viewImage(event, 2)">
                                 </div>
                                 <div class="image-cropper d-flex align-items-center" style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                <img src="" alt="">
+                                <img src="<%=product.productImage[1] ? '/uploads/product-images/' + product.productImage[1]: ''%> " alt="">
                                 <button type="button" id="saveButton2" class="btn-sm btn-primary">Save</button>
                                 </div>
                               </div>
                                 <div class="row">
                                 <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                  <img src="" alt="" id="imgView3">
+                                  <img src="<%=product.productImage[2] ? '/uploads/product-images/' + product.productImage[2]: ''%> " alt="" id="imgView3">
                                   <input class="form-control" type="file" name="images" id="input3" accept="image/png, image/jpeg, image/jpg" onchange="viewImage3(event),viewImage(event, 3)">
                                 </div>
                                 <div class="image-cropper d-flex align-items-center" style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
@@ -197,11 +197,12 @@
 
                                 <div class="row">
                                     <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                        <img src="" alt="" id="imgView4">
+                                      <img src="<%=product.productImage[3] ? '/uploads/product-images/' + product.productImage[3]: ''%> " alt="" id="imgView4">   
+
                                         <input class="form-control" type="file" name="images" id="input4" accept="image/png, image/jpeg, image/jpg" onchange="viewImage4(event),viewImage(event, 4)">
                                     </div>
                                     <div class="image-cropper d-flex align-items-center" style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                        <img src="" id="croppedImg4" alt="">
+                                        <img src="<%=product.productImage[3] ? '/uploads/product-images/' + product.productImage[3]: ''%> " id="croppedImg4" alt="">
                                         <button type="button" id="saveButton4" class="btn-sm btn-primary">Save</button>
                                     </div>
                                 </div>
@@ -418,10 +419,10 @@
 
         const currentRows = container.getElementsByClassName('row').length;
 
-    // Check if the current number of rows is already 3
+   
     if (currentRows >= 3) {
         alert('You can only add up to 3 rows.');
-        return; // Stop the function if there are already 3 rows
+        return; 
     }
 
 

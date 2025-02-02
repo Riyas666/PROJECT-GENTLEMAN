@@ -7,7 +7,7 @@ const session = require("express-session");
 const passport = require("./config/passport");
 dotenv.config();
 const db = require("./config/db");
-
+const cors =require("cors")
 const userRouter = require("./routes/userRouter");
 const profileRouter = require("./routes/user/profileRouter");
 const cartRouter = require("./routes/user/cartRouter");
@@ -20,6 +20,10 @@ const orderRouter = require("./routes/admin/orderRouter");
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
+app.use(cors({
+    origin: 'http://localhost:3000', // Replace with your frontend URL
+    credentials: true
+  }));
 app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

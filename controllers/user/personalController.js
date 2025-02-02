@@ -1,8 +1,7 @@
+
+
 const User = require("../../models/userSchema");
-const Category = require("../../models/categorySchema");
 const Address = require("../../models/addressSchema")
-const Products = require("../../models/productSchema");
-const Brand = require("../../models/brandSchema");
 const Order = require("../../models/orderSchema");
 const bcrypt = require("bcrypt");
 
@@ -339,6 +338,7 @@ const getOrders = async (req, res) => {
       });
     }
   };
+
   
 
 
@@ -348,7 +348,10 @@ const getOrders = async (req, res) => {
     const userId = req.session.user;
     try{
         const user = await User.findById(userId)
-res.render("wallet", {user})
+        console.log("zzzz", user.wallet.transactions)
+
+        const wallet = user.wallet.transactions.reverse()
+res.render("wallet", {wallet, user})
     }catch(error){
 console.error(error)
     }

@@ -66,7 +66,7 @@ router.get('/order/success', orderController.loadOrderCompletedPage);
 router.post('/place', orderController.placeOrder);
 router.get("/order-details/:id", orderController.orderDetails)
 router.post('/profile/cancel-order', orderController.cancelOrder);
-
+router.post('/profile/return-order', orderController.returnOrder)
 
 
 

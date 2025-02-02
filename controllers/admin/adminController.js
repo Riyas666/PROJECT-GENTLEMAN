@@ -3,7 +3,8 @@
 const User = require("../../models/userSchema");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
-
+const Order = require("../../models/orderSchema")
+const Coupon = require("../../models/couponSchema")
 
 //FOR ERROR PAGE
 const pageerror = async (req, res) => {
@@ -49,7 +50,30 @@ const login = async (req, res) => {
 const loadDashboard = async (req, res) => {
     if (req.session.admin) {
         try {
-            res.render("dashboard");
+            const totalOrders = await Order.countDocuments();
+
+            const totalSales = await Order.aggregate([
+                {$group:{_id:null, totalSales:{$sum:"$finalAmount"}}}
+            ])
+
+            const totalDiscount = await Order.aggregate([
+                {$group:{_id:null, totalDiscount:{$sum:"$discount"}}}
+            ])
+            const coupons = await Coupon.find({})
+
+
+            const order = await Order.find({})
+            const orders = order.reverse()
+          
+
+
+            res.render("dashboard", {
+                totalOrders,
+                totalSales:totalSales[0]?.totalSales || 0,
+                totalDiscount:totalDiscount[0]?.totalDiscount,
+                orders,
+                coupons
+            });
         } catch (error) {
             res.redirect("/pageerror");
         }
@@ -75,6 +99,101 @@ const logout = async (req, res) => {
     }
 };
 
+const generateReport = async(req,res) =>{
+    const {reportType , startDate, endDate} = req.body
+    console.log("qq", reportType)
+    try{
+      let reportData = [];
+      console.log("qq", reportType)
+
+      if(reportType==='Daily'){
+        const today = new Date();
+        const startOfDay =new Date(today.setHours(0,0,0,0));
+        const endOfDay = new Date(today.setHours(23,59,59,999));
+
+        reportData = await Order.aggregate([
+            {$match:
+                {createdAt:{$gte:startOfDay, $lte:endOfDay}
+                }
+            },
+            {$group:{
+                    _id:null,
+                    totalSales:{$sum:"$finalAmount"},
+                    totalDiscount:{$sum:"$discount"},
+                    totalOrders:{$sum:1},
+                    createdAt:{$first:"$createdAt"}
+                    }
+                },
+                { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
+           ]);
+      }else if(reportType==='Weekly'){
+        const today = new Date();
+        const firstDay = new Date(today);
+        firstDay.setDate(today.getDate() - today.getDay());
+        
+        const lastDay = new Date(today);
+        lastDay.setDate(today.getDate() - today.getDay() + 6);
+
+        reportData = await Order.aggregate([
+            {$match:
+                {createdAt:{$gte:firstDay, $lte:lastDay}
+                }
+            },
+            {$group: {
+                     _id:null,
+                     totalSales:{$sum:"$finalAmount"},
+                     totalDiscount:{$sum:"$discount"},
+                     totalOrders:{$sum:1},
+                     createdAt:{$first:"$createdAt"}
+                     }
+                },
+                { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
+        ])
+      }else if(reportType==='Yearly'){
+        const yearStart = new Date(new Date().getFullYear(),0,1);
+        const yearEnd = new Date(new Date().getFullYear(),11,31)
+
+        reportData = await Order.aggregate([
+            {$match:
+                {createdAt:{$gte:yearStart, $lte:yearEnd}
+                }
+            },
+            {$group:{
+                    _id:null,
+                    totalSales:{$sum:"$finalAmount"},
+                    totalDiscount:{$sum:"$discount"},
+                    totalOrders:{$sum:1},
+                    createdAt:{$first:"$createdAt"}
+                    }
+             },
+             { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
+        ])
+      }else if(reportType === 'Custom Date Range'){
+        reportData = await Order.aggregate([
+            {$match:
+                {createdAt:{$gte:new Date(startDate), $lte: new Date(endDate) }
+                }
+            },
+            {$group:{
+                _id:null,
+                totalSales:{$sum:"$finalAmount"},
+                totalDiscount:{$sum:"$discount"},
+                totalOrders:{$sum:1},
+                createdAt:{$first:"$createdAt"}
+                    }
+                },
+                { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
+        ])
+      }
+      console.log("zzzzzzz", reportData)
+      res.json({success:true, reportData})
+
+    }catch(error){
+        console.error("Error generating report:", error);
+        res.status(500).json({ success: false, message: "Error generating report." });
+    }
+}
+
 
 //EXPORTING..
 module.exports = {
@@ -83,4 +202,5 @@ module.exports = {
     login,
     pageerror,
     logout,
+    generateReport
 };

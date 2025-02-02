@@ -5,6 +5,17 @@
 
 
 <link rel="stylesheet" href="/admin-assets/css/orderManagement.css">
+  <div class="row">
+    <div class="col-12">
+      <div class="alert alert-info d-flex align-items-center" role="alert" id="returnRequestNotification" style="display: none;">
+        <i class="bi bi-bell-fill me-2"></i>
+        <div>
+          New Return Request! <button class="btn btn-sm btn-link" onclick="viewReturnRequestDetails()">View Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <div class="container-fluid" style="width: 80%; margin-left: auto;">
   <div class="row">
     <div class="col-12">
@@ -51,6 +62,32 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="returnRequestModal" tabindex="-1" aria-labelledby="returnRequestLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="returnRequestLabel">Return Request Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6><strong>Return Request Information</strong></h6>
+        <ul class="list-unstyled">
+          <li><strong>Order ID:</strong> <span id="returnOrderId"></span></li>
+          <li><strong>Product Name:</strong> <span id="returnProductName"></span></li>
+          <li><strong>Reason for Return:</strong> <span id="returnReason"></span></li>
+          <li><strong>Refund Amount:</strong> ₹<span id="refundAmount"></span></li>
+        </ul>
+        <h6><strong>Actions</strong></h6>
+        <button class="btn btn-success" onclick="approveReturn()">Approve Return</button>
+        <button class="btn btn-danger" onclick="rejectReturn()">Reject Return</button>
+        <div id="stockManagement" class="mt-3" style="display: none;">
+          <h6><strong>Stock Management</strong></h6>
+          <button class="btn btn-primary" onclick="adjustStock()">Adjust Stock</button>
         </div>
       </div>
     </div>
@@ -234,3 +271,130 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
   </script>
+<script>
+//  function showReturnRequestNotification() { 
+//   document.getElementById('returnRequestNotification').style.display = 'flex';
+// }
+
+function viewReturnRequestDetails() {
+   
+  fetch('/admin/orders/return-requests/details')  // 
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.length > 0) {
+        const modalBody = document.querySelector('.modal-body');
+        modalBody.innerHTML = ''; 
+        
+        data.forEach(returnRequest => {
+          const requestDiv = document.createElement('div');
+          requestDiv.classList.add('request-item');
+          
+          requestDiv.innerHTML = `
+  <h6><strong>Return Request Information</strong></h6>
+  <ul class="list-unstyled">
+    <li><strong>Order ID:</strong> ${returnRequest.orderId}</li>
+    <li><strong>Product Name:</strong>  <ul>
+        ${returnRequest.products.map(products => `<li>${products.productName}</li>`).join('')}
+      </ul>
+     
+    </li>
+    <li><strong>Reason for Return:</strong> ${returnRequest.returnReason}</li>
+    <li><strong>Refund Amount:</strong> ₹${returnRequest.refundAmount}</li>
+  </ul>
+  <h6><strong>Actions</strong></h6>
+  <button class="btn btn-success" onclick="approveReturn('${returnRequest.orderId}')">Approve Return</button>
+  <button class="btn btn-danger" onclick="rejectReturn('${returnRequest.orderId}')">Reject Return</button>
+`;
+          
+          modalBody.appendChild(requestDiv);
+        });
+
+        const modal = new bootstrap.Modal(document.getElementById('returnRequestModal'));
+        modal.show();
+      } else {
+        console.log("No return requests found.");
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching return request details:', error);
+    });
+}
+// showReturnRequestNotification();
+function approveReturn() {
+  const orderId = document.getElementById('returnOrderId').innerText;
+  const refundAmount = parseFloat(document.getElementById('refundAmount').innerText);
+
+  fetch(`/admin/orders/return-requests/approve/${orderId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refundAmount }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Return Approved and Refund Processed');
+        adjustStock(data.productId); 
+        updateWallet(data.userId, refundAmount); 
+        document.getElementById('stockManagement').style.display = 'block'; 
+      } else {
+        alert('Error approving return');
+      }
+    });
+}
+
+function rejectReturn() {
+  const orderId = document.getElementById('returnOrderId').innerText;
+
+  fetch(`/orders/return-requests/reject/${orderId}`, {
+    method: 'POST',
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Return Rejected');
+      } else {
+        alert('Error rejecting return');
+      }
+    });
+}
+
+function adjustStock() {
+  const productId = document.getElementById('returnProductName').innerText;  
+
+  fetch('/admin/stock/adjust', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productId, action: 'increase', quantity: 1 }),  
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        console.log('Stock Adjusted');
+      } else {
+        console.error('Error adjusting stock');
+      }
+    });
+}
+
+function updateWallet(userId, amount) {
+  fetch(`/admin/wallet/update/${userId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ amount }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        console.log('Wallet Updated');
+      } else {
+        console.error('Error updating wallet');
+      }
+    });
+}
+</script>

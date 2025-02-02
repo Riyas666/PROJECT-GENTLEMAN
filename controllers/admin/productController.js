@@ -207,42 +207,35 @@ const editProduct = async (req, res) => {
     try {
         const id = req.params.id;
         const data = req.body;
-        // const product = await Product.findById(id);
-       
-        // const images = [];
-        // if (req.files && req.files.length > 0) {
-        //     for (let i = 0; i < req.files.length; i++) {
-        //         images.push(req.files[i].filename);
-        //     }
-        // }
-
+        console.log("Request Body:", data);
+console.log("222 uploaded files", req.files)
     
 
-        const existingImages = Array.isArray(data.existingImages)
-            ? data.existingImages
-            : data.existingImages
-            ? [data.existingImages]
-            : [];
+const existingImages = data.existingImages 
+? JSON.parse(data.existingImages) 
+: [];
 
-        const deletedImages = Array.isArray(data.deletedImages) //? data.deletedImages : [];
+console.log("Existing images", existingImages)
+        const deletedImages = Array.isArray(data.deletedImages) 
         ? data.deletedImages
       : data.deletedImages
       ? [data.deletedImages]
       : [];
 
-        const updatedImages = [...existingImages.filter((img) => !deletedImages.includes(img)),  ...(req.files ? req.files.map((file) => file.filename) : []),
-    ];
-        // let sizes = [];
-        // if (data.sizes && data.quantities) {
-        //     const sizeArray = data.sizes;
-        //     const quantityArray = data.quantities;
+      console.log("deletedImgages", deletedImages)
 
-        //     for (let i = 0; i < sizeArray.length; i++) {
-        //         if (sizeArray[i] && quantityArray[i]) {
-        //             sizes.push({ size: sizeArray[i], quantity: Number(quantityArray[i]) });
-        //         }
-        //     }
-        // }
+      const filteredImages = existingImages.filter(
+        (img) => !deletedImages.includes(img)
+      );
+  
+      const newImages = req.files ? req.files.map((file) => file.filename) : [];
+
+      console.log("neww", newImages)
+  
+      const updatedImages = [...filteredImages, ...newImages];
+
+      console.log("updatedImages", updatedImages)
+       
         const updateFields = {
             productName: data.productName,
             description: data.description,

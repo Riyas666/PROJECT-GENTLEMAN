@@ -1,7 +1,283 @@
 <%- include("../../views/partials/admin/header") %>
+<style>
+    .content-main {
+        padding: 30px;
+    }
+    .card {
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .icontext {
+        display: flex;
+        align-items: center;
+    }
+    .icontext .icon {
+        position: relative;
+        flex-shrink: 0;
+        margin-right: 15px;
+    }
+    .rounded-circle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+    .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+    .bg-info-light {
+        background-color: rgba(13, 202, 240, 0.1);
+    }
+    .text-primary { color: #0d6efd; }
+    .text-success { color: #198754; }
+    .text-warning { color: #ffc107; }
+    .text-info { color: #0dcaf0; }
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
 <section class="content-main">
     <div class="content-header">
         <h2 class="content-title card-title">Dashboard</h2>
+        <div>
+            <button class="btn btn-primary" onclick="exportReport()">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="reportFilterForm">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select" id="reportType" name="reportType">
+                            <option value="Daily">Daily</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Yearly">Yearly</option>
+                            <option value="custom">Custom Date Range</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-control" name="startDate" id="startDate" oninput="validateDates()">
+                        <small id="startDateError" style="color: red; display: none;">You cannot select a future date.</small>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-control" name="endDate" id="endDate" oninput="validateDates()">
+                        <small id="endDateError" style="color: red; display: none;">End date must be later than start date.</small>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100">Generate Report</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                        <i class="fas fa-dollar-sign text-primary"></i>
+                    </span>
+                    <div class="text">
+                        <h6 class="mb-1">Total Sales</h6>
+                        <span>₹<%=totalSales.toLocaleString()%></span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-success-light">
+                        <i class="fas fa-shopping-cart text-success"></i>
+                    </span>
+                    <div class="text">
+                        <h6 class="mb-1">Total Orders</h6>
+                        <span><%=totalOrders%></span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-warning-light">
+                        <i class="fas fa-tag text-warning"></i>
+                    </span>
+                    <div class="text">
+                        <h6 class="mb-1">Total Discounts</h6>
+                        <span>₹<%=totalDiscount.toLocaleString()%></span>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Orders</th>
+                            <th scope="col">Gross Sales</th>
+                            <th scope="col">Discounts</th>
+                            <th scope="col">Net Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody  id="sales-report-body" style="color: black;">
+                        <%orders.forEach(order=>{%>
+                       <tr>
+                        <td><%=order.createdAt.toLocaleDateString()%></td>
+                        <td>1</td>
+                        <td ><%=order.status%></td>
+                        <td>₹<%=order.discount%></td>
+                        <td>₹<%=order.finalAmount%></td>
+                       </tr>
+                       <%})%>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Discount & Coupon Analysis</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Coupon Code</th>
+                            <th>Usage Count</th>
+                            <th>Total Discount Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: black;">
+                        <%coupons.forEach(coupon=>{%>
+                        <tr>
+                            <td><%=coupon.name%></td>
+                            <td>45</td>
+                            <td>₹4,500</td>
+                        </tr>
+                        <%})%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+<script>
+function exportReport() {
+    alert('Export functionality will be implemented here');
+}
+
+document.getElementById('reportFilterForm').addEventListener('submit', function(e) {
+    e.preventDefault(); 
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const data = {
+        reportType: reportType,
+        startDate: startDate,
+        endDate:  endDate
+
+    };
+    console.log("qqq", data)
+
+    fetch('/admin/generate-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+    if (result.success) {
+        const reportData = result.reportData;
+
+        const tbody = document.getElementById("sales-report-body");
+
+        let tableRows = '';
+
+        reportData.forEach(row => {
+            const date = new Date(row.createdAt);
+
+    const formattedDate = date.toISOString().split('T')[0];
+            tableRows += `
+                <tr>
+                    <td>${formattedDate}</td>
+                    <td>${row.totalOrders}</td>
+                    <td>₹${row.totalSales.toFixed(2)}</td>
+                    <td>₹${row.totalDiscount.toFixed(2)}</td>
+                    <td>₹${(row.totalSales - row.totalDiscount).toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = tableRows;
+    }
+}).catch(error => {
+    });
+});
+
+
+
+function validateDates() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const startDateError = document.getElementById('startDateError');
+    const endDateError = document.getElementById('endDateError');
+
+    const today = new Date().toISOString().split('T')[0];
+
+    startDateInput.max = today;
+    endDateInput.max = today;
+
+    if (startDateInput.value > today) {
+        startDateError.style.display = 'inline'; 
+        startDateInput.setCustomValidity("Invalid date"); 
+    } else {
+        startDateError.style.display = 'none';
+        startDateInput.setCustomValidity(""); 
+    }
+
+    if (endDateInput.value && endDateInput.value < startDateInput.value) {
+        endDateError.style.display = 'inline'; 
+        endDateInput.setCustomValidity("End date cannot be before start date");
+    } else {
+        endDateError.style.display = 'none'; 
+        endDateInput.setCustomValidity(""); 
+    }
+}
+
+
+
+
+
+
+
+</script>
+
 <%- include("../../views/partials/admin/footer") %>

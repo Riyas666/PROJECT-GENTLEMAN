@@ -1,15 +1,21 @@
 function deleteProduct(productId) {
-    // Show a SweetAlert2 confirmation dialog
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "Do you really want to delete this item from your cart?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
-    }).then((result) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Do you really want to delete this item from your cart?",
+    icon: 'warning',
+  
+    // Custom styles
+    iconColor: '#D3B382',  // Match icon color with primary theme
+    background: '#fffcf3', // Light background for a softer look
+    color: 'hsl(0, 0%, 13%)',
+  
+    showCancelButton: true,
+    confirmButtonColor: '#d7b178',
+    cancelButtonColor: '#D3B382',
+  
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
       if (result.isConfirmed) {
         // If the user confirms, send the delete request to the server
         fetch('/cart/delete', {
@@ -23,8 +29,14 @@ function deleteProduct(productId) {
           .then((data) => {
             if (data.success) {
               // Show a success message
-              Swal.fire('Deleted!', 'The item has been removed from your cart.', 'success');
-  
+              Swal.fire({
+                title :'Deleted!',
+                 text:'The item has been removed from your cart.', 
+                 icon:  'success' ,
+                background: '#fffcf3',
+                confirmButtonColor: '#d7b178',
+            });
+             
               // Remove the product row from the UI
               removeProductFromUI(productId);
             } else {

@@ -77,13 +77,14 @@ const orderSchema = new Schema({
         
        
     },
-    invoiceDate: {
-        type: Date
-    },
     status: {
         type: String,
         required:true,
-        enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return Request", "Returned"]
+        enum: ["Pending", "Delivered", "Cancelled", "Return Request", "Returned"]
+    },
+    returnReason:{
+         type:String,
+         required:false
     },
    
     couponApplied: {
@@ -93,7 +94,7 @@ const orderSchema = new Schema({
 
     paymentType: {
         type: String,
-        enum: ["Razorpay", "COD", "Wallet",], // Add payment types as required
+        enum: ["Razorpay", "COD", "Wallet"], 
         required: true
     },
     paymentStatus: {
