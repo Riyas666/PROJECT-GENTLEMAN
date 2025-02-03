@@ -1,4 +1,6 @@
 const Order = require("../../models/orderSchema")
+const User = require("../../models/userSchema")
+const Product = require("../../models/productSchema")
 
 const allOrders = async (req,res)=>{
 
@@ -54,11 +56,12 @@ const orderDetails = async (req, res) => {
 
  
 const approveReturnRequest = async (req, res) => {
-  const { orderId, refundAmount } = req.body;
-
+  const {orderId} = req.params
+  const { refundAmount } = req.body;
+const userId = req.session.user
+console.log("zzzzz", refundAmount)
   try {
     const order = await Order.findOne({ orderId }).populate('orderedItems.products');
-    
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
@@ -95,7 +98,7 @@ const approveReturnRequest = async (req, res) => {
       order.status = 'Returned';
       await order.save();
 
-      return res.status(200).json({ success: true, userId: user._id, message: 'Return approved and refund processed' });
+      return res.status(200).json({ success: true, userId: userId, message: 'Return approved and refund processed' });
     } else {
       return res.status(400).json({ message: 'Payment not successful. Cannot process the return.' });
     }
@@ -115,7 +118,7 @@ const rejectReturnRequest = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    order.status = 'Rejected';
+    order.status = 'Return Rejected';
     await order.save();
 
     return res.status(200).json({ success: true, message: 'Return request rejected' });
@@ -134,7 +137,7 @@ const rejectReturnRequest = async (req, res) => {
    });
 
      res.json(orders.map(order=>({
-      orderId:order.orderId.toString().slice(-7),
+      orderId:order.orderId,
       products: order.orderedItems.map(item => ({
         productName: item.products.productName,
         productImage: item.products.productImage

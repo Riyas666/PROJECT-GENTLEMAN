@@ -6,14 +6,17 @@ const getCart = async (req, res) => {
   try {
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId }).populate('items.productId');
+
     if (!cart) {
       return res.render('cart', { cartItems: [], total: 0 });
     }
 
     cart.items.forEach(item => {
-      item.totalPrice = item.quantity * item.productId.price;
+      item.totalPrice = item.quantity * item.price;
     });
+
     const total = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+    
     res.render('cart', { cartItems: cart.items, total });
   } catch (error) {
     console.error('Error fetching cart:', error);

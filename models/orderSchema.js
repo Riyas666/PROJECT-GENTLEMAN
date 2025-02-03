@@ -80,7 +80,7 @@ const orderSchema = new Schema({
     status: {
         type: String,
         required:true,
-        enum: ["Pending", "Delivered", "Cancelled", "Return Request", "Returned"]
+        enum: ["Pending", "Delivered", "Cancelled", "Return Request", "Returned", "Return Rejected"]
     },
     returnReason:{
          type:String,

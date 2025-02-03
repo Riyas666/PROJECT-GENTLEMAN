@@ -292,17 +292,17 @@ function viewReturnRequestDetails() {
           requestDiv.innerHTML = `
   <h6><strong>Return Request Information</strong></h6>
   <ul class="list-unstyled">
-    <li><strong>Order ID:</strong> ${returnRequest.orderId}</li>
+    <li><strong>Order ID:</strong><span id="returnOrderId">${returnRequest.orderId}</span></li>
     <li><strong>Product Name:</strong>  <ul>
         ${returnRequest.products.map(products => `<li>${products.productName}</li>`).join('')}
       </ul>
      
     </li>
     <li><strong>Reason for Return:</strong> ${returnRequest.returnReason}</li>
-    <li><strong>Refund Amount:</strong> ₹${returnRequest.refundAmount}</li>
+    <li><strong>Refund Amount:</strong><span id="refundAmount"> ₹${returnRequest.refundAmount}</span></li>
   </ul>
   <h6><strong>Actions</strong></h6>
-  <button class="btn btn-success" onclick="approveReturn('${returnRequest.orderId}')">Approve Return</button>
+  <button class="btn btn-success"  onclick="approveReturn('${returnRequest.orderId}')">Approve Return</button>
   <button class="btn btn-danger" onclick="rejectReturn('${returnRequest.orderId}')">Reject Return</button>
 `;
           
@@ -321,8 +321,9 @@ function viewReturnRequestDetails() {
 }
 // showReturnRequestNotification();
 function approveReturn() {
-  const orderId = document.getElementById('returnOrderId').innerText;
-  const refundAmount = parseFloat(document.getElementById('refundAmount').innerText);
+  const orderId = document.getElementById('returnOrderId').textContent;
+  const refundText = document.getElementById('refundAmount').textContent;
+const refundAmount = parseFloat(refundText.replace('₹', '').trim());
 
   fetch(`/admin/orders/return-requests/approve/${orderId}`, {
     method: 'POST',
@@ -334,9 +335,7 @@ function approveReturn() {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        alert('Return Approved and Refund Processed');
-        adjustStock(data.productId); 
-        updateWallet(data.userId, refundAmount); 
+        alert('Return Approved and Refund Processed'); 
         document.getElementById('stockManagement').style.display = 'block'; 
       } else {
         alert('Error approving return');
@@ -345,9 +344,9 @@ function approveReturn() {
 }
 
 function rejectReturn() {
-  const orderId = document.getElementById('returnOrderId').innerText;
+  const orderId = document.getElementById('returnOrderId').textContent;
 
-  fetch(`/orders/return-requests/reject/${orderId}`, {
+  fetch(`/admin/orders/return-requests/reject/${orderId}`, {
     method: 'POST',
   })
     .then(response => response.json())
@@ -360,41 +359,4 @@ function rejectReturn() {
     });
 }
 
-function adjustStock() {
-  const productId = document.getElementById('returnProductName').innerText;  
-
-  fetch('/admin/stock/adjust', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ productId, action: 'increase', quantity: 1 }),  
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        console.log('Stock Adjusted');
-      } else {
-        console.error('Error adjusting stock');
-      }
-    });
-}
-
-function updateWallet(userId, amount) {
-  fetch(`/admin/wallet/update/${userId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ amount }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        console.log('Wallet Updated');
-      } else {
-        console.error('Error updating wallet');
-      }
-    });
-}
 </script>

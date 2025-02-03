@@ -70,7 +70,7 @@ const loadDashboard = async (req, res) => {
             res.render("dashboard", {
                 totalOrders,
                 totalSales:totalSales[0]?.totalSales || 0,
-                totalDiscount:totalDiscount[0]?.totalDiscount,
+                totalDiscount:totalDiscount[0]?.totalDiscount || 0,
                 orders,
                 coupons
             });

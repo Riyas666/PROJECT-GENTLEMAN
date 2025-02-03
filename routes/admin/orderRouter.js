@@ -6,7 +6,7 @@ const orderController = require("../../controllers/admin/orderController")
 router.get("/",  adminAuth, orderController.allOrders)
 router.get('/:id',  adminAuth, orderController.orderDetails);
 router.patch('/change-status',  adminAuth, orderController.changeOrderStatus);
-router.post('/return-requests/approve', orderController.approveReturnRequest);
+router.post('/return-requests/approve/:orderId', orderController.approveReturnRequest);
 router.get("/return-requests/details", orderController.returnRequestDetails)
 
 // Route to reject the return request

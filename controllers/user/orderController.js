@@ -290,7 +290,7 @@ console.log("hahahaha", razorpayInstance)
   })),
   couponApplied:coupons?true:false,
   address: selectedAddress,
-  totalPrice: totalPrice / 100,
+  totalPrice: totalPrice ,
   discount:coupons?coupons.discountAmount:0,
   finalAmount:coupons?coupons.finalAmount:finalAmount,
   status: "Pending", 
@@ -350,7 +350,6 @@ const verifyPayment = async (req, res) => {
       res.status(500).json({ error: 'Payment verification failed' });
   }
 };
-
 
 const returnOrder = async (req, res) => {
   try {

@@ -164,6 +164,7 @@
   <section class="cart section--lg container">
     <div class="table__container">
       <table class="table">
+        <%if(cartItems.length>0){%>
         <thead>
           <tr>
             <th id="image-table">Image</th>
@@ -186,15 +187,13 @@
               <h3 class="table__title">
                 <%= item.productId.productName %>
               </h3>
-
             </td>
             <td>
               <span><%=item.size%></span>
             </td>
             <td>
-              <span class="table__price">₹<%= item.price %></span>
+              <span class="table__price">₹<%=item.price%></span>
             </td>
-
             <td>
               <div class="quantity-wrapper" data-product-id="<%= item.productId._id %>" data-stock="<%= item.productId.quantity %>">
                 <button class="decrease" onclick="updateStock('<%= item.productId._id %>', -1)">-</button>
@@ -208,6 +207,13 @@
             </td>
           </tr>
           <% }) %>  
+          <%}else{%>
+            <tr colspan="5" class="text-center">
+              <td>
+                  <p class="lead mb-4">No items found in Cart</p>
+              </td>
+            </tr>
+            <%}%>
         </tbody>
       </table>
     </div>
