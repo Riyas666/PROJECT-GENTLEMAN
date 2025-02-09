@@ -3,17 +3,12 @@ function deleteProduct(productId) {
     title: 'Are you sure?',
     text: "Do you really want to delete this item from your cart?",
     icon: 'warning',
-  
-    // Custom styles
-    iconColor: '#D3B382',  // Match icon color with primary theme
-    background: '#fffcf3', // Light background for a softer look
-    color: 'hsl(0, 0%, 13%)',
-  
-    showCancelButton: true,
-    confirmButtonColor: '#d7b178',
-    cancelButtonColor: '#D3B382',
-  
-    confirmButtonText: 'Yes, delete it!',
+    background: '#fff', 
+        color: '#000',
+        showCancelButton: true,
+        confirmButtonColor: '#000',
+        cancelButtonColor: '#666',
+        confirmButtonText: 'Yes, delete it!',
     cancelButtonText: 'Cancel',
   }).then((result) => {
       if (result.isConfirmed) {
@@ -33,11 +28,11 @@ function deleteProduct(productId) {
                 title :'Deleted!',
                  text:'The item has been removed from your cart.', 
                  icon:  'success' ,
-                background: '#fffcf3',
-                confirmButtonColor: '#d7b178',
-            });
+                 background: '#fff', 
+                 color: '#000', 
+                 confirmButtonColor: 'black', 
+                });
              
-              // Remove the product row from the UI
               removeProductFromUI(productId);
             } else {
               // Handle errors

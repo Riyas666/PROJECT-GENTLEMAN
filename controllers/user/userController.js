@@ -4,7 +4,7 @@ const Products = require("../../models/productSchema");
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-
+const Brand = require("../../models/brandSchema");
 
 
 //FOR RENDER THE SIGNUP PAGE IF HAVE SESSION THEN TO THE HOME PAGE
@@ -147,6 +147,8 @@ const loadHomePage = async (req, res) => {
         const user = req.session.user;
         const categories = await Category.find({ isListed: true });
         console.log("Categories:", categories);
+        let brandData = await Brand.find({isBlocked:false})
+        console.log("zzzzz", brandData)
         let productData = await Products.find({
             isBlocked: false,
             category: { $in: categories.map((category) => category._id) },
@@ -158,7 +160,7 @@ const loadHomePage = async (req, res) => {
         if (user) {
             const userData = await User.findById(user);
            
-            res.render("home", { user: userData, products: productData });
+            res.render("home", { user: userData, products: productData, brands:brandData });
         } else {
             return res.render("home", { products: productData });
         }

@@ -20,6 +20,7 @@ const orderRouter = require("./routes/admin/orderRouter");
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
+const {errorHandler} = require("./middlewares/errorhandling")
 app.use(cors({
     origin: 'http://localhost:3000', // Replace with your frontend URL
     credentials: true
@@ -53,6 +54,7 @@ app.set("views", [path.join(__dirname, "views/user"), path.join(__dirname, "view
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(logoutStatusMiddleware);
+app.use(errorHandler)
 
 app.use("/", userRouter);
 app.use("/profile", profileRouter);
@@ -70,7 +72,7 @@ app.use("/admin/orders", orderRouter)
 
 const PORT = 3000 || process.env.PORT;
 app.listen(PORT, () => {
-    console.log("Server Running");
+    console.log("http://localhost:3000");
 });
 
 module.exports = app;

@@ -77,14 +77,21 @@
     <script>
         function deleteProduct(productId) {
     Swal.fire({
+
+
       title: 'Are you sure?',
       text: "Do you really want to delete this item from your Wishlist?",
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
+      iconColor: '#D3B382',  
+    background: '#fffcf3', 
+    color: 'hsl(0, 0%, 13%)',
+  
+    showCancelButton: true,
+    confirmButtonColor: '#d7b178',
+    cancelButtonColor: '#D3B382',
+  
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
        

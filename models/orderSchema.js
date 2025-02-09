@@ -20,6 +20,13 @@ const orderSchema = new Schema({
             ref: "Product",
             required: true
         },
+        productName:{
+            type:String,
+            required:true
+        },
+        productImage: [{
+            type: String
+        }],
         size:{
             type:Number,
             required:true
@@ -85,6 +92,10 @@ const orderSchema = new Schema({
     returnReason:{
          type:String,
          required:false
+    },
+    cancelReason:{
+        type:String,
+        required:false
     },
    
     couponApplied: {

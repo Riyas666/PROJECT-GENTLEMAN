@@ -31,7 +31,7 @@ router.get("/deleteCoupon", adminAuth,couponController.deleteCoupon)
 
 
 
-router.post("/generate-report", adminController.generateReport)
+router.post("/generate-report", adminAuth,adminController.generateReport)
 
 
 //EXPORTING

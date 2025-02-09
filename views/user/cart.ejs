@@ -20,7 +20,7 @@
   }
 
   .quantity-wrapper button:hover {
-    background-color: #ffc107;
+    background-color: black;
     color: #fff;
   }
 
@@ -152,11 +152,11 @@
   <!--=============== BREADCRUMB ===============-->
   <section class="breadcrumb">
     <ul class="breadcrumb__list flex container">
-      <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+      <li><a href="/home" class="breadcrumb__link">Home</a></li>
       <li><span class="breadcrumb__link"></span>></li>
-      <li><span class="breadcrumb__link">Shop</span></li>
+      <li><a href="/shop" class="breadcrumb__link">Shop</a></li>
       <li><span class="breadcrumb__link"></span>></li>
-      <li><span class="breadcrumb__link">Cart</span></li>
+      <li><a href="/cart" class="breadcrumb__link">Cart</a></li>
     </ul>
   </section>
 
@@ -219,10 +219,10 @@
     </div>
 
     <div class="cart__actions">
-      <a href="/cart" class="btn flex btn__md">
+      <a href="/cart" class="btn flex btn__md" style="background-color: black; color: white;">
         <i class="fi-rs-shuffle"></i> Update Cart
       </a>
-      <a href="/home" class="btn flex btn__md">
+      <a href="/home" class="btn flex btn__md"  style="background-color: black; color: white;">
         <i class="fi-rs-shopping-bag"></i> Continue Shopping
       </a>
     </div>
@@ -252,7 +252,7 @@
           </tr>
          
         </table>
-        <a href="/checkout" class="btn flex btn--md">
+        <a href="/checkout" class="btn flex btn--md" id="checkout-btn" style="background-color: black; color: white;">
           <i class="fi fi-rs-box-alt"></i> Proceed To Checkout
         </a>
       </div>
@@ -278,6 +278,7 @@
   if (!quantityInput || !quantityWrapper) return;
 
   const maxStock = parseInt(quantityWrapper.getAttribute("data-stock"), 10);
+  console.log("fffff", maxStock)
   const maxLimit = 5;
   let currentQuantity = parseInt(quantityInput.value, 10);
   const newQuantity = currentQuantity + change;
@@ -309,13 +310,6 @@
     return;
   }
 
-  if (newQuantity > maxStock) {
-    Notiflix.Notify.failure(`Not enough stock available. Only ${maxStock} items in stock.`, {
-      timeout: 2000,
-      position: "right-top",
-    });
-    return;
-  }
 
   quantityInput.value = newQuantity;
   const row = quantityWrapper.closest("tr");
@@ -349,8 +343,19 @@ function updateCartOnServer(productId, newQuantity) {
     showOnlyTheLastOne: true,
         });
        
-      } else {
-        Notiflix.Notify.failure(`Failed to update cart: ${data.error}`, {
+      }
+      else if(data.message.includes('Not enough stock available')){
+        Notiflix.Notify.failure(data.message, {
+    timeout: 3000,                
+    position: 'right-top',       
+    clickToClose: true,          
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',            
+    borderRadius: '10px',       
+    showOnlyTheLastOne: true, 
+      })
+    }else{
+        Notiflix.Notify.failure(`Failed to update cart: ${data.message}`, {
           timeout: 3000,
           position: "right-top",
         });
@@ -366,6 +371,31 @@ function updateCartOnServer(productId, newQuantity) {
 }
 
 
+  </script>
+  <script>
+    document.getElementById('checkout-btn').addEventListener('click', async function(event){
+      event.preventDefault();
+
+      try{
+        const response = await fetch('/cart/check-stock', {
+          method:'GET'
+        });
+        const data = await response.json()
+
+        if(data.success){
+          window.location.href = '/checkout'
+        }else{
+          Swal.fire({
+            title:"Error",
+            text:data.message,
+            icon:"error",
+            button:"Try again"
+          })
+        }
+      }catch(error){
+        console.log("Error", error)
+      }
+    })
   </script>
   <script src="/js/cartproductActions.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/notiflix/dist/notiflix-3.2.6.min.js"></script>

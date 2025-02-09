@@ -62,10 +62,10 @@
             <tbody>
               <% if (orders && orders.length > 0) { %>
               <% orders.forEach((order, index) => { %>
-              <tr>
+              <tr style="font-weight: 600;">
                 <td>#<%= order.orderId.slice(-7) %></td>
                 <td><%= order.createdAt.toLocaleDateString() %></td>
-                <td><%= order.status %></td>
+                <td style="font-weight: 600;" ><%= order.status %></td>
                 <td>₹<%= order.finalAmount.toFixed(2) %></td>
                 <td><a href="/order-details/<%=order._id%>" class="view__order">View</a></td>
               </tr>

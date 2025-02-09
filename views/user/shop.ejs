@@ -7,13 +7,14 @@
 
 .controls__container {
   display: grid;
-  grid-template-columns: 1fr 200px 200px;
-  gap: 1.5rem;
-  align-items: center;
+    grid-template-columns: 40.5rem 12rem 12rem 12rem;
+    gap: 1.5rem;
+    align-items: center;
 }
 
 .search__wrapper {
   position: relative;
+  
 }
 
 .search__form {
@@ -55,6 +56,8 @@
     gap: 1rem;
   }
 }
+
+
 </style>
 
 <!--=============== MAIN ===============-->
@@ -95,6 +98,21 @@
             <option value="<%= category._id %>" 
               <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
               <%= category.name %>
+            </option>
+          <% }); %>
+        </select>
+      </div>
+
+
+
+
+      <div class="filter__wrapper">
+        <select name="brand" id="brandFilter" class="filter__select">
+          <option value="">All Brands</option>
+          <% brands.forEach(function(brand) { %>
+            <option value="<%= brand._id %>" 
+              <%= selectedBrand === brand._id.toString() ? 'selected' : '' %>>
+              <%= brand.brandName %>
             </option>
           <% }); %>
         </select>
@@ -227,6 +245,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
   const categoryFilter = document.getElementById('categoryFilter');
+  const brandFilter = document.getElementById('brandFilter')
   const sortProducts = document.getElementById('sortProducts');
   
   // Function to update URL with filter parameters
@@ -247,6 +266,12 @@
     }
     
     // Update sort
+    if(brandFilter.value){
+      searchParams.set('brand', brandFilter.value)
+    }else{
+      searchParams.delete('brand')
+    }
+
     if (sortProducts.value) {
       searchParams.set('sort', sortProducts.value);
     } else {
@@ -259,6 +284,7 @@
   
   // Add event listeners
   categoryFilter.addEventListener('change', updateFilters);
+  brandFilter.addEventListener('change',updateFilters)
   sortProducts.addEventListener('change', updateFilters);
 });
 

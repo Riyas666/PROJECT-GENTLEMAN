@@ -168,6 +168,42 @@
       });
 
       if (result.isConfirmed) {
+const cancelReasonResult = await Swal.fire({
+  title:'Reason For Cancel',
+  input:'select',
+  inputOptions:{
+    'Changed Mind' : 'Changed Mind',
+    'Product No Longer Needed' : 'Product No Longer Needed',
+    'Changed My Mind': 'Changed my mind',
+    'Other': 'Other (please specify)'  
+
+  },
+  inputPlaceholder:'Select a reason',
+  showCancelButton:true,
+  confirmButtonText:'Submit',
+  cancelButtonText:'Cancel'
+});
+
+if(cancelReasonResult.isConfirmed){
+  const reason = cancelReasonResult.value;
+  let finalReason = reason;
+
+  if(reason === 'Other'){
+    const customReasonResult = await Swal.fire({
+              title: 'Please provide your reason',
+              input: 'textarea',
+              inputPlaceholder: 'Enter custom reason for return...',
+              showCancelButton: true,
+              confirmButtonText: 'Submit',
+              cancelButtonText: 'Cancel'
+            });
+            if(customReasonResult.isConfirmed&&customReasonResult.value){
+              finalReason = customReasonResult.value
+            }elseP
+            return
+  }
+}
+
         try {
           console.log("Order cancellation started");
           const response = await fetch('/profile/cancel-order', {
@@ -177,7 +213,8 @@
             },
             body: JSON.stringify({
               orderId: '<%= orders.orderId %>',
-              status: 'Cancelled'
+              status: 'Cancelled',
+              reason:finalReason
             }),
           });
 

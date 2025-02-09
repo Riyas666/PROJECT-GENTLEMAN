@@ -7,16 +7,16 @@ const deleteAddress = async (addressId) => {
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
         icon: 'warning',
+        background: '#fff', 
+        color: '#000',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#000',
+        cancelButtonColor: '#666',
         confirmButtonText: 'Yes, delete it!',
     });
 
-    // If the user confirms the deletion
     if (result.isConfirmed) {
         try {
-            // Sending a DELETE request to the server
             const response = await fetch(`/profile/delete-address/${addressId}`, {
                 method: 'DELETE',
                 headers: {
@@ -30,28 +30,29 @@ const deleteAddress = async (addressId) => {
                 throw new Error(errorData.message || 'Failed to delete address');
             }
 
-            // Parse the JSON response
             const result = await response.json();
 
-            // Check the response from the server
             if (result.success) {
-                // If the deletion is successful, show a success message using SweetAlert
                 Swal.fire({
                     title: 'Success!',
                     text: result.message,
                     icon: 'success',
-                    button: 'OK',
+                    background: '#fff', 
+                    color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
                 }).then(() => {
-                    // Redirect the user to the address page after successful deletion
                     window.location.href = '/profile/address';  // Redirect to the address page
                 });
             } else {
-                // Show an error message using SweetAlert if the deletion failed
                 Swal.fire({
                     title: 'Error',
                     text: result.message || 'Failed to delete address',
                     icon: 'error',
-                    button: 'Try again',
+                    background: '#fff',
+                    color: '#000',
+                    confirmButtonColor: '#000',
+                    confirmButtonText: 'Try again',
                 });
             }
         } catch (error) {
@@ -61,7 +62,10 @@ const deleteAddress = async (addressId) => {
                 title: 'Error',
                 text: 'An unexpected error occurred',
                 icon: 'error',
-                button: 'OK',
+                background: '#fff',
+                color: '#000',
+                confirmButtonColor: '#000',
+                confirmButtonText: 'OK',
             });
         }
     }

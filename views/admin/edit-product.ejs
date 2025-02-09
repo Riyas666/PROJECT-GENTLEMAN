@@ -63,7 +63,7 @@
    <!-- /////////////////////////// DESCRIPTION AREA //////////////////////////////// -->
             <div class="mb-4">
               <label class="form-label">Full description</label>
-              <input name="descriptionData" value="<%=product.description%>" class="form-control border" rows="4">
+              <input name="description" value="<%=product.description%>" class="form-control border" rows="4">
               <div id="description-error" class="error-message"></div>
             </div>
 
@@ -241,7 +241,7 @@
                console.log("validate form");
                clearErrorMessages();
                const name = document.getElementsByName('productName')[0].value;
-               const description = document.getElementsByName('descriptionData')[0].value;
+               const description = document.getElementsByName('description')[0].value;
                const brand = document.getElementsByName('brand')[0].value;
                const price = document.getElementsByName('regularPrice')[0].value;
                const saleprice = document.getElementsByName('salePrice')[0].value;

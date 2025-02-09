@@ -22,7 +22,7 @@
 }
 
 .quantity-wrapper button:hover {
-  background-color: #ffc107;
+  background-color: black;
   color: #fff;
 }
 
@@ -100,12 +100,12 @@
   }
 
   .thumbnail-image:hover {
-    border-color: #007bff;
+    border-color: black;
     transform: translateY(-2px);
   }
 
   .thumbnail-image.active {
-    border-color: #007bff;
+    border-color: black;
   }
 
   .thumbnail-image img {
@@ -161,8 +161,8 @@
   }
   
     .btnn {
-  background-color: #D3B382;
-  border: 2px solid #D3B382;
+  background-color: black;
+  border: 3px solid black;
   color: white;
   padding-inline: 1rem;
   height: 2rem;
@@ -567,7 +567,7 @@ addToCartButton.addEventListener('click', (e) => {
     borderRadius: '10px',       
     showOnlyTheLastOne: true,    
   });
-        } else if (data.message.includes('Not enough stock')) {
+        } else if (data.message.includes('Not enough stock for size')) {
           Notiflix.Notify.failure(data.message, {
     timeout: 3000,               
     position: 'right-top',       

@@ -6,15 +6,17 @@
   --header-height: 4rem;
 
   /*========== Colors ==========*/
-  --first-color: #D3B382;
-  --first-color-alt: #FCEDC0;
+  --first-color:black;
+  --first-color-alt: black;
   --second-color: #FCEDC0;
   --title-color: hsl(0, 0%, 13%);
   --text-color: hsl(154, 13%, 32%);
-  --text-color-light: hsl(60, 1%, 56%);
+  --text-color-dark: black;
+  --text-color-white: white;
+
   --body-color: hsl(0, 0%, 100%);
   --container-color: hsl(0, 0%, 93%);
-  --border-color: #FDE7D2;
+  --border-color: black;
   --border-color-alt: hsl(113, 15%, 90%);
   
 
@@ -155,19 +157,15 @@ table {
   height: 45px;
   font-size: var(--small-font-size);
   border-radius: 0.25rem;
-  -webkit-border-radius: 0.25rem;
-  -moz-border-radius: 0.25rem;
-  -ms-border-radius: 0.25rem;
-  -o-border-radius: 0.25rem;
 }
 
 .new__price {
-  color: var(--first-color);
+  color: var(--text-color-dark);
   font-weight: var(--weight-600);
 }
 
 .old__price {
-  color: var(--text-color-light);
+  color: var(--text-color);
   font-size: var(--small-font-size);
   text-decoration: line-through;
 }
@@ -212,7 +210,7 @@ table {
 
 .header__alert-news {
   margin-left: 10rem;
-  color: var(--text-color-light);
+  color: var(--text-color-white);
   font-weight: var(--weight-600);
 }
 
@@ -261,7 +259,7 @@ table {
 }
 
 .sign-in-lnk {
-  color: inherit;
+  color: white;
   text-decoration: none;
   padding: 8px;
 }
@@ -342,10 +340,7 @@ table {
   font-size: var(--tiny-font-size);
   line-height: 18px;
   border-radius: 50%;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
+  
 }
 
 .nav__menu-top,
@@ -403,35 +398,27 @@ table {
   border: 2px solid var(--first-color);
   color: var(--body-color);
   padding-inline: 1.75rem;
-  /* padding: 0.75rem 1.75rem; */
   height: 49px;
   line-height: 2rem;
   font-family: var(--second-font);
   font-size: var(--small-font-size);
   font-weight: var(--weight-700);
   border-radius: 0.25rem;
-  -webkit-border-radius: 0.25rem;
-  -moz-border-radius: 0.25rem;
-  -ms-border-radius: 0.25rem;
-  -o-border-radius: 0.25rem;
-  transition: all 0.4s var(--transition);
-  -webkit-transition: all 0.4s var(--transition);
-  -moz-transition: all 0.4s var(--transition);
-  -ms-transition: all 0.4s var(--transition);
-  -o-transition: all 0.4s var(--transition);
 }
 
 .btn:hover {
-  background-color: #e0b370;
+  background-color: black;
   color:white;
 }
 
+
 .btn--md,
+.btn--lg,
 .btn--sm {
   font-family: var(--body-font);
 }
 
-.btn--md {
+.btn--md, .btn--lg {
   height: 45px;
   line-height: 40px;
 }
@@ -447,28 +434,30 @@ table {
 }
 
 .category__item {
+  width: 10rem; /* Set a fixed width */
+  height: 13rem;
   text-align: center;
   border: 1px solid var(--border-color);
   padding: 0.625rem 0.625rem 1.25rem;
   border-radius: 1.25rem;
-  -webkit-border-radius: 1.25rem;
-  -moz-border-radius: 1.25rem;
-  -ms-border-radius: 1.25rem;
-  -o-border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .category__img {
+  width: 100px; 
+  height: 100px;
+  object-fit: contain; 
   margin-bottom: 1.25rem;
   border-radius: 0.75rem;
-  -webkit-border-radius: 0.75rem;
-  -moz-border-radius: 0.75rem;
-  -ms-border-radius: 0.75rem;
-  -o-border-radius: 0.75rem;
 }
 
 .category__title {
   color: var(--text-color);
   font-size: var(--small-font-size);
+  font-weight: bold;
 }
 
 .flex {
@@ -477,41 +466,6 @@ table {
   column-gap: 0.5rem;
 }
 
-/* Swiper class */
-
-.swiper {
-  overflow: initial;
-}
-
-.swiper-button-next::after,
-.swiper-button-prev::after {
-  content: "";
-}
-
-.swiper-button-next,
-.swiper-button-prev {
-  top: -1.875rem;
-  background-color: var(--first-color-alt);
-  border: 1px solid var(--border-color);
-  width: 30px;
-  height: 30px;
-  color: var(--first-color);
-  font-size: var(--tiny-font-size);
-  border-radius: 50%;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
-}
-
-.swiper-button-prev {
-  left: initial;
-  right: 2.5rem;
-}
-
-.swiper-button-next {
-  right: 0;
-}
 
 /*=============== PRODUCTS ===============*/
 .tab__btns {
@@ -615,20 +569,17 @@ table {
 }
 
 .action__btn {
+  cursor: pointer;
   position: relative;
   width: 40px;
   height: 40px;
   line-height: 42px;
   text-align: center;
-  background-color: var(--first-color-alt);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
+  background: #2a2a2a;
+    border: 1px solid var(--border-color);
+  color: var(--text-color-white);
   font-size: var(--small-font-size);
   border-radius: 50%;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
 }
 
 .action__btn::before,
@@ -636,10 +587,10 @@ table {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  -webkit-transform: translateX(-50%);
+  /* -webkit-transform: translateX(-50%);
   -moz-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
-  -o-transform: translateX(-50%);
+  -o-transform: translateX(-50%); */
 }
 
 .action__btn::before {
@@ -659,10 +610,10 @@ table {
   padding-inline: 0.625rem;
   line-height: 2.58;
   border-radius: 0.25rem;
-  -webkit-border-radius: 0.25rem;
+  /* -webkit-border-radius: 0.25rem;
   -moz-border-radius: 0.25rem;
   -ms-border-radius: 0.25rem;
-  -o-border-radius: 0.25rem;
+  -o-border-radius: 0.25rem; */
 }
 
 .product__badge {
@@ -702,7 +653,7 @@ table {
 }
 
 .product__category {
-  color: var(--text-color-light);
+  color: var(--text-color-dark);
   font-size: var(--smaller-font-size);
 }
 
@@ -729,8 +680,8 @@ table {
 
 /* Active Tab */
 .tab__btn.active-tab {
-  color: var(--first-color);
-  background-color: var(--second-color);
+  color: var(--text-color-white);
+  background-color: var(--first-color);
 }
 
 .tab__item:not(.active-tab) {
@@ -1029,7 +980,7 @@ table {
 }
 
 .footer__subtitle {
-  color: var(--text-color-light);
+  color: var(--text-color-dark);
   font-size: var(--small-font-size);
   margin-block: 1.25rem 0.625rem;
 }
@@ -1086,7 +1037,7 @@ table {
 
 .copyright,
 .designer {
-  color: var(--text-color-light);
+  color: var(--text-color-dark);
   font-size: var(--small-font-size);
 }
 
@@ -1115,13 +1066,49 @@ table {
   font-weight: var(--weight-600);
 }
 
-.pagination {
+/* .pagination {
   display: flex;
   justify-content: center;
   column-gap: 0.625rem;
   margin-top: 2.75rem;
+} */
+
+
+
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px solid black;
 }
 
+.page-link {
+  background: #222;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.page-link:hover {
+  background: #444;
+}
+
+.active .page-link {
+  background: black;
+  color: white;
+  font-weight: bold;
+}
+.pagination__link.active{
+  border-color: white;
+}
+
+
+
+
+/* 
 .pagination__link {
   display: inline-block;
   width: 34px;
@@ -1141,18 +1128,18 @@ table {
   -moz-transition: all 0.15s var(--transition);
   -ms-transition: all 0.15s var(--transition);
   -o-transition: all 0.15s var(--transition);
-}
+} */
 
-.pagination__link.active,
+/* .pagination__link.active,
 .pagination__link:hover {
   background-color: var(--first-color);
   color: var(--body-color);
-}
+} */
 
-.pagination__link.icon {
+/* .pagination__link.icon {
   border-top-right-radius: 50%;
   border-bottom-right-radius: 50%;
-}
+} */
 
 /*=============== DETAILS ===============*/
 .details__container {
@@ -1327,7 +1314,7 @@ table {
 }
 
 .info__table tr td {
-  color: var(--text-color-light);
+  color: var(--text-color-dark);
 }
 
 .reviews__container {
@@ -1461,7 +1448,7 @@ table {
 }
 
 .table__trash {
-  color: var(--text-color-light);
+  color: var(--text-color-dark);
   cursor: pointer;
 }
 
@@ -1494,7 +1481,7 @@ table {
 }
 
 .divider i {
-  color: var(--text-color-light);
+  color: var(--text-color-dark);
   background-color: var(--body-color);
   font-size: 1.5rem;
   padding-inline: 1.25rem;
@@ -1637,7 +1624,7 @@ table {
 }
 
 .compare__table tr th {
-  color: var(--text-color-light);
+  color: var(--text-color-dark);
   font-size: var(--small-font-size);
 }
 
@@ -1962,7 +1949,7 @@ table {
     line-height: 39px;
   }
 
-  .btn--md {
+  .btn--md ,.btn--lg{
     height: 42px;
     line-height: 35px;
   }

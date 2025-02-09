@@ -62,18 +62,6 @@
   .modal-close:hover {
     color: #333;
   }
-
-
-
-  .edit-btn,
-  .delete-btn {
-    display: inline-block;
-    background-color: orange;
-    border-radius: 3px;
-    color: white;
-    padding: 7px;
-    margin-right: 15px;
-  }
 </style>
 <style>
   .tab__body {
@@ -93,17 +81,12 @@
   }
 
   .add-btnn {
-    background-color: blue;
+    background-color: darkslategray;
     color: white;
     padding: 0.625rem 1.25rem;
     border-radius: 0.25rem;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s;
-  }
-
-  .add-btnn:hover {
-    background-color: darkblue;
   }
 
   .address-grid {
@@ -120,15 +103,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 1rem;
-  }
-
   .card-header h3 {
     font-size: 1.125rem;
     margin: 0;
@@ -137,37 +111,6 @@
   .card-actions {
     display: flex;
     gap: 0.5rem;
-  }
-
-  .card-actions button {
-    width: 2.5rem;
-    height: 2.5rem;
-    border: none;
-    border-radius: 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: opacity 0.3s;
-  }
-
-  .card-actions button:hover {
-    opacity: 0.8;
-  }
-
-  .edit-btn {
-    background-color: orange;
-    color: white;
-  }
-
-  .delete-btn {
-    background-color: red;
-    color: white;
-  }
-
-  .address-details {
-    font-style: normal;
-    line-height: 1.5;
   }
 
   @media (max-width: 768px) {
@@ -205,25 +148,6 @@
     padding: 1rem;
   }
 
-  .address-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-  }
-
-  .address-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .address-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
 
   .card-header {
     display: flex;
@@ -456,7 +380,7 @@
                       <span class="error-message" id="addressTypeError"></span>
                     </span>
                   </div>
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" class="btn btn-dark " style="width: 50%; margin-left: 25%;" >Submit</button>
                 </form>
               </div>
             </div>
@@ -550,7 +474,7 @@
                     </span>
                   </div>
                   <input type="hidden" id="editAddressId" name="addressId" value="">
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" class="btn btn-dark " style="width: 50%; margin-left: 25%;">Submit</button>
                 </form>
               </div>
             </div>
@@ -712,7 +636,10 @@
             title: "Success!",
             text: result.message,
             icon: "success",
-            button: "OK"
+            background: '#fff', 
+                    color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
           }).then(() => {
             window.location.href = '/profile/address'
           })
@@ -919,7 +846,10 @@
             title: "Success!",
             text: result.message,
             icon: "success",
-            button: "OK"
+            background: '#fff', 
+                    color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
           }).then(() => {
             window.location.href = '/profile/address';
           });

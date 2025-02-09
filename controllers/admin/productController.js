@@ -101,7 +101,7 @@ const addProducts = async (req, res) => {
             sizes: sizes,
             status: "Available",
         });
-        console.log(newProduct)
+        console.log("hehehe",newProduct)
         await newProduct.save();
 
         return res.redirect("/admin/products");
@@ -125,14 +125,21 @@ const getAllProducts = async (req, res) => {
         })
             .populate("category")
             .populate("brand")
+            .sort({ createdAt: -1 }) 
             .limit(limit)
             .skip((page - 1) * limit);
 
+            console.log("bbbbb", productData)
+
+          
+        
         const productsWithImages = productData.map((product) => {
             const productObject = product.toObject();
             productObject.imageUrls = product.productImage; 
             return productObject;
         });
+
+        console.log("dddddd", productsWithImages)
 
         const totalProducts = await Product.countDocuments({
             productName: { $regex: search, $options: "i" },
@@ -140,9 +147,10 @@ const getAllProducts = async (req, res) => {
 
         const totalPages = Math.ceil(totalProducts / limit);
     
-
+       const data = productsWithImages
+       console.log("ssssss", data)
         res.render("products", {
-            data: productsWithImages,
+            data,
             totalPages,
             currentPage: page,
         });
@@ -222,7 +230,7 @@ console.log("Existing images", existingImages)
       ? [data.deletedImages]
       : [];
 
-      console.log("deletedImgages", deletedImages)
+      console.log("deletedImages", deletedImages)
 
       const filteredImages = existingImages.filter(
         (img) => !deletedImages.includes(img)
@@ -235,6 +243,15 @@ console.log("Existing images", existingImages)
       const updatedImages = [...filteredImages, ...newImages];
 
       console.log("updatedImages", updatedImages)
+
+      const sizesArray = req.body.sizes || [];
+      const quantitiesArray = req.body.quantities || [];
+
+
+const sizes = sizesArray.map((size, index) => ({
+    size: size,
+    quantity: parseInt(quantitiesArray[index], 10) || 0  // Convert to number
+}));
        
         const updateFields = {
             productName: data.productName,
@@ -244,12 +261,9 @@ console.log("Existing images", existingImages)
             regularPrice: data.regularPrice,
             salePrice: data.salePrice,
             productImage: updatedImages,
-            sizes: data.sizes.map((size, index) => ({
-              size: size,
-              quantity: Number(data.quantities[index]),
-            })),
+            sizes: sizes
           };
-      
+      console.log(updateFields)
 
           await Product.findByIdAndUpdate(id, updateFields, { new: true });
 

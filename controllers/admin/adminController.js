@@ -65,8 +65,6 @@ const loadDashboard = async (req, res) => {
             const order = await Order.find({})
             const orders = order.reverse()
           
-
-
             res.render("dashboard", {
                 totalOrders,
                 totalSales:totalSales[0]?.totalSales || 0,

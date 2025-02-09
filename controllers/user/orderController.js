@@ -48,7 +48,6 @@ const loadCheckoutPage = async (req, res) => {
   const placeOrder = async (req, res) => {
     try {
       const coupons = req.session.coupon;
-      console.log("qqqqqqq",coupons)
         const userId = req.session.user; 
         const { addressId, paymentMethod } = req.body; 
         if (!addressId || !paymentMethod) {
@@ -67,7 +66,6 @@ const loadCheckoutPage = async (req, res) => {
             if (!product) {
                 return res.status(404).json({ success: false, message: `Product with ID ${item.productId} not found` });
             }
-  console.log("This is the product", product)
             const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
   
             if (!sizeObject || sizeObject.quantity < item.quantity) {
@@ -101,13 +99,14 @@ const loadCheckoutPage = async (req, res) => {
   }
   
 
-
   
         const newOrder = new Order({
           userId,
           orderId: uuidv4(),
           orderedItems: cart.items.map((item) => ({
           products: item.productId,
+          productName : item.productName,
+          productImage : item.productImage,
           size: item.size,
           quantity: item.quantity,
           price: item.totalPrice,
@@ -119,9 +118,38 @@ const loadCheckoutPage = async (req, res) => {
           finalAmount:coupons?coupons.finalAmount:finalAmount,
           status: 'Pending',
           paymentType:paymentMethod,
+          paymentStatus:'Pending'
         });
+        const orderId = newOrder.orderId
+        switch(paymentMethod){
+          case 'COD':
+            await newOrder.save();
+            break;
+          case 'Wallet':
+            const user = await User.findById(userId);
+            if(user.wallet.balance< finalAmount){
+              return res.status(400).json({
+                success:false,
+                message:"Not enough balance in wallet"
+              })
+            }
+            user.wallet.balance-=finalAmount;
+            user.wallet.transactions.push({
+              type: 'Debit',
+              amount: finalAmount,
+              description: `For Order #${orderId}`,
+            });
+            await user.save()
+            newOrder.paymentStatus = 'Success';
+            newOrder.save()
+            break;
+          default:
+            return res.status(400).json({
+              success:false,
+              message:'Invalid payment method'
+            })
+        }
   
-        await newOrder.save();
         cart.items = [];
         await cart.save();
   
@@ -171,7 +199,7 @@ const orderDetails = async(req,res)=>{
     }
 }
 const cancelOrder = async (req, res) => {
-  const { orderId, status } = req.body;
+  const { orderId, status, reason } = req.body;
 
   try {
     const order = await Order.findOne({ orderId }).populate('orderedItems.products');
@@ -183,7 +211,7 @@ const cancelOrder = async (req, res) => {
       const user = await User.findById(order.userId);
       if (user) {
         user.wallet.balance += order.finalAmount;
-
+      
         user.wallet.transactions.push({
           type: 'Credit',
           amount: order.finalAmount,
@@ -218,6 +246,8 @@ const cancelOrder = async (req, res) => {
     }
 
     order.status = status;
+    order.cancelReason = reason
+
     await order.save(); 
 
     res.status(200).json({ message: 'Order cancelled successfully, and stock updated' });
@@ -229,7 +259,7 @@ const cancelOrder = async (req, res) => {
 
 
 
-const createOrder = async (req, res) => {
+const placeOrderOnline = async (req, res) => {
   try {
     const coupons = req.session.coupon;
     const userId = req.session.user; 
@@ -284,6 +314,8 @@ console.log("hahahaha", razorpayInstance)
   orderId: razorpayOrder.id,
   orderedItems : cart.items.map((item) => ({
       products: item.productId,
+      productName : item.productName,
+      productImage : item.productImage,
       size: item.size,
       quantity: item.quantity,
       price: item.totalPrice,
@@ -316,6 +348,7 @@ res.json({ success: true, razorpayOrder });
     res.status(500).json({ error: 'Failed to create order' });
   }
 };
+
 const verifyPayment = async (req, res) => {
 
 
@@ -388,8 +421,7 @@ const returnOrder = async (req, res) => {
       placeOrder,
       orderDetails,
       cancelOrder,
-      createOrder,
+      placeOrderOnline,
       verifyPayment,
       returnOrder,
-      
     }

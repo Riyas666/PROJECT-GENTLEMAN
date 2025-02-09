@@ -50,23 +50,23 @@ router.get("/auth/google/callback", passport.authenticate("google", { failureRed
 
 
 //PROFILE
-router.get("/forgot-password", profileController.forgotPassword);
-router.post("/forgot-email-valid", profileController.forgotEmailValid);
+router.get("/forgot-password", userAuth,profileController.forgotPassword);
+router.post("/forgot-email-valid",userAuth, profileController.forgotEmailValid);
 router.post("/verify-passForgot-otp", profileController.verifyForgotPassOtp);
-router.get("/reset-password", profileController.getResetPassPage);
-router.post("/reset-password", profileController.resetPassword);
-router.post("/resend-forgot-otp", profileController.resendOtp);
+router.get("/reset-password",userAuth, profileController.getResetPassPage);
+router.post("/reset-password",userAuth, profileController.resetPassword);
+router.post("/resend-forgot-otp", userAuth,profileController.resendOtp);
 
 
 
 
 
 router.get("/checkout",userAuth, orderController.loadCheckoutPage);
-router.get('/order/success', orderController.loadOrderCompletedPage);
-router.post('/place', orderController.placeOrder);
-router.get("/order-details/:id", orderController.orderDetails)
-router.post('/profile/cancel-order', orderController.cancelOrder);
-router.post('/profile/return-order', orderController.returnOrder)
+router.get('/order/success',userAuth, orderController.loadOrderCompletedPage);
+router.post('/place',userAuth, orderController.placeOrder);
+router.get("/order-details/:id",userAuth, orderController.orderDetails)
+router.post('/profile/cancel-order', userAuth,orderController.cancelOrder);
+router.post('/profile/return-order', userAuth,orderController.returnOrder)
 
 
 
@@ -76,9 +76,9 @@ router.post('/profile/return-order', orderController.returnOrder)
 
 
 
-router.get("/wishlist", wishlistController.getWishlist)
+router.get("/wishlist",userAuth, wishlistController.getWishlist)
 router.post("/addToWishlist", userAuth,wishlistController.addToWishlist)
-router.post('/wishlist/delete', wishlistController.deleteWishlistItem);
+router.post('/wishlist/delete',userAuth, wishlistController.deleteWishlistItem);
 // router.post("/wishlist/remove", wishlistController.removeFromWishlist)
 
 
@@ -86,9 +86,9 @@ router.post('/wishlist/delete', wishlistController.deleteWishlistItem);
 
 router.post("/apply-coupon",userAuth, cartController.applyCoupon)
 
-router.post('/create-order', orderController.createOrder);
+router.post('/place-order-online',userAuth, orderController.placeOrderOnline);
 
-router.post('/verify-payment', orderController.verifyPayment); 
+router.post('/verify-payment', userAuth,orderController.verifyPayment); 
 
 
 

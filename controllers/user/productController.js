@@ -1,6 +1,7 @@
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const User = require("../../models/categorySchema");
+const Brand = require("../../models/brandSchema")
 
 
 const productDetails = async (req, res) => {
@@ -37,15 +38,19 @@ const productDetails = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 12;
         const skip = (page - 1) * limit;
+        const categories = await Category.find({ isListed: true });
+        const brands = await Brand.find({isBlocked:false})
 
-
-        let query = {}
+        let query = {isBlocked:false,category: { $in: categories.map((category) => category._id) }}
 
         if(req.query.search){
             query.productName = {$regex:req.query.search, $options:'i'}
         }
         if(req.query.category){
             query.category = req.query.category;
+        }
+        if(req.query.brand){
+            query.brand = req.query.brand;
         }
 
         let productsQuery = Product.find(query).populate('brand')
@@ -70,7 +75,7 @@ const productDetails = async (req, res) => {
         const products = await productsQuery.skip(skip).limit(limit);
         const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / limit);
-        const categories = await Category.find({ isListed: true });
+        
 
 
         
@@ -80,10 +85,11 @@ const productDetails = async (req, res) => {
 
             products: products,
             categories: categories,
+            brands: brands,
             searchQuery: req.query.search || '',
             selectedCategory: req.query.category || '',
+            selectedBrand: req.query.brand || '',
             sortBy: req.query.sort || '',
-            brand: products.brand,
             totalProducts: totalProducts,
             currentPage: page,
             totalPages: totalPages,
