@@ -36,7 +36,11 @@ const productSchema = new Schema({
         type: Number,
         required:true                           
     },
-    productOffer:{
+    offerName:{
+        type:String,
+        require:true
+    },
+    offerPercentage:{
         type: Number,
         default: 0
     },

@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const Order = require("../../models/orderSchema")
 const Coupon = require("../../models/couponSchema")
+const Product = require("../../models/productSchema")
+const Category = require("../../models/categorySchema")
 
 //FOR ERROR PAGE
 const pageerror = async (req, res) => {
@@ -192,7 +194,82 @@ const generateReport = async(req,res) =>{
     }
 }
 
+const getProductOffer = async(req,res) =>{
+    try{
+       
+        const category = await Category.find({})
+        const products = await Product.find({}).populate("category")
+        const productsoffer = await Product.find({offerPercentage:{$gt:0}})
+        const categoryoffer = await Category.find({offerPercentage:{$gt:0}})
+        const merge = [...productsoffer, ...categoryoffer]
+        merge.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
+        console.log("mnb", merge)
+        console.log("vv", productsoffer)
+        console.log("qq", category)
+
+            res.render("productOffer", {
+                products,
+                productsoffer,
+                categoryoffer,
+                category,
+                merge
+            })
+          
+        }catch(error){
+        res.redirect("/pageerror")
+    }
+
+}
+
+const createOffer = async(req,res) =>{
+
+    try{
+
+        const {offerName, offerType, selectedItem, offerPercentage, } = req.body;
+       
+       if(offerType === "product"){
+        const products = await Product.findById(selectedItem).populate("category");
+
+        const categoryOffer = products.category.offerPercentage
+        if(products.offerPercentage > 0){
+             return res.status(400).json({status:false, message:"Product already have a offer"})
+        }else if(categoryOffer > offerPercentage){
+            return res.status(400).json({status:false, message:`Category already has a ${categoryOffer}% offer. No need to add a product offer.` })
+        }
+        
+            products.offerPercentage = offerPercentage;
+            products.offerName = offerName;
+           await products.save()
+        
+       }else if(offerType === "category"){
+        const category = await Category.findById(selectedItem)
+        if(category.offerPercentage > 0){
+             return res.status(400).json({status:false, message:"category already have a offer"})
+       }
+
+       category.offerPercentage = offerPercentage;
+       category.offerName = offerName;
+       await category.save();
+
+       const products = await Product.find({category:selectedItem})
+       for(let product of products){
+
+        if (product.offerPercentage < offerPercentage) {
+        product.offerPercentage = 0;
+        product.offerName = "";
+        await product.save()
+       }
+       }
+       return res.status(200).json({ status: true, message: "Offer applied successfully" });
+    }
+      
+  
+    } catch (error) {
+      console.error("Error adding offer:", error);
+      return res.status(500).json({ status: false, message: "Internal Server Error" });
+    }
+  };
 //EXPORTING..
 module.exports = {
     loadDashboard,
@@ -200,5 +277,7 @@ module.exports = {
     login,
     pageerror,
     logout,
-    generateReport
+    generateReport,
+    getProductOffer,
+    createOffer
 };

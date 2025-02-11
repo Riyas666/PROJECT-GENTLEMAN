@@ -16,9 +16,13 @@ const categorySchema = new mongoose.Schema({
         type: Boolean,
         default : true
     },
-    categoryOffer: {
+    offerPercentage:{
         type: Number,
-        default: 0
+        default:0
+    },
+    offerName: {
+        type: String,
+        required: true
     }, 
    
 }, {timestamps:true})

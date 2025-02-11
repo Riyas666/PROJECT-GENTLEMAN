@@ -1,4 +1,5 @@
-const Category = require("../../models/categorySchema");
+const Product = require("../../models/productSchema");
+
 
 const categoryInfo = async (req, res) => {
     try {
@@ -27,10 +28,12 @@ const categoryInfo = async (req, res) => {
 //FOR ADD THE CATEGORY
 const addCategory = async (req, res) => {
     const { name, description } = req.body;
-    const trimmedName = name.trim()
+    const trimmedName = name.trim();
     try {
+
         const existingCategory = await Category.findOne({ name: trimmedName });
         if (existingCategory) {
+
             return res.status(400).json({ error: "Category already exist" });
         }
         const newCategory = new Category({
@@ -41,7 +44,7 @@ const addCategory = async (req, res) => {
         return res.json({ message: "Category added Successfully" });
     } catch (error) {
         return res.status(500).json({ error: "Internal Server Error" });
-    }
+    };
 };
 
 
@@ -115,8 +118,6 @@ const editCategory = async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 };
-
-
 //EXPORTING..
 module.exports = {
     categoryInfo,

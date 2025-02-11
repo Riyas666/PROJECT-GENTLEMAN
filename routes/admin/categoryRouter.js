@@ -17,6 +17,4 @@ router.post("/editCategory/:id",adminAuth, categoryController.editCategory)
 
 
 
-
-
 module.exports = router;

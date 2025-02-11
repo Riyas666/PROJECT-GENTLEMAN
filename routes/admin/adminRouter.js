@@ -33,6 +33,9 @@ router.get("/deleteCoupon", adminAuth,couponController.deleteCoupon)
 
 router.post("/generate-report", adminAuth,adminController.generateReport)
 
+router.get("/productoffer", adminController.getProductOffer)
+router.post("/createOffer", adminController.createOffer);
+
 
 //EXPORTING
 module.exports = router;

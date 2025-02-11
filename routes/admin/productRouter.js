@@ -26,4 +26,6 @@ router.post("/editProduct/:id",adminAuth, uploadProductImage.array('images', 4),
 router.post("/deleteImage",adminAuth, productController.deleteSingleImage)
 
 
+
+
 module.exports = router

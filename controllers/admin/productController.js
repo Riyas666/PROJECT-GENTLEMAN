@@ -1,6 +1,6 @@
-const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
-const Brand = require("../../models/brandSchema")
+const Brand = require("../../models/brandSchema");
+const Product =require("../../models/productSchema");
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -117,7 +117,7 @@ const getAllProducts = async (req, res) => {
 
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
-    const limit = 4;
+    const limit = 7;
 
     try {
         const productData = await Product.find({
@@ -294,6 +294,7 @@ const deleteSingleImage = async (req, res) => {
         res.redirect("/pageerror");
     }
 };
+
 
 //EXPORTING..
 module.exports = {

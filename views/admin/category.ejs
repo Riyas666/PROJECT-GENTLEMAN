@@ -112,12 +112,11 @@
                   <tr>
                     <th class="text-center"></th>
                     <th>Name</th>
-                    <th>Description</th>
+                    <th style="width: 20rem;" class="text-center">Description</th>
                     <th>Offer Price</th>
-                    <th class="text-center">Offer</th>
-                    <th>Status</th>
+                    <th class="text-center">Status</th>
                     <th>List/Unlist</th>
-                    <th class="text-start">Edit</th>
+                    <th class="text-center">Edit</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -126,17 +125,12 @@
                     <td></td>
                     <td class="text-start"><%=category.name%></td>
                     <td class="text-start"><%=category.description%></td>
-                    <td>
-                    </td>
-                    <td class="text-start">
-                      
-                      <button class="btn btn-info" style="width: 100px">
-                        <a href="#" class="text-white">Add Offer</a>
-                      </button>
-                      <button class="btn btn-info"style="width: 100px">
-                        <a href="#" class="text-white">Remove</a>
-                      </button>
-
+                    <td class="text-center">
+                      <%if(category.categoryOffer){%>
+                        <%=category.categoryOffer%>%
+                        <%}else{%>
+                          0%
+                          <%}%>
                     </td>
                     <td class="text-start">
                         <%if(category.isListed){%>
@@ -146,7 +140,7 @@
                       <%}%>
                     </td>
                     <td class="text-start">
-                        <%if(category.isListed){%>
+                        <%if(category.isListed){%> 
                       <button class="btn btn-danger" style="width: 70px">
                         <a href="/admin/category/listCategory?id=<%=category._id%>" class="text-white">Unlist</a>
                       </button>
@@ -321,9 +315,8 @@
     }
 
 
+
 </script>
-
-
 
 
 
