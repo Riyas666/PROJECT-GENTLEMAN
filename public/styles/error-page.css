@@ -1,53 +1,129 @@
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-}
+*{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
 
-.container {
-    text-align: center;
-    padding: 50px;
-    margin-top: 10%;
-}
+        body {
+            background: #111;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-h1 {
-    font-size: 120px;
-    font-weight: 100;
-    margin: 0;
-    color: #a57c4d;
-}
+        .container {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
 
-h2 {
-    font-size: 28px;
-    margin: 10px 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #555;
-}
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            right: -100%;
+            bottom: -100%;
+            background: repeating-linear-gradient(
+                45deg,
+                #000 0%,
+                #000 10%,
+                #111 10%,
+                #111 20%
+            );
+            animation: moveBackground 15s linear infinite;
+            opacity: 0.1;
+            z-index: -1;
+        }
 
+        h1 {
+            font-size: 150px;
+            margin-bottom: 0;
+            letter-spacing: 10px;
+            animation: glitch 3s infinite;
+            text-shadow: 
+                2px 2px 0 #777,
+                -2px -2px 0 #777;
+        }
 
-p {
-    font-size: 20px;
-    color: #777;
-    line-height: 1.5;
-}
+        h2 {
+            font-size: 24px;
+            margin: 20px 0;
+            letter-spacing: 2px;
+            animation: fadeInUp 0.8s ease-out;
+        }
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #a57c4d;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
+        p {
+            max-width: 600px;
+            margin: 20px auto;
+            line-height: 1.6;
+            color: #999;
+            animation: fadeInUp 1s ease-out;
+        }
 
-.btn:hover {
-    cursor: pointer;
-    background-color: #8c683a;
-    transition: 0.3s ease;
-}
+        .btn {
+            padding: 15px 30px;
+            margin-top: 30px;
+            background: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            font-size: 16px;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%) rotate(45deg);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover::before {
+            transform: translate(-50%, -50%) rotate(45deg) scale(2);
+            opacity: 0;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100%, 100%); }
+        }
+  

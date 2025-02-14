@@ -3,10 +3,8 @@
 const User = require("../../models/userSchema");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
-const Order = require("../../models/orderSchema")
-const Coupon = require("../../models/couponSchema")
-const Product = require("../../models/productSchema")
-const Category = require("../../models/categorySchema")
+const Product = require("../../models/productSchema");
+const Category = require("../../models/categorySchema");
 
 //FOR ERROR PAGE
 const pageerror = async (req, res) => {
@@ -14,76 +12,36 @@ const pageerror = async (req, res) => {
 };
 
 
-// LOAD LOGIN PAGE BASED ON THE SESSION
 const loadLogin = async (req, res) => {
-    if (!req.session.admin) {
+    if (!req.session.admin){
         res.render("admin-login",{message:null}) 
     }else{
         res.redirect("/admin/dashboard");
-    }
-   
+    };
 };
 
 
-//FOR LOGIN
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const admin = await User.findOne({ email, isAdmin: true });
         if (!admin) {
             return res.render("admin-login", { message: "Invalid email or password" });
-        }
+        };
 
-        //COMPARE TWO PASSWORDS
         const passwordMatch = await bcrypt.compare(password, admin.password);
         if (!passwordMatch) {
             return res.render("admin-login", { message: "Invalid Email or password" });
         }
+
         req.session.admin = admin;
         return res.redirect("/admin/dashboard");
     } catch (error) {
         console.error("login error", error);
         return res.redirect("/pageerror");
-    }
+    };
 };
 
-
-//TO LOAD THE DASHBOARD FOR LOGGED ONES
-const loadDashboard = async (req, res) => {
-    if (req.session.admin) {
-        try {
-            const totalOrders = await Order.countDocuments();
-
-            const totalSales = await Order.aggregate([
-                {$group:{_id:null, totalSales:{$sum:"$finalAmount"}}}
-            ])
-
-            const totalDiscount = await Order.aggregate([
-                {$group:{_id:null, totalDiscount:{$sum:"$discount"}}}
-            ])
-            const coupons = await Coupon.find({})
-
-
-            const order = await Order.find({})
-            const orders = order.reverse()
-          
-            res.render("dashboard", {
-                totalOrders,
-                totalSales:totalSales[0]?.totalSales || 0,
-                totalDiscount:totalDiscount[0]?.totalDiscount || 0,
-                orders,
-                coupons
-            });
-        } catch (error) {
-            res.redirect("/pageerror");
-        }
-    } else {
-        res.redirect("/admin/login");
-    }
-};
-
-
-//FOR LOGOUT
 const logout = async (req, res) => {
     try {
         req.session.destroy((err) => {
@@ -96,117 +54,18 @@ const logout = async (req, res) => {
     } catch (error) {
         console.error("Unexpected error during logout", error);
         res.redirect("/pageerror");
-    }
+    };
 };
 
-const generateReport = async(req,res) =>{
-    const {reportType , startDate, endDate} = req.body
-    console.log("qq", reportType)
+
+const getProductOffer = async(req, res) =>{
     try{
-      let reportData = [];
-      console.log("qq", reportType)
-
-      if(reportType==='Daily'){
-        const today = new Date();
-        const startOfDay =new Date(today.setHours(0,0,0,0));
-        const endOfDay = new Date(today.setHours(23,59,59,999));
-
-        reportData = await Order.aggregate([
-            {$match:
-                {createdAt:{$gte:startOfDay, $lte:endOfDay}
-                }
-            },
-            {$group:{
-                    _id:null,
-                    totalSales:{$sum:"$finalAmount"},
-                    totalDiscount:{$sum:"$discount"},
-                    totalOrders:{$sum:1},
-                    createdAt:{$first:"$createdAt"}
-                    }
-                },
-                { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
-           ]);
-      }else if(reportType==='Weekly'){
-        const today = new Date();
-        const firstDay = new Date(today);
-        firstDay.setDate(today.getDate() - today.getDay());
-        
-        const lastDay = new Date(today);
-        lastDay.setDate(today.getDate() - today.getDay() + 6);
-
-        reportData = await Order.aggregate([
-            {$match:
-                {createdAt:{$gte:firstDay, $lte:lastDay}
-                }
-            },
-            {$group: {
-                     _id:null,
-                     totalSales:{$sum:"$finalAmount"},
-                     totalDiscount:{$sum:"$discount"},
-                     totalOrders:{$sum:1},
-                     createdAt:{$first:"$createdAt"}
-                     }
-                },
-                { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
-        ])
-      }else if(reportType==='Yearly'){
-        const yearStart = new Date(new Date().getFullYear(),0,1);
-        const yearEnd = new Date(new Date().getFullYear(),11,31)
-
-        reportData = await Order.aggregate([
-            {$match:
-                {createdAt:{$gte:yearStart, $lte:yearEnd}
-                }
-            },
-            {$group:{
-                    _id:null,
-                    totalSales:{$sum:"$finalAmount"},
-                    totalDiscount:{$sum:"$discount"},
-                    totalOrders:{$sum:1},
-                    createdAt:{$first:"$createdAt"}
-                    }
-             },
-             { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
-        ])
-      }else if(reportType === 'Custom Date Range'){
-        reportData = await Order.aggregate([
-            {$match:
-                {createdAt:{$gte:new Date(startDate), $lte: new Date(endDate) }
-                }
-            },
-            {$group:{
-                _id:null,
-                totalSales:{$sum:"$finalAmount"},
-                totalDiscount:{$sum:"$discount"},
-                totalOrders:{$sum:1},
-                createdAt:{$first:"$createdAt"}
-                    }
-                },
-                { $project: {_id:0, totalSales: 1 , totalDiscount: 1 , totalOrders: 1 , createdAt:1} }
-        ])
-      }
-      console.log("zzzzzzz", reportData)
-      res.json({success:true, reportData})
-
-    }catch(error){
-        console.error("Error generating report:", error);
-        res.status(500).json({ success: false, message: "Error generating report." });
-    }
-}
-
-const getProductOffer = async(req,res) =>{
-    try{
-       
-        const category = await Category.find({})
-        const products = await Product.find({}).populate("category")
-        const productsoffer = await Product.find({offerPercentage:{$gt:0}})
-        const categoryoffer = await Category.find({offerPercentage:{$gt:0}})
-        const merge = [...productsoffer, ...categoryoffer]
+        const category = await Category.find({});
+        const products = await Product.find({}).populate("category");
+        const productsoffer = await Product.find({offerPercentage:{$gt:0}});
+        const categoryoffer = await Category.find({offerPercentage:{$gt:0}});
+        const merge = [...productsoffer, ...categoryoffer];
         merge.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-        console.log("mnb", merge)
-        console.log("vv", productsoffer)
-        console.log("qq", category)
 
             res.render("productOffer", {
                 products,
@@ -214,70 +73,77 @@ const getProductOffer = async(req,res) =>{
                 categoryoffer,
                 category,
                 merge
-            })
-          
+            });
         }catch(error){
         res.redirect("/pageerror")
-    }
+    };
+};
 
-}
-
-const createOffer = async(req,res) =>{
-
+const createOffer = async(req, res) =>{
     try{
 
         const {offerName, offerType, selectedItem, offerPercentage, } = req.body;
        
        if(offerType === "product"){
-        const products = await Product.findById(selectedItem).populate("category");
 
+        const products = await Product.findById(selectedItem).populate("category");
         const categoryOffer = products.category.offerPercentage
-        if(products.offerPercentage > 0){
-             return res.status(400).json({status:false, message:"Product already have a offer"})
+
+        if(offerPercentage < products.offerPercentage){
+
+             return res.status(400).json({status:false, message:"Better offer already exist"});
+
         }else if(categoryOffer > offerPercentage){
-            return res.status(400).json({status:false, message:`Category already has a ${categoryOffer}% offer. No need to add a product offer.` })
+
+            return res.status(400).json({status:false, message:`Category already has a ${categoryOffer}% offer. No need to add a product offer.` });
+
         }
         
             products.offerPercentage = offerPercentage;
             products.offerName = offerName;
-           await products.save()
+
+            await products.save();
         
        }else if(offerType === "category"){
-        const category = await Category.findById(selectedItem)
-        if(category.offerPercentage > 0){
-             return res.status(400).json({status:false, message:"category already have a offer"})
-       }
+
+        const category = await Category.findById(selectedItem);
+
+        if(offerPercentage < category.offerPercentage){
+
+             return res.status(400).json({status:false, message:"Better offfer already exists"});
+
+       }    
 
        category.offerPercentage = offerPercentage;
        category.offerName = offerName;
+
        await category.save();
 
        const products = await Product.find({category:selectedItem})
        for(let product of products){
-
-        if (product.offerPercentage < offerPercentage) {
+        if (product.offerPercentage < offerPercentage){
+            
         product.offerPercentage = 0;
         product.offerName = "";
+
         await product.save()
        }
        }
-       return res.status(200).json({ status: true, message: "Offer applied successfully" });
     }
-      
+
+    return res.status(200).json({ status: true, message: "Offer applied successfully" });
   
     } catch (error) {
       console.error("Error adding offer:", error);
       return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
   };
-//EXPORTING..
+
 module.exports = {
-    loadDashboard,
     loadLogin,
     login,
     pageerror,
     logout,
-    generateReport,
     getProductOffer,
     createOffer
 };

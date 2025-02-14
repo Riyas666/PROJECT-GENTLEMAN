@@ -199,10 +199,12 @@ if(cancelReasonResult.isConfirmed){
             });
             if(customReasonResult.isConfirmed&&customReasonResult.value){
               finalReason = customReasonResult.value
-            }elseP
-            return
+            }else{
+              return
+            }
+            
   }
-}
+
 
         try {
           console.log("Order cancellation started");
@@ -240,6 +242,7 @@ if(cancelReasonResult.isConfirmed){
           });
         }
       }
+    }
     });
   }
   if(returnOrderButton){

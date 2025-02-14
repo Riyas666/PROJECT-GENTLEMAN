@@ -195,10 +195,10 @@
               <span class="table__price">₹<%=item.price%></span>
             </td>
             <td>
-              <div class="quantity-wrapper" data-product-id="<%= item.productId._id %>" data-stock="<%= item.productId.quantity %>">
-                <button class="decrease" onclick="updateStock('<%= item.productId._id %>', -1)">-</button>
-                <input type="number" id="quantity-<%= item.productId._id %>" value="<%= item.quantity %>" min="1" readonly />
-                <button class="increase" onclick="updateStock('<%= item.productId._id %>', 1)">+</button>
+              <div class="quantity-wrapper" data-product-id="<%= item.productId._id %>" data-stock="<%= item.productId.quantity %>" data-size="<%= item.size %>" >
+                <button class="decrease" onclick="updateStock('<%= item.productId._id %>', '<%=item.size%>', -1)">-</button>
+                <input type="number" id="quantity-<%= item.productId._id %>-<%=item.size%>" value="<%= item.quantity %>" min="1" readonly />
+                <button class="increase" onclick="updateStock('<%= item.productId._id %>','<%=item.size%>' ,1)">+</button>
               </div>
             </td>
             <td><span class="subtotal">₹<%= (item.quantity * item.price).toFixed(2) %></span></td>
@@ -271,9 +271,9 @@
 
     /////////////////////UPDATE TEH STOCK///////////////////////
     
-    function updateStock(productId, change) {
-  const quantityInput = document.getElementById(`quantity-${productId}`);
-  const quantityWrapper = document.querySelector(`[data-product-id="${productId}"]`);
+    function updateStock(productId, size, change) {
+  const quantityInput = document.getElementById(`quantity-${productId}-${size}`);
+  const quantityWrapper = document.querySelector(`[data-product-id="${productId}"][data-size="${size}"]`);
 
   if (!quantityInput || !quantityWrapper) return;
 
@@ -317,7 +317,7 @@
   const pricePerItem = parseFloat(row.querySelector(".table__price").textContent.replace("₹", ""));
   subtotalElement.textContent = `₹${(pricePerItem * newQuantity).toFixed(2)}`;
 
-  updateCartOnServer(productId, newQuantity);
+  updateCartOnServer(productId,size, newQuantity);
 }
 
 
@@ -328,7 +328,7 @@ function updateCartOnServer(productId, newQuantity) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ productId, quantity: newQuantity }),
+    body: JSON.stringify({ productId, size,quantity: newQuantity }),
   })
     .then((response) => response.json())
     .then((data) => {

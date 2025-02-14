@@ -44,10 +44,6 @@ const productSchema = new Schema({
         type: Number,
         default: 0
     },
-    color: {
-        type: String,
-        required: false
-    },
     sizes: [SizeSchema],
     productImage: [{
         type: String
@@ -62,8 +58,6 @@ const productSchema = new Schema({
         required: true,
         default: "Available"
     },
- 
-
 
 }, {timestamps:true})
 

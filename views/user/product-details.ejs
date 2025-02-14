@@ -172,6 +172,18 @@
   border-radius: 0.25rem;
   
 }
+
+.badge {
+            display: inline-block;
+            background: black; /* Red background */
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+        } 
   
 </style>
 <!--=============== MAIN ===============-->
@@ -215,7 +227,12 @@
         <div class="details__price flex">
           <span class="new__price">₹<%=product.salePrice%></span>
           <span class="old__price">₹<%=product.regularPrice%></span>
-          <span class="save__price">25% Off</span>
+          <!-- <span class="save__price">25% Off</span> -->
+           <%if(product.offerPercentage > 0 ){%>
+          <div class="badge">🔥 Extra <%=product.offerPercentage || product.category.offerPercentage%>% Off!</div>
+<%}else if(product.category.offerPercentage > 0 ){%>
+  <div class="badge">🔥 Extra <%=product.offerPercentage || product.category.offerPercentage%>% Off!</div>
+<%}%>
         </div>
         <p class="short__description">
           <%=product.description%>

@@ -3,63 +3,60 @@ const User = require("../../models/userSchema")
 const Product = require("../../models/productSchema")
 
 const allOrders = async (req,res)=>{
-
-   const orderdetails = await Order.find({}).populate("orderedItems.products")
-   const orders = orderdetails.reverse()
-   res.render("order", {orders})
+   const orderdetails = await Order.find({}).populate("orderedItems.products");
+   const orders = orderdetails.reverse();
+   res.render("order", {orders});
 }
 
 const orderDetails = async (req, res) => {
    try {
      const {id}   = req.params;
-     console.log("zzz", id)
      const orders = await Order.findById(id).populate({
       path: "orderedItems.products",
-      select: "productName sizes productImage" // Only fetch required fields
+      select: "productName sizes productImage"
    });
       
- console.log("hehehe", orders)
-     if (!orders) {
-       return res.status(404).json({ message: 'Order not found' });
-     }
- 
-     res.json({order:orders});
+   if (!orders){
+    return res.status(404).json({ message: 'Order not found' });
+   }
+   res.json({order:orders});   
 
    } catch (error) {
      console.error(error);
      res.status(500).json({ message: 'Error fetching order details' });
-   }
+   };
  };
  
 
  const changeOrderStatus = async (req, res) => {
-   const { orderId, newStatus } = req.body;
-   try {
-     const order = await Order.findById(orderId);
-     if (!order) {
+
+  const { orderId, newStatus } = req.body;
+  try {
+
+    const order = await Order.findById(orderId);
+    if (!order) {
        return res.status(404).json({ message: 'Order not found' });
-     }
+    }
 
-     order.status = newStatus;
-     if(order.status==="Delivered"){
-      order.paymentStatus= "Success";
-     }
+    order.status = newStatus;
+    if(order.status==="Delivered"){
+    order.paymentStatus= "Success";
+    }
 
-     await order.save();
-     return res.status(200).json({ message: 'Order status updated successfully' });
+    await order.save();
+    return res.status(200).json({ message: 'Order status updated successfully' });
    } catch (error) {
-     console.error('Error updating order status:', error);
-     return res.status(500).json({ message: 'Error updating order status' });
-   }
+    console.error('Error updating order status:', error);
+    return res.status(500).json({ message: 'Error updating order status' });
+   };
  };
 
 
- 
 const approveReturnRequest = async (req, res) => {
-  const {orderId} = req.params
+  const {orderId} = req.params;
   const { refundAmount } = req.body;
-const userId = req.session.user
-console.log("zzzzz", refundAmount)
+  const userId = req.session.user;
+
   try {
     const order = await Order.findOne({ orderId }).populate('orderedItems.products');
     if (!order) {
@@ -73,7 +70,6 @@ console.log("zzzzz", refundAmount)
       }
 
       user.wallet.balance += refundAmount;
-
       user.wallet.transactions.push({
         type: 'Credit',
         amount: refundAmount,
@@ -92,12 +88,11 @@ console.log("zzzzz", refundAmount)
             sizeToUpdate.quantity += item.quantity; 
           }
           await product.save();
-        }
-      }
+        };
+      };
 
       order.status = 'Returned';
       await order.save();
-
       return res.status(200).json({ success: true, userId: userId, message: 'Return approved and refund processed' });
     } else {
       return res.status(400).json({ message: 'Payment not successful. Cannot process the return.' });
@@ -110,7 +105,6 @@ console.log("zzzzz", refundAmount)
 
 const rejectReturnRequest = async (req, res) => {
   const { orderId } = req.params;
-
   try {
     const order = await Order.findOne({ orderId });
 
@@ -156,6 +150,6 @@ module.exports = {
    orderDetails,
    changeOrderStatus,
    rejectReturnRequest,
-      approveReturnRequest,
-      returnRequestDetails
+   approveReturnRequest,
+   returnRequestDetails
 }

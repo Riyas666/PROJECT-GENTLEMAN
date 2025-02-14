@@ -270,43 +270,6 @@ const deleteAddress = async (req, res) => {
 };
 
 
-const removeProduct = async (req, res) => {
-    try {
-        const { productId, size } = req.params;
-        const userId = req.session.user; 
-        console.log("Remove product request:", productId, size, userId);
-
-        const userCart = await Cart.findOne({ userId });
-
-        if (!userCart) {
-            return res.status(404).json({ success: false, message: "Cart not found" });
-        }
-
-        
-        const productIndex = userCart.items.findIndex(
-            (item) => item.productId.toString() === productId && item.size === size
-        );
-
-        if (productIndex === -1) {
-            return res.status(404).json({ success: false, message: "Product not found in the cart" });
-        }
-
-        userCart.items.splice(productIndex, 1);
-
-        await userCart.save();
-
-        res.status(200).json({ success: true, message: "Product removed from cart successfully" });
-    } catch (error) {
-        console.error("Error removing product from cart:", error);
-
-        
-        if (!res.headersSent) {
-            res.status(500).json({ success: false, message: "Failed to remove product from cart" });
-        }
-    }
-};
-
-
 
 const getOrders = async (req, res) => {
     try {
@@ -365,8 +328,7 @@ module.exports = {
     getAddressPage,
     addAddress,
     editAddress,
-    deleteAddress,
-    removeProduct,
+    deleteAddress,  
     getOrders,
-   wallet
+    wallet
 }

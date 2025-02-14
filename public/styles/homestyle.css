@@ -10,7 +10,7 @@
   --first-color-alt: black;
   --second-color: #FCEDC0;
   --title-color: hsl(0, 0%, 13%);
-  --text-color: hsl(154, 13%, 32%);
+  --text-color: black;
   --text-color-dark: black;
   --text-color-white: white;
 
@@ -215,7 +215,7 @@ table {
 }
 
 .header__top-action {
-  color: var(--text-color);
+  color: var(--text-color-white);
 }
 
 .nav,
@@ -1596,6 +1596,7 @@ table {
 }
 
 .payment__methods {
+  width: 15rem;
   margin-block: 2.5rem 2.75rem;
 }
 
@@ -1608,6 +1609,9 @@ table {
 }
 
 .payment__input {
+  accent-color: var(--first-color);
+}
+.address-radio{
   accent-color: var(--first-color);
 }
 

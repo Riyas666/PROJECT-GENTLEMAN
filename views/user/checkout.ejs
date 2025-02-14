@@ -91,6 +91,39 @@
     color: #333;
   }
  
+  .checkout__details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.payment__methods {
+  flex: 1;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+
+.wallet__balance {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+.wallet__amount {
+  font-weight: bold;
+  color: #28a745; 
+  font-size: 1.1rem;
+}
+
 
 </style>
     <main class="main">
@@ -125,7 +158,7 @@
                             name="deliveryAddress" 
                             value="<%= address.id %>" 
                             class="address-radio" 
-                           
+                           checked
                           />
                           <div class="address-details">
                             <address class="address-details">
@@ -306,15 +339,21 @@
                   </td>
                 </tr>
                 <tr>
-                  <td colspan="2"><span class="order__subtitle">Discount</span></td>
+                  <td colspan="2"><span class="order__subtitle">Coupon Discount</span></td>
                   <td colspan="3">
-                    <span class="table__price" id="discountAmount">₹0</span>
+                    <span class="table__price" id="coupondiscountAmount">₹0</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2"><span class="order__subtitle">Offer Discount</span></td>
+                  <td colspan="3">
+                    <span class="table__price" id="offerdiscountAmount">₹<%=offerDiscount.toFixed(2) %></span>
                   </td>
                 </tr>
                 <tr>
                   <td colspan="2"><span class="order__subtitle">Total</span></td>
                   <td colspan="3">
-                    <span class="order__grand-total" id="finalAmount">₹<%=totalAmount %></span>
+                    <span class="order__grand-total" id="finalAmount">₹<%= (totalAmount - offerDiscount).toFixed(2) %></span>
                   </td>
                 </tr>
                 
@@ -322,53 +361,51 @@
             </table>
 
 
-            <div class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                  <div class="toast-body">
-                    Hello, world! This is a toast message.
+          
+
+              <div class="checkout__details">
+                <div class="payment__methods">
+                  <h3 class="checkout__title payment__title">Payment</h3>
+                  <div class="payment__option flex">
+                    <input
+                      type="radio"
+                      name="radio"
+                      id="l1"
+                      checked
+                      class="payment__input"
+                    />
+                    <label for="l1" class="payment__label"
+                      >Cash On Delivery</label
+                    >
                   </div>
-                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                  <div class="payment__option flex">
+                    <input
+                      type="radio"
+                      name="radio"
+                      id="l2"
+                      class="payment__input"
+                    />
+                    <label for="l2" class="payment__label">Wallet Payment</label>
+                  </div>
+                  <div class="payment__option flex">
+                    <input
+                      type="radio"
+                      name="radio"
+                      id="l3"
+                      class="payment__input"
+                    />
+                    <label for="l3" class="payment__label">Razorpay</label>
+                  </div>
                 </div>
-              </div>
-
-
-
-            <div class="payment__methods">
-              <h3 class="checkout__title payment__title">Payment</h3>
-              <div class="payment__option flex">
-                <input
-                  type="radio"
-                  name="radio"
-                  id="l1"
-                  checked
-                  class="payment__input"
-                />
-                <label for="l1" class="payment__label"
-                  >Cash On Delivery</label
-                >
-              </div>
-              <div class="payment__option flex">
-                <input
-                  type="radio"
-                  name="radio"
-                  id="l2"
-                  class="payment__input"
-                />
-                <label for="l2" class="payment__label">Wallet Payment</label>
-              </div>
-              <div class="payment__option flex">
-                <input
-                  type="radio"
-                  name="radio"
-                  id="l3"
-                  class="payment__input"
-                />
-                <label for="l3" class="payment__label">Razorpay</label>
+            
+              <!-- Wallet Balance Display -->
+              <div class="wallet__balance" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                <h4 style="margin: 0; font-weight: bold;">Your Wallet Balance: ₹<span id="walletBalance"><%=user.wallet.balance%></span></h4>
               </div>
             </div>
-            <button id="placeOrderBtn" class="btn btn--md"  style="background-color: black; color: white;">Place Order</button>
-          </div>
-        </div>
+              <button id="placeOrderBtn" class="btn btn--md" style="background-color: black; color: white;">Place Order</button>
+            </div>
+        
       </section> 
 
       
@@ -386,8 +423,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   placeOrderBtn.addEventListener('click', async function () {
     const paymentMethod = document.querySelector('input[name="radio"]:checked').id;
+   
+    const offerdiscountString = document.getElementById('offerdiscountAmount').textContent;
+    let offerdiscount= parseFloat(offerdiscountString.replace("₹", "").trim());
 
-    const cartItems = getCartItems();  
+    const cartItems = getCartItems(); 
 
     if (!cartItems || cartItems.length === 0) {
       return Swal.fire({
@@ -416,8 +456,11 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include', 
           body: JSON.stringify({
+            finalAmount,
             paymentMethod: 'COD',
             addressId: selectedAddressId,
+           
+            offerdiscount
 
           }),
         });
@@ -453,8 +496,11 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            finalAmount,
             paymentMethod: 'Wallet',
             addressId: selectedAddressId,
+            
+            offerdiscount
           }),
         });
 
@@ -488,8 +534,11 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            finalAmount,
             addressId: selectedAddressId,
-            paymentMethod:"Razorpay"
+            paymentMethod:"Razorpay",
+            
+            offerdiscount
           }),
         });
         console.log("2");
@@ -804,12 +853,12 @@ document.addEventListener('DOMContentLoaded', function() {
           const minPrice = parseFloat(selectedCoupon.getAttribute('data-min-price'));
       
           if (couponId) {
-            const subtotal = parseFloat('<%= totalAmount %>'); 
+            const subtotal = parseFloat('<%= totalAmount - offerDiscount %>'); 
             if (subtotal >= minPrice) {
               const discountAmount = discount;
               const finalAmount = subtotal - discountAmount;
       
-              document.getElementById('discountAmount').textContent = `₹${discountAmount}`;
+              document.getElementById('coupondiscountAmount').textContent = `₹${discountAmount}`;
               document.getElementById('finalAmount').textContent = `₹${finalAmount}`;
       
              

@@ -42,13 +42,18 @@
 
 .filter__select,
 .sort__select {
+  color:black;
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
   border-radius: 0.25rem;
   font-size: 0.938rem;
   cursor: pointer;
+  
 }
+
+
+
 
 @media screen and (max-width: 768px) {
   .controls__container {
@@ -157,9 +162,13 @@
             <!-- <a href="#" class="action__btn" aria-label="Compare">
                   <i class="fi fi-rs-shuffle"></i>
                 </a> -->
-
+               
           </div>
-        
+         <%if(products[i].offerPercentage > 0){%>
+          <div  class="product__badge light-dark">🔥 Extra <%=products[i].offerPercentage%>% Off!</div>
+<%}else if(products[i].category.offerPercentage > 0){%>
+  <div  class="product__badge light-dark">🔥 Extra <%=products[i].category.offerPercentage%>% Off!</div>
+  <%}%>
         </div>
         <div class="product__content">
           <span class="product__category">Brand : <%=products[i].brand.brandName%></span>

@@ -58,12 +58,13 @@
       <div class="row">
         <!-- Offer Form Section -->
         <div class="col-md-3">
-          <form method="post" action="/admin/createOffer" onsubmit="return validateForm()">
+          <form  id="offerForm" >
             <div class="mb-4">
               <label for="offer-name" class="form-label">Offer Name</label>
-              <input type="text" id="offer-name" name="offerName" placeholder="Enter offer name" class="form-control" required />
+              <input type="text" id="offer-name" name="offerName" placeholder="Enter offer name" class="form-control" />
               <div id="error-offer-name" class="error-message"></div>
             </div>
+
 
             <div class="mb-4">
               <label class="form-label">Offer Type</label><br>
@@ -98,14 +99,14 @@
 
             <div>
               <label for="offer-percentage" class="form-label">Discount Percentage (%)</label>
-              <input type="number" name="offerPercentage" placeholder="Enter discount percentage" class="form-control" min="1" max="100" required />
+              <input type="number" id="offer-percentage" name="offerPercentage" placeholder="Enter discount percentage" class="form-control" min="1" max="60" required />
               <div id="error-offer-percentage" class="error-message"></div>
             </div>
 
             
 
             <div class="d-grid">
-              <button class="btn btn-primary mt-20" type="submit" id="submitButton" onclick="addOffer()">Add Offer</button>
+              <button class="btn btn-primary mt-20" type="submit" id="submitButton" >Add Offer</button>
             </div>
             <div id="err-msg" class="error-message"></div>
           </form>
@@ -129,6 +130,7 @@
                 <%for(let i = 0 ; i < merge.length; i++){%>
                 <tr>
                   <td class="text-start"><%=merge[i].offerName%></td>
+
                   <%if(merge[i].productName){%>
                   <td class="text-center">Product Offer</td>
                   <%}%>
@@ -155,116 +157,113 @@
   </div>
 </section>
 
+
+
+
 <script>
+  document.getElementById("offerForm").addEventListener("submit", async function (event){
+    event.preventDefault();
+
+
+    if(!validateForm()) return;
+
+
+    const offerName = document.getElementById("offer-name").value.trim();
+    console.log("aa",offerName)
+
+    const selectedItem = document.getElementById("select-item").value;
+    console.log("bb",selectedItem)
+
+    const offerType = document.querySelector('input[name="offerType"]:checked').value;
+    console.log("cc",offerType)
+
+    const offerPercentage = document.getElementById("offer-percentage").value;
+    console.log("dd",offerPercentage)
+
+    const submitButton = document.getElementById("submitButton");
+
+    submitButton.disabled = true; // Disable button to prevent multiple clicks
+
+    try {
+      const response = await fetch("/admin/createOffer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ offerName, offerType, selectedItem, offerPercentage }),
+      });
+
+      const data = await response.json();
+      if (data.status) {
+        Swal.fire({
+          icon: "success",
+          title: "Added",
+          text: "Offer added successfully!",
+          confirmButtonText: "OK",
+        }).then(() => location.reload());
+      } else {
+        Swal.fire("Failed", data.message || "Adding offer failed", "error");
+      }
+    } catch (error) {
+      Swal.fire("Error", "An error occurred while adding the offer", "error");
+      console.error("Error adding offer:", error);
+    } finally {
+      submitButton.disabled = false; // Re-enable button after request completes
+    }
+  });
+
   function validateForm() {
-    document.querySelectorAll(".error-message").forEach((element) => (element.innerHTML = ""));
+    document.querySelectorAll(".error-message").forEach(el => (el.innerHTML = ""));
 
-    let name = document.getElementsByName("offerName")[0].value;
-    const nameRegex = /^[A-Za-z0-9 ]{1,50}$/;
-
-    if (!nameRegex.test(name)) {
-      document.getElementById("error-offer-name").innerHTML = "Invalid Offer Name";
+    let nameField = document.getElementById("offer-name").value;
+    let name = nameField;
+    if (name === "") {
+      document.getElementById("error-offer-name").innerHTML = "Offer Name cannot be empty.";
       return false;
     }
+
+    const nameRegex = /^[A-Za-z0-9 ]+$/; // No special characters
+    if (!nameRegex.test(name)) {
+      document.getElementById("error-offer-name").innerHTML = "Invalid Offer Name ";
+      return false;
+    }
+
+    // let percentage = document.getElementById("offer-percentage").value;
+    // if (percentage < 1 || percentage > 60) {
+    //   document.getElementById("error-offer-percentage").innerHTML = "Percentage must be between 1 and 60.";
+    //   return false;
+    // }
+
     return true;
   }
+
+
+
 
   function toggleDropdown() {
     const productOfferChecked  = document.getElementById("productOffer").checked;
     const categoryOfferChecked  = document.getElementById("categoryOffer").checked;
     const productOptions = document.getElementById("product-options");
   const categoryOptions = document.getElementById("category-options");
-  const selectItem = document.getElementById("select-item");
+  const selectItem = document.getElementById("select-item").value;
 
   if (productOfferChecked) {
     productOptions.style.display = "block";
     categoryOptions.style.display = "none";
 
-    let firstProduct = productOptions.querySelector("option");
+    let firstProduct = productOptions.querySelector("option").value;
     if (firstProduct) {
-      selectItem.value = firstProduct.value;
+      selectItem = firstProduct;
     }
   } else if (categoryOfferChecked) {
     productOptions.style.display = "none";
     categoryOptions.style.display = "block";
   
-    let firstCategory = categoryOptions.querySelector("option");
+    let firstCategory = categoryOptions.querySelector("option").value;
     if (firstCategory) {
-      selectItem.value = firstCategory.value;
+      selectItem = firstCategory;
     }
   }
 }
 
-  function confirmDelete(offerId) {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteOffer(offerId);
-      }
-    });
-  }
-
-
-
-
-
-
-  async function addOffer(){
-  const offerName = document.getElementById("offer-name").value;
-  const offerType = document.querySelector('input[name="offerType"]:checked').value;
-  const selectedItem = document.getElementById("select-item").value;
-  const offerPercentage = document.querySelector('input[name="offerPercentage"]').value;
-  const submitButton = document.getElementById('submitButton')
-  // submitButton.disabled = true; // Disable button to prevent multiple requests
-
-        try{
-           const response = await fetch("/admin/createOffer",{
-            method:"POST",
-            headers:{
-              'content-type':"application/json",
-            },
-            body:JSON.stringify({
-              offerName,
-              offerType,
-              selectedItem,
-              offerPercentage,
-            }),
-           });
-
-           const data = await response.json()
-           if(data.status){
-            Swal.fire({
-         icon: "success",
-         title: "Added",
-         text: "Offer addded",
-         confirmButtonText: "OK",
-       }).then(()=>{
-              location.reload();
-            })
-           }else{
-            Swal.fire("Failed", data.message || "Adding offer failed", "error");
-           }
-        }catch(error){
-          Swal.fire(
-            "Error",
-            "An error occured",
-            "error"
-          );
-
-          console.log("Error adding offer", error)
-        
-        } finally {
-        submitButton.disabled = false; // Re-enable button after request completes
-    }
-      }
-    
 
 async function removeOffer(productId){
       try{  
@@ -287,7 +286,8 @@ async function removeOffer(productId){
           ).then(()=>{
             location.reload();
           })
-        }else{
+        }else{    
+          
           Swal.fire("Failed", data.message || "Removing offer failed", "error");
         }
       }catch(error){

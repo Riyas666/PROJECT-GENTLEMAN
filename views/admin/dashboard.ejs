@@ -1,92 +1,247 @@
 <%- include("../../views/partials/admin/header") %>
 <style>
+   /* Main Layout Styles */
+.content-main {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.content-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #2c3345;
+    margin: 0;
+}
+
+/* Card Styles */
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Stats Cards */
+.icontext {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.icon {
+    position: relative;
+    flex-shrink: 0;
+    margin-right: 1rem;
+}
+
+.rounded-circle {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.icontext:hover .rounded-circle {
+    transform: scale(1.1);
+}
+
+/* Background Colors with Enhanced Opacity */
+.bg-primary-light {
+    background-color: rgba(13, 110, 253, 0.15);
+}
+
+.bg-success-light {
+    background-color: rgba(25, 135, 84, 0.15);
+}
+
+.bg-warning-light {
+    background-color: rgba(255, 193, 7, 0.15);
+}
+
+.bg-info-light {
+    background-color: rgba(13, 202, 240, 0.15);
+}
+
+/* Text Colors */
+.text-primary { color: #0d6efd !important; }
+.text-success { color: #198754 !important; }
+.text-warning { color: #ffc107 !important; }
+.text-info { color: #0dcaf0 !important; }
+
+/* Stats Text Styling */
+.text h6 {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.text span {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3345;
+}
+
+/* Table Styles */
+.table-responsive {
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    color: #495057;
+    font-weight: 600;
+    padding: 1rem;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Form Controls */
+.form-select, .form-control {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Button Styles */
+.btn-primary {
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
     .content-main {
-        padding: 30px;
+        padding: 1rem;
     }
-    .card {
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    .card-body {
+        padding: 1rem;
     }
-    .icontext {
-        display: flex;
-        align-items: center;
+    
+    .content-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
     }
-    .icontext .icon {
-        position: relative;
-        flex-shrink: 0;
-        margin-right: 15px;
-    }
-    .rounded-circle {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .bg-primary-light {
-        background-color: rgba(13, 110, 253, 0.1);
-    }
-    .bg-success-light {
-        background-color: rgba(25, 135, 84, 0.1);
-    }
-    .bg-warning-light {
-        background-color: rgba(255, 193, 7, 0.1);
-    }
-    .bg-info-light {
-        background-color: rgba(13, 202, 240, 0.1);
-    }
-    .text-primary { color: #0d6efd; }
-    .text-success { color: #198754; }
-    .text-warning { color: #ffc107; }
-    .text-info { color: #0dcaf0; }
-    .table-responsive {
-        overflow-x: auto;
-    }
+}
 </style>
 <section class="content-main">
     <div class="content-header">
-        <h2 class="content-title card-title">Dashboard</h2>
+        
+        <h2 class="content-title card-title">Dashboard Analytics</h2>
+        
         <div>
             <button class="btn btn-primary" onclick="exportReport()">
-                <i class="fas fa-download"></i> Export
+                <i class="fas fa-download"></i> Export Report
             </button>
         </div>
+        
     </div>
-
     <div class="card mb-4">
         <div class="card-body">
             <form id="reportFilterForm">
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label">Report Type</label>
                         <select class="form-select" id="reportType" name="reportType">
-                            <option value="Daily">Daily</option>
-                            <option value="Weekly">Weekly</option>
-                            <option value="Yearly">Yearly</option>
-                            <option value="custom">Custom Date Range</option>
+                    
+                            <option value="Daily">Daily Report</option>
+                            <option value="Weekly">Weekly Report</option>
+                            <option value="monthly">Monthly Report</option>
+                            <option value="Yearly">Yearly Report</option>
+                            <option value="Custom Date Range">Custom Date Range</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+    
+                    <div class="col-md-3" id="monthSelectDiv" style="display: none;">
+                        <label class="form-label">Select Month</label>
+                        <input type="month" class="form-control" id="monthSelect" name="monthSelect">
+                    </div>
+    
+                    <div class="col-md-3" id="yearSelectDiv" style="display: none;">
+                        <label class="form-label">Select Year</label>
+                        <select class="form-select" id="yearSelect" name="yearSelect">
+                            <% 
+                            const currentYear = new Date().getFullYear();
+                            for(let year = currentYear; year >= currentYear - 5; year--) { %>
+                                <option value="<%=year%>"><%=year%></option>
+                            <% } %>
+                        </select>
+                    </div>
+    
+                    <div class="col-md-3" id="startDateDiv">
                         <label class="form-label">Start Date</label>
-                        <input type="date" class="form-control" name="startDate" id="startDate" oninput="validateDates()">
-                        <small id="startDateError" style="color: red; display: none;">You cannot select a future date.</small>
+                        <input type="date" class="form-control" name="startDate" id="startDate">
+                        <small id="startDateError" class="text-danger" style="display: none;">Invalid date selection</small>
                     </div>
                     
-                    <div class="col-md-3">
+                    <div class="col-md-3" id="endDateDiv">
                         <label class="form-label">End Date</label>
-                        <input type="date" class="form-control" name="endDate" id="endDate" oninput="validateDates()">
-                        <small id="endDateError" style="color: red; display: none;">End date must be later than start date.</small>
+                        <input type="date" class="form-control" name="endDate" id="endDate">
+                        <small id="endDateError" class="text-danger" style="display: none;">Invalid date selection</small>
                     </div>
-                    
-                    <div class="col-md-3">
-                        <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="btn btn-primary w-100">Generate Report</button>
+    
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Generate Report
+                            <i class="fas fa-chart-bar ms-2"></i>
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Key Metrics Cards -->
     <div class="row">
         <div class="col-lg-3">
             <div class="card card-body mb-4">
@@ -127,41 +282,78 @@
                 </article>
             </div>
         </div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Orders</th>
-                            <th scope="col">Gross Sales</th>
-                            <th scope="col">Discounts</th>
-                            <th scope="col">Net Sales</th>
-                        </tr>
-                    </thead>
-                    <tbody  id="sales-report-body" style="color: black;">
-                        <%orders.forEach(order=>{%>
-                       <tr>
-                        <td><%=order.createdAt.toLocaleDateString()%></td>
-                        <td>1</td>
-                        <td ><%=order.status%></td>
-                        <td>₹<%=order.discount%></td>
-                        <td>₹<%=order.finalAmount%></td>
-                       </tr>
-                       <%})%>
-                    </tbody>
-
-                </table>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-info-light">
+                        <i class="fas fa-users text-info"></i>
+                    </span>
+                    <div class="text">
+                        <h6 class="mb-1">Total Users</h6>
+                        <span><%=totalUsers%></span>
+                    </div>
+                </article>
             </div>
         </div>
     </div>
 
+   
+    <!-- Order Details Table -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Recent Orders</h5>
+            <div class="table-responsive">
+                <table class="table table-hover text-center"  >
+                    <thead>
+                        <tr >
+                            <th >Order Date</th>
+                            <th style="width: 3rem;">Order ID</th>
+                            <th>Customer</th>
+                            <th>Products</th>
+                            <th>Order Status</th>
+                           
+                            <th>Net Amount</th>
+                            <th>Offer Discount</th>
+                            
+                            <th>Total Amount</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sales-report-body" style="color: black; font-size: 0.9rem;">
+                        <% orders.forEach(order => { %>
+                        <tr>
+                            <td><%=order.createdAt.toLocaleDateString()%></td>
+                            <td>#<%=order.orderId%></td>
+                            <td><%=order.userId.name%></td>
+                            <td><%=order.orderedItems.length%></td>
+                            <td>
+                                <span class="badge bg-<%=order.status === 'Delivered' ? 'success' : 
+                                    order.status === 'Pending' ? 'warning' : 
+                                    order.status === 'Cancelled' ? 'danger' : 'info'%>">
+                                    <%=order.status%>
+                                </span>
+                            </td>
+                           
+                            <td>₹<%=(order.finalAmount + order.discount).toLocaleString()%></td>
+                            <td>₹<%=order.discount.toLocaleString()%></td>
+                            <td>₹<%=order.finalAmount.toLocaleString()%></td>
+                            <td>
+                                <button onclick="viewOrderDetails('<%=order._id%>')" class="btn btn-primary btn-sm">View</button>
+                            </td>
+                            
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Coupon Analysis -->
     <div class="card mb-4">
         <div class="card-header">
-            <h4>Discount & Coupon Analysis</h4>
+            <h5 class="card-title mb-0">Coupon Performance Analysis</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -169,24 +361,81 @@
                     <thead>
                         <tr>
                             <th>Coupon Code</th>
+                            <th>Discount Type</th>
+                            <th>Discount Value</th>
                             <th>Usage Count</th>
                             <th>Total Discount Amount</th>
+                            <th>Average Order Value</th>
+                            <th>Status</th>
+                            <th>Expiry Date</th>
                         </tr>
                     </thead>
-                    <tbody style="color: black;">
-                        <%coupons.forEach(coupon=>{%>
-                        <tr>
+                    <tbody>
+                        <% coupons.forEach(coupon => { %>
+                        <tr style="color: black;">
                             <td><%=coupon.name%></td>
-                            <td>45</td>
-                            <td>₹4,500</td>
+                            <td><%=coupon.discountType%></td>
+                            <td><%=coupon.discountType === 'Percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue%></td>
+                            <td><%=coupon.usageCount%></td>
+                            <td>₹coupon.totalDiscountAmount.toLocaleString()</td>
+                            <td>coupon.averageOrderValue.toLocaleString()</td>
+                            <td>
+                                <span class="badge bg-<%=coupon.isActive ? 'success' : 'danger'%>">
+                                    <%=coupon.isActive ? 'Active' : 'Inactive'%>
+                                </span>
+                            </td>
+                            <td>coupon.expiryDate.toLocaleDateString()</td>
                         </tr>
-                        <%})%>
+                        <% }) %>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <!--------------------------------ORDER DETAILS MODAL-------------------------------------------->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="orderDetailsLabel">Order Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <div class="modal-body">
+          <h6><strong>Order Information</strong></h6>
+          <ul class="list-unstyled mb-3">
+            <li><strong>Order ID:</strong> <span id="orderId"></span></li>
+            <li><strong>Status:</strong> <span id="orderStatus"></span></li>
+            <li><strong>Payment Method:</strong> <span id="paymentMethod"></span></li>
+            <li><strong>Total Price:</strong> <span id="totalPrice"></span></li>
+            <li><strong>Created At:</strong> <span id="createdAt"></span></li>
+          </ul>
+  
+        
+          <h6><strong>Products in Order</strong></h6>
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead class="table-dark">
+                  <tr >
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody id="orderProducts" >
+             
+                </tbody>
+              </table>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
 <script>
@@ -222,20 +471,39 @@ document.getElementById('reportFilterForm').addEventListener('submit', function(
         let tableRows = '';
 
         reportData.forEach(row => {
+            console.log("1")
             const date = new Date(row.createdAt);
+            console.log("2")
 
     const formattedDate = date.toISOString().split('T')[0];
+    console.log("3")
+
+    let statusClass = row.status === 'Delivered' ? 'success' :
+                          row.status === 'Pending' ? 'warning' :
+                          row.status === 'Cancelled' ? 'danger' : 'info';
             tableRows += `
                 <tr>
-                    <td>${formattedDate}</td>
-                    <td>${row.totalOrders}</td>
-                    <td>₹${row.totalSales.toFixed(2)}</td>
-                    <td>₹${row.totalDiscount.toFixed(2)}</td>
-                    <td>₹${(row.totalSales - row.totalDiscount).toFixed(2)}</td>
+                   <td>${new Date(row.createdAt).toLocaleDateString('en-GB')}</td>
+                    <td>${row.orderId}</td>
+                    <td>${row.userId.name}</td>
+                    <td>${row.orderedItems.length}</td>
+                    <td>
+                                <span class="badge bg-${statusClass}">
+                        ${row.status}
+                    </span>
+                            </td>
+                            <td>${row.finalAmount + row.discount}</td>
+                    <td>${row.discount.toLocaleString()}</td>
+                            <td>${row.finalAmount.toLocaleString()}</td>
+                    <td>
+                                <button onclick="viewOrderDetails('${row._id}')" class="btn btn-primary btn-sm">View</button>
+                            </td>
                 </tr>
             `;
-        });
+            console.log("5")
 
+        });
+     
         tbody.innerHTML = tableRows;
     }
 }).catch(error => {
@@ -274,8 +542,82 @@ function validateDates() {
 
 
 
+function viewOrderDetails(id) {
+  fetch(`/admin/orders/${id}`)
+    .then(response => response.json())
+    .then(order => {
+
+      console.log("dd",order)
+      document.getElementById('orderId').innerText = `${order.order.orderId}`;
+      document.getElementById('orderStatus').innerText =` ${order.order.status}`;
+      document.getElementById('paymentMethod').innerText = `${order.order.paymentType}`;
+      document.getElementById('totalPrice').innerText = ` ₹${order.order.totalPrice}`;
+      document.getElementById('createdAt').innerText = `${new Date(order.order.createdAt).toLocaleDateString()}`;
+
+      const orderProductsTable = document.getElementById("orderProducts");
+      orderProductsTable.innerHTML = "";  
+
+      order.order.orderedItems.forEach(item => {
+          let row = `<tr  style="background-color: rgb(48, 48, 48); color: white;">
+            <td style="width: 7rem;"><img src="/uploads/product-images/${item.products.productImage[0]}"></td>
+                      <td>${item.products.productName}</td>
+                      <td>${item.size}</td>
+                      <td>${item.quantity}</td>
+                      <td>₹${item.price}</td>
+                    </tr>`;
+          orderProductsTable.innerHTML += row;
+        });
 
 
+      const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+      orderDetailsModal.show();
+    })
+    .catch(error => {
+      console.error('Error fetching order details:', error);
+      alert('Failed to fetch order details.');
+    });
+}
+
+
+function exportReport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(16);
+    doc.text("Sales Report", 14, 15);
+
+    // Table Headers
+    const table = document.querySelector("#sales-report-body"); // Get table body
+    const rows = table.querySelectorAll("tr");
+
+    let tableData = [];
+    let headers = ["Order Date", "Order ID", "Customer", "Products", "Order Status", "Net Amount", "Offer Discount", "Total Amount"];
+
+    rows.forEach(row => {
+        let columns = row.querySelectorAll("td");
+        let rowData = [];
+
+        columns.forEach(column => {
+            rowData.push(column.innerText.trim());
+        });
+
+        tableData.push(rowData);
+    });
+
+    // Add table to PDF
+    doc.autoTable({
+        head: [headers], 
+        body: tableData, 
+        startY: 25, 
+        theme: 'grid', 
+        styles: { fontSize: 10 }, 
+        headStyles: { fillColor: [0, 102, 204] } 
+    });
+
+    // Save the PDF
+    doc.save("Sales_Report.pdf");
+}
 
 
 </script>

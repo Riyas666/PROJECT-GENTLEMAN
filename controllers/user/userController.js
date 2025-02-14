@@ -152,17 +152,16 @@ const loadHomePage = async (req, res) => {
         let productData = await Products.find({
             isBlocked: false,
             category: { $in: categories.map((category) => category._id) },
-        });
+        })
 
         productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
         productData = productData.slice(0, 4);
-       
         if (user) {
             const userData = await User.findById(user);
            
             res.render("home", { user: userData, products: productData, brands:brandData });
         } else {
-            return res.render("home", { products: productData });
+            return res.render("home", { products: productData ,brands:brandData});
         }
     } catch (error) {
         console.log("Home page not found");

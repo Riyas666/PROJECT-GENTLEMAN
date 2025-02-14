@@ -5,12 +5,12 @@ const router = express.Router();
 const adminController = require("../../controllers/admin/adminController");
 const { adminAuth } = require("../../middlewares/auth");
 const couponController = require("../../controllers/admin/couponController")
-
+const dashboardController = require("../../controllers/admin/dashboardController")
 
 //RELATED TO ADMIN LOGIN
 router.get("/login", adminController.loadLogin);
 router.post("/login", adminController.login);
-router.get("/dashboard",adminAuth, adminController.loadDashboard);
+router.get("/dashboard", dashboardController.loadDashboard);
 router.get("/logout",adminAuth, adminController.logout);
 
 
@@ -31,7 +31,7 @@ router.get("/deleteCoupon", adminAuth,couponController.deleteCoupon)
 
 
 
-router.post("/generate-report", adminAuth,adminController.generateReport)
+router.post("/generate-report",dashboardController.generateReport)
 
 router.get("/productoffer", adminController.getProductOffer)
 router.post("/createOffer", adminController.createOffer);

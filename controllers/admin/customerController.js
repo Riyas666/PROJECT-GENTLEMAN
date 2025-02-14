@@ -37,7 +37,6 @@ const customerInfo = async (req, res) => {
 };
 
 
-//FOR THE BLOCK THE CUSTOMER
 const customerBlocked = async (req, res) => {
     const { id, isBlocked } = req.body;
 
@@ -50,7 +49,6 @@ const customerBlocked = async (req, res) => {
 };
 
 
-//FOR UNBLOCK THE CUSTOMER
 const customerunBlocked = async (req, res) => {
     try {
         const { id, isBlocked } = req.body;
@@ -63,8 +61,6 @@ const customerunBlocked = async (req, res) => {
     }
 };
 
-
-//EXPORTING..
 
 module.exports = {
     customerInfo,

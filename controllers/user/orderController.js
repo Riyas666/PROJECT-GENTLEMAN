@@ -2,11 +2,11 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
-const { v4: uuidv4 } = require('uuid'); 
 const Coupon = require("../../models/couponSchema")
 const User = require("../../models/userSchema");
 const Razorpay  = require("razorpay")
 const crypto = require('crypto');
+const generateOrderId = require("../../utils/generateorderid");
 
 
 const razorpayInstance  = new Razorpay({
@@ -19,22 +19,32 @@ const loadCheckoutPage = async (req, res) => {
     try {
       const userId = req.session.user;
       const user = await User.findOne({_id:userId});
-      console.log("userrrrrrrrrrrrrrr",user)
       const cart = await Cart.findOne({ userId }).populate("items.productId");
-      const coupons = await Coupon.find({})
+      const coupons = await Coupon.find({});
 
       if (!cart || cart.items.length === 0) {
-        return res.render("checkout", { user,cart: [], totalAmount: 0, addresses: [],coupons:[] });
+        return res.redirect("/cart")
       }
-  
-      const totalAmount = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-      console.log("this is cart items",cart.items)
+
+      let totalAmount = 0;
+      let offerDiscount = 0;
+
+      cart.items.forEach(item=>{
+        let originalPrice = item.price * item.quantity;
+        let productOffer = item.productId.offerPercentage || 0;
+        let categoryOffer = item.productId.categoryPercentage || 0;
+        let appliedOffer = Math.max(productOffer, categoryOffer);
+        let discountAmount = (originalPrice * appliedOffer) / 100;
+        offerDiscount +=discountAmount;
+        totalAmount +=originalPrice;
+      })
+
       const userAddresses = await Address.findOne({ userId });
-  
       res.render("checkout", {
         user,
         cart: cart.items, 
         totalAmount,
+        offerDiscount,
         addresses: userAddresses ? userAddresses.address : [], 
         coupons
       });
@@ -47,27 +57,27 @@ const loadCheckoutPage = async (req, res) => {
 
   const placeOrder = async (req, res) => {
     try {
+
       const coupons = req.session.coupon;
-        const userId = req.session.user; 
-        const { addressId, paymentMethod } = req.body; 
+      const userId = req.session.user; 
+      const { addressId, paymentMethod , offerdiscount} = req.body; 
         if (!addressId || !paymentMethod) {
             return res.status(400).json({ success: false, message: "Invalid order details" });
-        }
-  
-        const cart = await Cart.findOne({ userId });
+        }  
+      const discount = offerdiscount + coupons?coupons.discountAmount : 0;
+      const cart = await Cart.findOne({ userId })
         if (!cart || cart.items.length === 0) {
             return res.status(404).json({ success: false, message: "Cart is empty" });
         }
-    
+
         const productIds = cart.items.map((item) => item.productId);
         const products = await Product.find({ _id: { $in: productIds } });
         for (const item of cart.items) {
-            const product = products.find((prod) => prod._id.toString() === item.productId.toString());
+            const product = products.find((prod) => prod._id.toString() == item.productId.toString());
             if (!product) {
                 return res.status(404).json({ success: false, message: `Product with ID ${item.productId} not found` });
             }
             const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
-  
             if (!sizeObject || sizeObject.quantity < item.quantity) {
                 return res.status(400).json({
                     success: false,
@@ -80,14 +90,12 @@ const loadCheckoutPage = async (req, res) => {
             const product = products.find((prod) => prod._id.toString() === item.productId.toString());
             const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
             sizeObject.quantity -= item.quantity;
-
             await product.save();
         }
   
         const totalPrice = cart.items.reduce((acc, item) => acc + item.totalPrice, 0);
-        const finalAmount = totalPrice; 
         const address = await Address.findOne({ userId, "address._id": addressId });
-
+         const finalAmount = totalPrice - discount;
         if (!address) {
             return res.status(404).json({ success: false, message: "Address not found" });
         }
@@ -97,12 +105,9 @@ const loadCheckoutPage = async (req, res) => {
   if (!selectedAddress) {
       return res.status(404).json({ success: false, message: "Address not found" });
   }
-  
-
-  
         const newOrder = new Order({
           userId,
-          orderId: uuidv4(),
+          orderId:generateOrderId(),
           orderedItems: cart.items.map((item) => ({
           products: item.productId,
           productName : item.productName,
@@ -114,8 +119,8 @@ const loadCheckoutPage = async (req, res) => {
         couponApplied: coupons?true:false,
           address: selectedAddress,
           totalPrice,
-          discount:coupons?coupons.discountAmount:0,
-          finalAmount:coupons?coupons.finalAmount:finalAmount,
+          discount,
+          finalAmount,
           status: 'Pending',
           paymentType:paymentMethod,
           paymentStatus:'Pending'
@@ -295,7 +300,7 @@ for (const item of cart.items) {
           await product.save();
       }
       const totalPrice = cart.items.reduce((acc, item) => acc + item.totalPrice, 0);
-      const finalAmount = totalPrice; 
+      const finalAmount = totalPrice ; 
       const address = await Address.findOne({ userId, "address._id": addressId });
       const selectedAddress = address.address.find(addr => addr._id == addressId);
       console.log("this is address", selectedAddress)

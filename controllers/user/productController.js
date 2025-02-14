@@ -53,7 +53,7 @@ const productDetails = async (req, res) => {
             query.brand = req.query.brand;
         }
 
-        let productsQuery = Product.find(query).populate('brand')
+        let productsQuery = Product.find(query).populate('brand').populate("category")
 
         if(req.query.sort){
             switch(req.query.sort){

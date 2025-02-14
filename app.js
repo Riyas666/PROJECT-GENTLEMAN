@@ -67,7 +67,9 @@ app.use("/admin/users", customerRouter);
 app.use("/admin/orders", orderRouter)
 
 
-
+app.get("/*", (req,res) =>{
+    res.redirect("/pageNotFound")
+})
 
 
 const PORT = 3000 || process.env.PORT;
