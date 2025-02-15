@@ -174,7 +174,7 @@ console.log("this is the existinggggggggg existing product", existingProduct);
   
       await Cart.findOneAndUpdate(
         { userId: req.session.user },
-        { $pull: { items: { productId, quantity: 0 } } }, // Remove if quantity = 0
+        { $pull: { items: { productId, quantity: 0 } } },
         { new: true }
       );
   

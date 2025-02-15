@@ -877,7 +877,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error applying coupon:', error);
               });
             } else {
-              alert('Your subtotal is too low for this coupon.');
+              Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:"You can't apply this Coupon. Your total is low for this coupon"
+              })
             }
           } else {
             alert('Please select a coupon.');

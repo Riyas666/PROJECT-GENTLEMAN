@@ -35,7 +35,6 @@ router.post("/generate-report",dashboardController.generateReport)
 
 router.get("/productoffer", adminController.getProductOffer)
 router.post("/createOffer", adminController.createOffer);
+router.patch("/deleteOffer/:id", adminController.removeOffer);
 
-
-//EXPORTING
 module.exports = router;

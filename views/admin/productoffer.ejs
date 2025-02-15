@@ -143,8 +143,10 @@
                     <span class="badge rounded-pill btn-success" style="width: 60px;">Active</span>
                   </td>
                   <td>
-                    <a href="#" onclick="confirmDelete()" class="btn btn-danger btn-sm" style="height: 35px;width: 90px;">Delete</a>
+                    <a href="#" onclick="deleteOffer('<%= merge[i]._id %>')" class="btn btn-danger btn-sm" style="height: 35px;width: 90px;">Delete</a>
                   </td>
+                  
+                  
                 </tr>
                 <%}%>
               </tbody>
@@ -206,7 +208,7 @@
       Swal.fire("Error", "An error occurred while adding the offer", "error");
       console.error("Error adding offer:", error);
     } finally {
-      submitButton.disabled = false; // Re-enable button after request completes
+      submitButton.disabled = false;
     }
   });
 
@@ -220,17 +222,13 @@
       return false;
     }
 
-    const nameRegex = /^[A-Za-z0-9 ]+$/; // No special characters
+    const nameRegex = /^[A-Za-z0-9 ]+$/; 
     if (!nameRegex.test(name)) {
       document.getElementById("error-offer-name").innerHTML = "Invalid Offer Name ";
       return false;
     }
 
-    // let percentage = document.getElementById("offer-percentage").value;
-    // if (percentage < 1 || percentage > 60) {
-    //   document.getElementById("error-offer-percentage").innerHTML = "Percentage must be between 1 and 60.";
-    //   return false;
-    // }
+   
 
     return true;
   }
@@ -263,46 +261,29 @@
     }
   }
 }
+</script>
 
+<script>
+  async function deleteOffer(offerId) {
+  try {
+    const response = await fetch(`/admin/deleteOffer/${offerId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
 
-async function removeOffer(productId){
-      try{  
-        const response = await fetch("/admin/products/removeProductOffer", {
-          method:"POST",
-          headers:{ 
-            'content-type':"application/json",
-          },
-          body:JSON.stringify({
-              productId:productId,
-            }),
-        })
-
-        const data = await response.json();
-        if(response.ok && data.status === true){
-          Swal.fire(
-            "Offer removed",
-            "the offer has been removed",
-            "success"
-          ).then(()=>{
-            location.reload();
-          })
-        }else{    
-          
-          Swal.fire("Failed", data.message || "Removing offer failed", "error");
-        }
-      }catch(error){
-        Swal.fire(
-          "Error",
-          "An error occured while removing the offer",
-          "error"
-        );
-        console.error("Error removing the offer", error)
-      }
+    const data = await response.json();
+    if (data.success) {
+      Swal.fire("Deleted", "Offer has been Deleted!", "success").then(() => location.reload());
+    } else {
+      Swal.fire("Error", data.message, "error");
     }
-
-    
+  } catch (error) {
+    Swal.fire("Error", "Something went wrong!", "error");
+  }
+}
 
 </script>
+
 
 <%- include("../../views/partials/admin/footer") %>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>

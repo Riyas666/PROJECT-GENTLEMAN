@@ -361,30 +361,27 @@
                     <thead>
                         <tr>
                             <th>Coupon Code</th>
-                            <th>Discount Type</th>
-                            <th>Discount Value</th>
-                            <th>Usage Count</th>
-                            <th>Total Discount Amount</th>
-                            <th>Average Order Value</th>
-                            <th>Status</th>
+                            <th>Minimum Purchase Amount</th>
+                            <th> Discount Amount</th>
+                           
+                            
                             <th>Expiry Date</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% coupons.forEach(coupon => { %>
                         <tr style="color: black;">
                             <td><%=coupon.name%></td>
-                            <td><%=coupon.discountType%></td>
-                            <td><%=coupon.discountType === 'Percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue%></td>
-                            <td><%=coupon.usageCount%></td>
-                            <td>₹coupon.totalDiscountAmount.toLocaleString()</td>
-                            <td>coupon.averageOrderValue.toLocaleString()</td>
+                            <td>₹<%=coupon.minimumPrice%></td>
+                            <td>₹<%=coupon.offerPrice%></td>
+                           
+                            <td><%=coupon.expireOn.toLocaleDateString()%></td>
                             <td>
                                 <span class="badge bg-<%=coupon.isActive ? 'success' : 'danger'%>">
                                     <%=coupon.isActive ? 'Active' : 'Inactive'%>
                                 </span>
                             </td>
-                            <td>coupon.expiryDate.toLocaleDateString()</td>
                         </tr>
                         <% }) %>
                     </tbody>
@@ -425,8 +422,7 @@
                     <th>Price</th>
                   </tr>
                 </thead>
-                <tbody id="orderProducts" >
-             
+                <tbody id="orderProducts">
                 </tbody>
               </table>
             </div>

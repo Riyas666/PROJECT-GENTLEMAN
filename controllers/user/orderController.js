@@ -125,6 +125,7 @@ const loadCheckoutPage = async (req, res) => {
           paymentType:paymentMethod,
           paymentStatus:'Pending'
         });
+        
         const orderId = newOrder.orderId
         switch(paymentMethod){
           case 'COD':

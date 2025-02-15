@@ -199,7 +199,7 @@ const editProduct = async (req, res) => {
 
 const sizes = sizesArray.map((size, index) => ({
     size: size,
-    quantity: parseInt(quantitiesArray[index], 10) || 0  // Convert to number
+    quantity: parseInt(quantitiesArray[index], 10) || 0 
 }));
        
         const updateFields = {

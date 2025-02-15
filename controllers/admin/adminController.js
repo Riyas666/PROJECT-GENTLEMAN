@@ -1,4 +1,3 @@
-//IMPORT THE MODULES
 
 const User = require("../../models/userSchema");
 const bcrypt = require("bcrypt");
@@ -6,7 +5,6 @@ const mongoose = require("mongoose");
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 
-//FOR ERROR PAGE
 const pageerror = async (req, res) => {
     res.render("admin-error");
 };
@@ -79,6 +77,7 @@ const getProductOffer = async(req, res) =>{
     };
 };
 
+
 const createOffer = async(req, res) =>{
     try{
 
@@ -139,11 +138,32 @@ const createOffer = async(req, res) =>{
     }
   };
 
+  const removeOffer = async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log("aa", id)
+      const updatedOffer = await Product.findByIdAndUpdate(
+        id,
+        { offerPercentage: 0, offerName: "" },
+        { new: true }
+      );
+  
+      if (!updatedOffer) {
+        return res.status(404).json({ success: false, message: "Offer not found" });
+      }
+  
+      res.json({ success: true, message: "Offer updated", offer: updatedOffer });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  };
+
 module.exports = {
     loadLogin,
     login,
     pageerror,
     logout,
     getProductOffer,
-    createOffer
+    createOffer,
+    removeOffer
 };
