@@ -5,13 +5,15 @@ const Coupon = require("../../models/couponSchema");
 const getCart = async (req, res) => {
   try {
     const userId = req.session.user;
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
+    const cart = await Cart.findOne({ userId }).populate("items.productId")
+    console.log("bb", cart)
     if (!cart) {
       return res.render('cart', { cartItems: [], total: 0 });
     }
     cart.items.forEach(item => {
       item.totalPrice = item.quantity * item.price;
     });
+    
     const total = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
     res.render('cart', { cartItems: cart.items, total });
   } catch (error) {
@@ -149,42 +151,44 @@ console.log("this is the existinggggggggg existing product", existingProduct);
   
       cartItem.quantity = quantity;
       cartItem.totalPrice = cartItem.price * quantity;
-  
+
+      console.log("vv",cart);
+
+      const totel = cart.items.reduce((acc,value)=>{
+        return acc + value.totalPrice
+      },0);
+
+      console.log("kk",totel)
+     
       await cart.save();
       console.log("Cart updated successfully:", cart);
-      res.json({ success: true, cart: cart });
+      res.json({ success: true, totel, cart: cart });
     } catch (error) {
       console.error("Error updating cart:", error);
       res.status(500).json({ success: false, error: 'Failed to update cart' });
     }
   };
-  
   const deleteCartItem = async (req, res) => {
     try {
-      const { productId } = req.body;
-      const updatedCart = await Cart.findOneAndUpdate(
-        { userId: req.session.user, "items.productId": productId },
-        { $inc: { "items.$.quantity": -1 } }, 
-        { new: true }
-      );
-  
-      if (!updatedCart) {
-        return res.status(404).json({ success: false, error: "Cart item not found" });
-      }
-  
-      await Cart.findOneAndUpdate(
-        { userId: req.session.user },
-        { $pull: { items: { productId, quantity: 0 } } },
-        { new: true }
-      );
-  
-      res.json({ success: true, cart: updatedCart });
+        const { productId, size } = req.body; // Include size in the request
+
+        const updatedCart = await Cart.findOneAndUpdate(
+            { userId: req.session.user },
+            { $pull: { items: { productId, size } } }, // Remove only the matching size
+            { new: true }
+        );
+
+        if (!updatedCart) {
+            return res.status(404).json({ success: false, error: "Cart item not found" });
+        }
+
+        res.json({ success: true, cart: updatedCart });
     } catch (error) {
-      console.error("Error deleting cart item:", error);
-      res.status(500).json({ success: false, error: "Internal server error" });
+        console.error("Error deleting cart item:", error);
+        res.status(500).json({ success: false, error: "Internal server error" });
     }
-  };
-  
+};
+
 const applyCoupon = async (req, res) => {
   try {
     const { couponId, discountAmount, finalAmount } = req.body;

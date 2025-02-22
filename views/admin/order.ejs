@@ -39,7 +39,7 @@
               <tbody id="orderList">
                 <% orders.forEach(order => { %>
                 <tr style="background-color: rgb(48, 48, 48);">
-                  <td><%= order._id %></td>
+                  <td><%= order.orderId %></td>
                   <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
                   <td id="order_<%= order._id %>" class="status-cell">
                     <p><%= order.status %></p>

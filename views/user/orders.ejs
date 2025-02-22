@@ -1,4 +1,160 @@
 <%-include("../../views/partials/user/userprofile")%>
+<style>
+/* Base styles */
+.main {
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Breadcrumb styles */
+.breadcrumb {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.breadcrumb__list {
+  gap: 0.5rem;
+}
+
+.breadcrumb__link {
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb__link:hover {
+  color: #000;
+}
+
+/* Account tabs */
+.accounts__container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.account__tabs {
+  border-right: 1px solid #eee;
+  padding-right: 2rem;
+}
+
+.account__tab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+}
+
+.account__tab i {
+  font-size: 1.25rem;
+}
+
+.account__tab:hover {
+  background-color: #f5f5f5;
+  color: #000;
+  transform: translateX(5px);
+}
+
+.account__tab.active-tab {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Orders table */
+.tab__header {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+
+
+.placed__order-table {
+  width: 100%;
+  border-collapse: collapse;
+  animation: fadeIn 0.5s ease;
+}
+
+.placed__order-table th {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.placed__order-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.placed__order-table tr {
+  transition: background-color 0.3s ease;
+}
+
+.placed__order-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.view__order {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #000;
+  color: #fff;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.view__order:hover {
+  background-color: #333;
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media screen and (max-width: 968px) {
+  .accounts__container {
+    grid-template-columns: 1fr;
+  }
+  
+  .account__tabs {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding-right: 0;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .placed__order-table {
+    overflow-x: auto;
+    display: block;
+  }
+}
+
+/* Empty state styling */
+.placed__order-table tr td[colspan="5"] {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-style: italic;
+}
+</style>
 <main class="main">
   <!--=============== BREADCRUMB ===============-->
   <section class="breadcrumb">

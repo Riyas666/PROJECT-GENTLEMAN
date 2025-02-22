@@ -105,6 +105,9 @@ const loadCheckoutPage = async (req, res) => {
   if (!selectedAddress) {
       return res.status(404).json({ success: false, message: "Address not found" });
   }
+  if(finalAmount>1000){
+    return res.status(400).json({success:false, message:"The Order Cannot Be done with the COD"})
+  }
         const newOrder = new Order({
           userId,
           orderId:generateOrderId(),
@@ -189,16 +192,18 @@ const loadCheckoutPage = async (req, res) => {
   
 
 const orderDetails = async(req,res)=>{
-    
+    const userId = req.session.user;
     const id = req.params.id;
-    console.log("This is the order id", id)
+    console.log("This is the order id", id);
     try{
        
+      const user = User.find({userId})
         const orders = await Order.findById(id).populate("orderedItems.products").populate("address")
         console.log("This is the order that you are ordered", orders)
         const estimatedDeliveryDate = new Date(orders.createdAt);
         estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 2);
-        res.render("orderdetails", {orders, estimatedDeliveryDate})
+        console.log("mm", orders)
+        res.render("orderdetails", {orders,user, estimatedDeliveryDate})
 
     } catch(error) {
       console.log(error)
@@ -419,6 +424,67 @@ const returnOrder = async (req, res) => {
   }
 }; 
 
+const retryPayment = async (req, res) => {
+  const { orderId } = req.body;
+console.log("aa", orderId)
+  try {
+      const orderDetails = await Order.findOne({ orderId: orderId });
+
+      if (!orderDetails) {
+          return res.status(404).json({ success: false, message: "Order not found" });
+      }
+
+      const options = {
+          amount: orderDetails.finalAmount * 100, // Convert to paise (Razorpay requires amount in paise)
+          currency: "INR",
+          receipt: `order_rcptid_${orderDetails.orderId}`,
+      };
+
+      const razorpayOrder = await razorpayInstance.orders.create(options);
+
+      orderDetails.orderId = razorpayOrder.id;
+
+      await orderDetails.save()
+
+      console.log("aaa", orderDetails )
+      res.json({ success: true, razorpayOrder, amount: options.amount });  
+
+  } catch (error) {
+      console.error("Error creating Razorpay order:", error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+const verifyRetryPayment = async (req, res) => {
+  try {
+      const { paymentId, orderId, signature } = req.body;
+      console.log("🔄 Verifying Retry Payment - Order ID:", orderId);
+
+      const generatedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+          .update(`${orderId}|${paymentId}`)
+          .digest('hex');
+
+      if (generatedSignature !== signature) {
+          console.log(" Signature verification failed for Order ID:", orderId);
+          return res.status(400).json({ error: 'Retry payment verification failed' });
+      }
+
+      const order = await Order.findOne({ orderId: orderId });
+      if (!order) {
+          console.log(" Order not found in DB for retry:", orderId);
+          return res.status(404).json({ error: 'Order not found' });
+      }
+
+      order.paymentStatus = "Success";
+      await order.save();
+
+      console.log(" Retry Payment Verified Successfully for Order ID:", orderId);
+      res.json({ success: true, message: 'Retry payment verified successfully' });
+
+  } catch (error) {
+      console.error(" Error verifying retry payment:", error);
+      res.status(500).json({ error: "Retry payment verification failed" });
+  }
+};
 
   
     module.exports = {
@@ -430,4 +496,6 @@ const returnOrder = async (req, res) => {
       placeOrderOnline,
       verifyPayment,
       returnOrder,
+      retryPayment,
+      verifyRetryPayment
     }

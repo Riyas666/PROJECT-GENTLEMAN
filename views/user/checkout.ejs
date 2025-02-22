@@ -9,6 +9,7 @@
   background-color: #f9f9f9;
 }
 
+
 .address-list {
   list-style: none;
   padding: 0;
@@ -124,7 +125,6 @@
   font-size: 1.1rem;
 }
 
-
 </style>
     <main class="main">
       <section class="breadcrumb">
@@ -196,103 +196,6 @@
                   <p id="couponMessage" style="color: green; display: none;">Coupon applied successfully!</p>
                 </div>
 
-
-
-
-
-
-                <div class="modal-overlay" id="addressModal">
-                  <div class="address-modal">
-                    <div class="modal-header">
-                      <h2>Add New Address</h2>
-                      <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="address-form-container">
-                      <form method="post" id="addaddressform">
-                        <div class="mb-3">
-                          <label for="fullname" class="form-label">Full Name</label>
-                          <input type="text" class="form-control" id="addname" name="name" placeholder="Enter your full name" />
-                          <span class="error-message" id="addnameError"></span>
-                        </div>
-      
-                        <div class="mb-3">
-                          <label for="city" class="form-label">City</label>
-                          <input type="text" class="form-control" id="city" name="city" placeholder="Enter your city" />
-                          <span class="error-message" id="cityError"></span>
-                        </div>
-      
-                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
-                          <span class="mb-3" style="flex: 1;">
-                            <label for="state" class="form-label" style="display: flex;">State</label>
-                            <select id="state" name="state" class="form-select">
-                              <option value="{{state}}" elected>state</option>
-                              <option value="Andhra Pradesh">Andhra Pradesh</option>
-                              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                              <option value="Assam">Assam</option>
-                              <option value="Bihar">Bihar</option>
-                              <option value="Chhattisgarh">Chhattisgarh</option>
-                              <option value="Goa">Goa</option>
-                              <option value="Gujarat">Gujarat</option>
-                              <option value="Haryana">Haryana</option>
-                              <option value="Himachal Pradesh">Himachal Pradesh</option>
-                              <option value="Jharkhand">Jharkhand</option>
-                              <option value="Karnataka">Karnataka</option>
-                              <option value="Kerala">Kerala</option>
-                              <option value="Madhya Pradesh">Madhya Pradesh</option>
-                              <option value="Maharashtra">Maharashtra</option>
-                              <option value="Manipur">Manipur</option>
-                              <option value="Meghalaya">Meghalaya</option>
-                              <option value="Mizoram">Mizoram</option>
-                              <option value="Nagaland">Nagaland</option>
-                              <option value="Odisha">Odisha</option>
-                              <option value="Punjab">Punjab</option>
-                              <option value="Rajasthan">Rajasthan</option>
-                              <option value="Sikkim">Sikkim</option>
-                              <option value="Tamil Nadu">Tamil Nadu</option>
-                              <option value="Telangana">Telangana</option>
-                              <option value="Tripura">Tripura</option>
-                              <option value="Uttar Pradesh">Uttar Pradesh</option>
-                              <option value="Uttarakhand">Uttarakhand</option>
-                              <option value="West Bengal">West Bengal</option>
-                              <option value="Chandigarh">Chandigarh</option>
-                              <option value="Delhi">Delhi</option>
-                              <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                              <option value="Ladakh">Ladakh</option>
-                            </select>
-                            <span class="error-message" id="stateError"></span>
-                          </span>
-                          <span class="mb-3" style="flex: 1;">
-                            <label for="postalcode" class="form-label" style="display: flex;">Postal Code</label>
-                            <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter your postal code" />
-                            <span class="error-message" id="pincodeError"></span>
-                          </span>
-                        </div>
-                        <div class="mb-3">
-                          <label for="landmark" class="form-label">Landmark</label>
-                          <input type="text" class="form-control" id="landmark" name="landmark" placeholder="Enter a landmark " />
-                          <span class="error-message" id="landmarkError"></span>
-                        </div>
-                        <div class="mb-3">
-                          <label for="phonenumber" class="form-label">Phone Number</label>
-                          <input type="text" class="form-control" id="addphone" name="phonenumber" placeholder="Enter your phone number" />
-                          <span class="error-message" id="addphoneError"></span>
-                        </div>
-                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
-                          <span class="mb-3" style="flex: 1;">
-                            <label for="addressType" class="form-label" style="display: flex;">Address Type</label>
-                            <select name="addressType" id="addressType" class="form-select">
-                              <option value="--none--" selected>--none--</option>
-                              <option value="Home Address">Home Address</option>
-                              <option value="Office Address">Office Address</option>
-                            </select>
-                            <span class="error-message" id="addressTypeError"></span>
-                          </span>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
               </section>
               
           </div>
@@ -408,7 +311,98 @@
         
       </section> 
 
-      
+      <div class="modal-overlay" id="addressModal">
+        <div class="address-modal">
+          <div class="modal-header">
+            <h2>Add New Address</h2>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="address-form-container">
+            <form method="post" id="addaddressform">
+              <div class="mb-3">
+                <label for="fullname" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="addname" name="name" placeholder="Enter your full name" />
+                <span class="error-message" id="addnameError"></span>
+              </div>
+
+              <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" class="form-control" id="city" name="city" placeholder="Enter your city" />
+                <span class="error-message" id="cityError"></span>
+              </div>
+
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <span class="mb-3" style="flex: 1;">
+                  <label for="state" class="form-label" style="display: flex;">State</label>
+                  <select id="state" name="state" class="form-select">
+                    <option value="{{state}}" elected>state</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Manipur">Manipur</option>
+                    <option value="Meghalaya">Meghalaya</option>
+                    <option value="Mizoram">Mizoram</option>
+                    <option value="Nagaland">Nagaland</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Sikkim">Sikkim</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Uttarakhand">Uttarakhand</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Chandigarh">Chandigarh</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                    <option value="Ladakh">Ladakh</option>
+                  </select>
+                  <span class="error-message" id="stateError"></span>
+                </span>
+                <span class="mb-3" style="flex: 1;">
+                  <label for="postalcode" class="form-label" style="display: flex;">Postal Code</label>
+                  <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter your postal code" />
+                  <span class="error-message" id="pincodeError"></span>
+                </span>
+              </div>
+              <div class="mb-3">
+                <label for="landmark" class="form-label">Landmark</label>
+                <input type="text" class="form-control" id="landmark" name="landmark" placeholder="Enter a landmark " />
+                <span class="error-message" id="landmarkError"></span>
+              </div>
+              <div class="mb-3">
+                <label for="phonenumber" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="addphone" name="phonenumber" placeholder="Enter your phone number" />
+                <span class="error-message" id="addphoneError"></span>
+              </div>
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <span class="mb-3" style="flex: 1;">
+                  <label for="addressType" class="form-label" style="display: flex;">Address Type</label>
+                  <select name="addressType" id="addressType" class="form-select">
+                    <option value="--none--" selected>--none--</option>
+                    <option value="Home Address">Home Address</option>
+                    <option value="Office Address">Office Address</option>
+                  </select>
+                  <span class="error-message" id="addressTypeError"></span>
+                </span>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
 
 
       
@@ -459,7 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
             finalAmount,
             paymentMethod: 'COD',
             addressId: selectedAddressId,
-           
             offerdiscount
 
           }),
@@ -499,7 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
             finalAmount,
             paymentMethod: 'Wallet',
             addressId: selectedAddressId,
-            
             offerdiscount
           }),
         });
@@ -541,8 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
             offerdiscount
           }),
         });
-        console.log("2");
-        if (!response.ok) {
+       if (!response.ok) {
           const errorData = await response.json();
     Swal.fire({
         title: 'Order Failed',
@@ -551,12 +542,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     return;
 }
-        console.log("3")
 
         const order = await response.json();
        
-        console.log(`orderrrrrrrrr:${order}`)
-        console.log("4")
 
         if (!order ||  !order.razorpayOrder || !order.razorpayOrder.id ) {
           return Swal.fire({
@@ -566,7 +554,6 @@ document.addEventListener('DOMContentLoaded', () => {
             button: 'OK',
           });
         }
-        console.log("5")
         const options = {
           key: 'rzp_test_rry7kkHDgndyCv', 
           amount: order.amount, 
@@ -575,7 +562,6 @@ document.addEventListener('DOMContentLoaded', () => {
           name: 'Your Store',
           description: 'Payment for your order',
           handler: async function (response) {
-            console.log("6")
             try {
               const verifyResponse = await fetch('/verify-payment', {
                 method: 'POST',
@@ -586,9 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   signature: response.razorpay_signature,
                 }),
               });
-              console.log("7")
               const verifyData = await verifyResponse.json();
-              console.log("8")
 
               if (verifyData.success) {
                     Swal.fire({
@@ -617,6 +601,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const rzp = new Razorpay(options);
+        rzp.on('payment.failed',()=>{
+          alert('Payement failed')
+        })
         rzp.open();
       } catch (error) {
         console.error('Error creating order with Razorpay:', error);
@@ -890,7 +877,6 @@ document.addEventListener('DOMContentLoaded', function() {
       </script>
 
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
 

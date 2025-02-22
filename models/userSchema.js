@@ -74,17 +74,12 @@ const userSchema = new Schema({
           stockStatus: { type: String },
         },
       ],
-    // orderHistory: [{
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Order"
-    // }],
+   
    
     referalCode: {
         type: String
     },
-    // redeemed: {
-    //     type: Boolean
-    // },
+   
     redeemedUsers: [{
         type: Schema.Types.ObjectId,
         ref: "User"

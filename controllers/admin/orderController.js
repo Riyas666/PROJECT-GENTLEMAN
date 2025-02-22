@@ -150,6 +150,6 @@ module.exports = {
    orderDetails,
    changeOrderStatus,
    rejectReturnRequest,
-   approveReturnRequest,
-   returnRequestDetails
+  approveReturnRequest,
+      returnRequestDetails
 }

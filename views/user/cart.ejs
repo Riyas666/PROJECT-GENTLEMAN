@@ -134,18 +134,6 @@
     }
   }
 
-  #image-table {
-    width: 10%;
-  }
-
-
-  #name-table {
-    width: 30%;
-  }
-
-  #price-table {
-    width: 15%;
-  }
 </style>
 <!--=============== MAIN ===============-->
 <main class="main">
@@ -162,18 +150,18 @@
 
   <!--=============== CART ===============-->
   <section class="cart section--lg container">
-    <div class="table__container">
-      <table class="table">
+    <div class="table__container" style="display: flex;">
+      <table class="table" style="width: 62rem;">
         <%if(cartItems.length>0){%>
         <thead>
           <tr>
-            <th id="image-table">Image</th>
-            <th id="name-table">Name</th>
-            <th>size</th>
-            <th id="price-table">Price</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-            <th>Rename</th>
+            <th style="width: 4rem;">Image</th>
+            <th style="width: 14rem;">Name</th>
+            <th style="width: 3rem;">size</th>
+            <th style="width: 5rem;">Price</th>
+            <th style="width: 8rem;">Quantity</th>
+            <th style="width: 5rem;">Subtotal</th>
+            <th style="width: 6rem;">Rename</th>
           </tr>
         </thead>
         <tbody>
@@ -189,13 +177,13 @@
               </h3>
             </td>
             <td>
-              <span><%=item.size%></span>
+              <span ><%=item.size%></span>
             </td>
             <td>
               <span class="table__price">₹<%=item.price%></span>
             </td>
             <td>
-              <div class="quantity-wrapper" data-product-id="<%= item.productId._id %>" data-stock="<%= item.productId.quantity %>" data-size="<%= item.size %>" >
+              <div class="quantity-wrapper" data-product-id="<%= item.productId._id %>" data-stock="<%= item.productId.quantity %>" data-size="<%= item.size %>">
                 <button class="decrease" onclick="updateStock('<%= item.productId._id %>', '<%=item.size%>', -1)">-</button>
                 <input type="number" id="quantity-<%= item.productId._id %>-<%=item.size%>" value="<%= item.quantity %>" min="1" readonly />
                 <button class="increase" onclick="updateStock('<%= item.productId._id %>','<%=item.size%>' ,1)">+</button>
@@ -203,26 +191,49 @@
             </td>
             <td><span class="subtotal">₹<%= (item.quantity * item.price).toFixed(2) %></span></td>
 
-            <td><i class="fi fi-rs-trash table__trash" title="Delete Address" onclick="deleteProduct('<%= item.productId._id %>')" id="delete-button"></i>
+            <td><i class="fi fi-rs-trash table__trash" title="Delete Address" 
+              onclick="deleteProduct('<%= item.productId._id %>', '<%= item.size %>')" id="delete-button">
+            </i>
+            
             </td>
           </tr>
-          <% }) %>  
+          <% }) %>
           <%}else{%>
-            <tr colspan="5" class="text-center">
-              <td>
-                  <p class="lead mb-4">No items found in Cart</p>
-              </td>
-            </tr>
-            <%}%>
+          <tr colspan="5" class="text-center">
+            <td>
+              <p class="lead mb-4">No items found in Cart</p>
+            </td>
+          </tr>
+          <%}%>
         </tbody>
       </table>
+
+      <div class="cart__total" style="width: 24rem;">
+        <h3 class="section__title">Cart Totals</h3>
+        <table class="cart__total-table">
+          <tr>
+            <td><span class="cart__total-title">Cart Subtotal</span></td>
+            <td><span class="cart__total-price" id="cart-total">₹<span class="cartTotel"><%=total%></span></span></td>
+          </tr>
+          <tr>
+            <td><span class="cart__total-title">Shipping</span></td>
+            <td><span class="cart__total-price">Free Shipping</span></td>
+          </tr>
+          <tr>
+            <td><span class="cart__total-title">Total</span></td>
+            <td><span class="cart__total-price">₹<span class="cartTotel"><%=total%></span></span></td>
+          </tr>
+
+      </table>
+
+    </div>
     </div>
 
     <div class="cart__actions">
-      <a href="/cart" class="btn flex btn__md" style="background-color: black; color: white;">
-        <i class="fi-rs-shuffle"></i> Update Cart
+      <a class="btn flex btn--md" id="checkout-btn" style="background-color: black; color: white;">
+        <i class="fi fi-rs-box-alt"></i> Proceed To Checkout
       </a>
-      <a href="/home" class="btn flex btn__md"  style="background-color: black; color: white;">
+      <a href="/home" class="btn flex btn__md" style="background-color: black; color: white;">
         <i class="fi-rs-shopping-bag"></i> Continue Shopping
       </a>
     </div>
@@ -232,30 +243,10 @@
     </div>
 
     <div class="cart__group grid">
-      
-      </div>
 
-      <div class="cart__total w-50">
-        <h3 class="section__title">Cart Totals</h3>
-        <table class="cart__total-table">
-          <tr>
-            <td><span class="cart__total-title">Cart Subtotal</span></td>
-            <td><span class="cart__total-price">₹<%=total %></span></td>
-          </tr>
-          <tr>
-            <td><span class="cart__total-title">Shipping</span></td>
-            <td><span class="cart__total-price">Free Shipping</span></td>
-          </tr>
-          <tr>
-            <td><span class="cart__total-title">Total</span></td>
-            <td><span class="cart__total-price">₹<%=total %></span></td>
-          </tr>
-         
-        </table>
-        <a href="/checkout" class="btn flex btn--md" id="checkout-btn" style="background-color: black; color: white;">
-          <i class="fi fi-rs-box-alt"></i> Proceed To Checkout
-        </a>
-      </div>
+    </div>
+
+
     </div>
   </section>
 
@@ -266,133 +257,151 @@
 
   <!--=============== MAIN JS ===============-->
   <script src="/js/main.js"></script>
+  
+  
+  
 
   <script>
-
-    /////////////////////UPDATE TEH STOCK///////////////////////
-    
     function updateStock(productId, size, change) {
-  const quantityInput = document.getElementById(`quantity-${productId}-${size}`);
-  const quantityWrapper = document.querySelector(`[data-product-id="${productId}"][data-size="${size}"]`);
+      const quantityInput = document.getElementById(`quantity-${productId}-${size}`);
+      const quantityWrapper = document.querySelector(`[data-product-id="${productId}"][data-size="${size}"]`);
 
-  if (!quantityInput || !quantityWrapper) return;
+      if (!quantityInput || !quantityWrapper) return;
 
-  const maxStock = parseInt(quantityWrapper.getAttribute("data-stock"), 10);
-  console.log("fffff", maxStock)
-  const maxLimit = 5;
-  let currentQuantity = parseInt(quantityInput.value, 10);
-  const newQuantity = currentQuantity + change;
+      const maxStock = parseInt(quantityWrapper.getAttribute("data-stock"), 10);
+      const maxLimit = 5;
+      let currentQuantity = parseInt(quantityInput.value, 10);
+      const newQuantity = currentQuantity + change;
 
-  if (newQuantity < 1) {
-    Notiflix.Notify.warning("Minimum quantity is 1", {
-    timeout: 3000,           
-    position: 'right-top',       
-    clickToClose: true,           
-    cssAnimationStyle: 'zoom',   
-    fontSize: '16px',          
-    borderRadius: '10px',        
-    showOnlyTheLastOne: true,     
-  });
-      
-      return;
+      if (newQuantity > maxStock) {
+        Notiflix.Notify.failure(`Only ${maxStock} items available in stock.`, {
+          timeout: 3000,
+          position: 'right-top',
+          clickToClose: true,
+          cssAnimationStyle: 'zoom',
+          fontSize: '16px',
+          borderRadius: '10px',
+          showOnlyTheLastOne: true,
+        });
+
+
+
+        return;
+      }
+
+      if (newQuantity < 1) {
+        Notiflix.Notify.warning("Minimum quantity is 1", {
+          timeout: 3000,
+          position: 'right-top',
+          clickToClose: true,
+          cssAnimationStyle: 'zoom',
+          fontSize: '16px',
+          borderRadius: '10px',
+          showOnlyTheLastOne: true,
+        });
+
+        return;
+      }
+
+      if (newQuantity > maxLimit) {
+        Notiflix.Notify.warning(`You can only add up to ${maxLimit} items of this product.`, {
+          timeout: 3000,
+          position: 'right-top',
+          clickToClose: true,
+          cssAnimationStyle: 'zoom',
+          fontSize: '16px',
+          borderRadius: '10px',
+          showOnlyTheLastOne: true,
+        });
+
+        return;
+      }
+
+
+      quantityInput.value = newQuantity;
+      const row = quantityWrapper.closest("tr");
+      const subtotalElement = row.querySelector(".subtotal");
+      const pricePerItem = parseFloat(row.querySelector(".table__price").textContent.replace("₹", ""));
+      subtotalElement.textContent = `₹${(pricePerItem * newQuantity).toFixed(2)}`;
+
+      console.log("aaa")
+      updateCartOnServer(productId, size, newQuantity);
+
     }
 
-  if (newQuantity > maxLimit) {
-    Notiflix.Notify.warning(`You can only add up to ${maxLimit} items of this product.`, {
-      timeout: 3000,           
-    position: 'right-top',       
-    clickToClose: true,           
-    cssAnimationStyle: 'zoom',   
-    fontSize: '16px',          
-    borderRadius: '10px',        
-    showOnlyTheLastOne: true,
-    });
-    return;
-  }
+    function updateCartOnServer(productId, size, quantity) {
+      fetch("/cart/update", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            productId,
+            size,
+            quantity
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+
+            document.querySelectorAll('.cartTotel').forEach(item=>{
+              item.innerHTML = data.totel;
+            })
+
+            Notiflix.Notify.success("Cart updated successfully!", {
+              timeout: 3000,
+              position: 'right-top',
+              clickToClose: true,
+              cssAnimationStyle: 'zoom',
+              fontSize: '16px',
+              borderRadius: '10px',
+              showOnlyTheLastOne: true,
+            });
 
 
-  quantityInput.value = newQuantity;
-  const row = quantityWrapper.closest("tr");
-  const subtotalElement = row.querySelector(".subtotal");
-  const pricePerItem = parseFloat(row.querySelector(".table__price").textContent.replace("₹", ""));
-  subtotalElement.textContent = `₹${(pricePerItem * newQuantity).toFixed(2)}`;
-
-  updateCartOnServer(productId,size, newQuantity);
-}
 
 
-////CART AUTOMATIC UPDATION////
-function updateCartOnServer(productId, newQuantity) {
-  fetch("/cart/update", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ productId, size,quantity: newQuantity }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        Notiflix.Notify.success("Cart updated successfully!", {
-          timeout: 3000,             
-    position: 'right-top',       
-    clickToClose: true,           
-    cssAnimationStyle: 'zoom',   
-    fontSize: '16px',            
-    borderRadius: '10px',        
-    showOnlyTheLastOne: true,
-        });
-       
-      }
-      else if(data.message.includes('Not enough stock available')){
-        Notiflix.Notify.failure(data.message, {
-    timeout: 3000,                
-    position: 'right-top',       
-    clickToClose: true,          
-    cssAnimationStyle: 'zoom',   
-    fontSize: '16px',            
-    borderRadius: '10px',       
-    showOnlyTheLastOne: true, 
-      })
-    }else{
-        Notiflix.Notify.failure(`Failed to update cart: ${data.message}`, {
-          timeout: 3000,
-          position: "right-top",
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Error updating cart:", error);
-      Notiflix.Notify.failure("Something went wrong. Please try again.", {
-        timeout: 3000,
-        position: "right-top",
-      });
-    });
-}
+          } else {
+            Notiflix.Notify.failure(data.message || "Failed to update cart.", {
+              timeout: 3000,
+              position: 'right-top',
+              clickToClose: true,
+              cssAnimationStyle: 'zoom',
+              fontSize: '16px',
+              borderRadius: '10px',
+              showOnlyTheLastOne: true,
+            });
+
+          }
+        })
 
 
+
+        .catch(() => Notiflix.Notify.failure("Something went wrong. Please try again."));
+    }
   </script>
   <script>
-    document.getElementById('checkout-btn').addEventListener('click', async function(event){
+    document.getElementById('checkout-btn').addEventListener('click', async function(event) {
       event.preventDefault();
 
-      try{
+      try {
         const response = await fetch('/cart/check-stock', {
-          method:'GET'
+          method: 'GET'
         });
         const data = await response.json()
 
-        if(data.success){
+        if (data.success) {
           window.location.href = '/checkout'
-        }else{
+        } else {
           Swal.fire({
-            title:"Error",
-            text:data.message,
-            icon:"error",
-            button:"Try again"
+            title: "Error",
+            text: data.message,
+            icon: "error",
+            button: "Try again"
           })
         }
-      }catch(error){
+      } catch (error) {
         console.log("Error", error)
       }
     })

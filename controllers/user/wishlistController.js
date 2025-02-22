@@ -7,6 +7,7 @@ const Product = require("../../models/productSchema")
 
 const getWishlist = async(req,res)=>{
     try{
+
       const userId = req.session.user;
       const user = await User.findById(userId).populate("wishlist.productId");
       res.render("wishlist", {
@@ -17,14 +18,14 @@ const getWishlist = async(req,res)=>{
     }catch(error){
      console.error(error)
      res.redirect("/pageNotFound")
-    }
-    
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
   }
 
 
   
 const addToWishlist = async(req,res)=>{
     try{
+      
       const {productId,size} = req.body;
       const userId = req.session.user;
                                                  
@@ -116,8 +117,6 @@ const deleteWishlistItem = async (req, res) => {
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   };
-  
-
   
 
   

@@ -265,6 +265,7 @@
 
 <script>
   async function deleteOffer(offerId) {
+    
   try {
     const response = await fetch(`/admin/deleteOffer/${offerId}`, {
       method: "PATCH",

@@ -67,7 +67,7 @@ router.post('/place',userAuth, orderController.placeOrder);
 router.get("/order-details/:id",userAuth, orderController.orderDetails)
 router.post('/profile/cancel-order', userAuth,orderController.cancelOrder);
 router.post('/profile/return-order', userAuth,orderController.returnOrder)
-
+router.post('/retry-payment', orderController.retryPayment);
 
 
 
@@ -90,6 +90,6 @@ router.post('/place-order-online',userAuth, orderController.placeOrderOnline);
 
 router.post('/verify-payment', userAuth,orderController.verifyPayment); 
 
-
+router.post('/verify-retry-payment', userAuth, orderController.verifyRetryPayment)
 
 module.exports = router;

@@ -1,6 +1,6 @@
 <%-include("../../views/partials/user/header")%>
 <style>
-  .review-icon {
+  /* .review-icon {
     font-size: 2rem;
     color: #ff9800;
   }
@@ -67,7 +67,234 @@
     background-color: white;
     padding: 20px;
     border-radius: 5px;
+  } */
+
+  /* Container styles */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.order-details-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Breadcrumb styles */
+.breadcrumb {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.breadcrumb__list {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.breadcrumb__link {
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb__link:hover {
+  color: #000;
+}
+
+/* Card styles */
+.card {
+  margin-top: 5rem;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease;
+  
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.card-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 9rem;
+  height: 2px;
+  background-color: #000;
+}
+
+/* Order actions */
+.order-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-option {
+  padding: 0.5rem 1rem;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-option:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+/* Status badges */
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.bg-success {
+  background: #000;
+  color: #fff;
+}
+
+.bg-warning {
+  background: #f5f5f5;
+  color: #000;
+}
+
+.bg-danger {
+  background: #ff4444;
+  color: #fff;
+}
+
+/* Product grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.order-details-row {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+}
+
+.order-details-row:hover {
+  background: #f9f9f9;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.order-details-text {
+  flex: 1;
+}
+
+.order-details-text p {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.order-details-text strong {
+  color: #000;
+}
+
+.product-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Shipping address */
+.shipping-address {
+  margin-top: 2rem;
+}
+
+.shipping-address p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .order-actions {
+    position: static;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
   }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .products-container {
+    grid-template-columns: 1fr;
+  }
+
+  .order-details-row {
+    flex-direction: row;
+  }
+
+  .product-image {
+    margin: 1rem 0 0 0;
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* Animation for content loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.order-details-container {
+  animation: fadeIn 0.5s ease;
+}
+
+.mt-4 {
+  margin-top: 2rem;
+}
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
 
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -91,50 +318,81 @@
       <div class="card mb-4 position-relative order-details">
 
         <div class="order-actions">
+          <%if (orders.paymentType==="Razorpay" && orders.paymentStatus === "Pending" && orders.status!=="Cancelled"){%>
+            <button class="btn btn-primary btn-option" id="retry-payment">Retry Payment</button>
+  <%}%>
           <% if (orders.status === "Delivered") { %>
           <button class="btn btn-primary btn-option" id="return-order">Return Order</button>
           <% } %>
           <% if (orders.status === "Pending") { %>
           <button class="btn btn-primary btn-option" id="cancel-order">Cancel Order</button>
           <% } %>
-
+          
+         
+<%if(orders.status==="Delivered"||orders.status==="Return Request" || orders.status==="Returned"){%>
+  <button class="btn btn-primary btn-option" id="invoice-download" onclick="downloadInvoice('<%= orders.orderId %>')">Download Invoice</button>                                                                                                                                                                                                                                              
+<%}%>
         </div>
         <div class="card-body">
-          <h5 class="card-title">Order Details</h5>
-          <p><strong>Order ID:</strong><%= orders._id %></p>
-          <p><strong>Date:</strong> <%= new Date(orders.createdAt).toLocaleDateString() %></p>
-          <p><strong>Items:</strong> <%= orders.orderedItems.length %></p>
-          <p><strong>Total Amount:</strong>₹<%= orders.finalAmount %></p>
-          <p><strong>Estimated Delivery:</strong> <%=estimatedDeliveryDate.toLocaleDateString()%></p>
-          <p><strong>Status:</strong> <span class="badge bg-<%= orders.status === 'Delivered' ? 'success' : 'warning' %>"><%= orders.status %></span></p>
-          <p><strong>Payment Type:</strong><%=orders.paymentType%></p>
-          <p><strong>Payment Status:</strong><span class="badge bg-<%=orders.paymentStatus === 'Success'? 'success': orders.paymentStatus==='Pending'? 'warning':orders.paymentStatus==='Failed'?'danger':'secondary' %>"> <%=orders.paymentStatus%></span></p>
-          <div class="mt-4">
-            <h6>Products:</h6>
-            <% orders.orderedItems.forEach(item => { %>
-            <div class="order-details-row">
-              <div class="order-details-text">
-                <p><strong>Product Name:</strong><%=item.products.productName%></p>
-                <p><strong>Quantity:</strong> <%= item.quantity %></p>
-                <p><strong>Price:</strong> ₹<%= item.price %></p>
-              </div>
-              <div>
-                <img src="/uploads/product-images/<%=item.products.productImage[0]%>" alt="Product Image" class="product-image">
+          <div class="row">
+            <!-- Order Details -->
+            <div class="col-md-6">
+              <h5 class="card-title">Order Details</h5>
+              <p id="orderId"><strong>Order ID:</strong> <%= orders.orderId %></p>
+              <p><strong>Date:</strong> <%= new Date(orders.createdAt).toLocaleDateString() %></p>
+              <p><strong>Items:</strong> <%= orders.orderedItems.length %></p>
+              <p><strong>Total Amount:</strong>₹<%= orders.finalAmount %></p>
+              <p><strong>Estimated Delivery:</strong> <%=estimatedDeliveryDate.toLocaleDateString()%></p>
+              <p><strong>Status:</strong> 
+                <span class="badge bg-<%= orders.status === 'Delivered' ? 'success' : 'warning' %>">
+                  <%= orders.status %>
+                </span>
+              </p>
+              <p><strong>Payment Type:</strong> <%=orders.paymentType%></p>
+              <p><strong>Payment Status:</strong>
+                <span class="badge bg-<%=orders.paymentStatus === 'Success'? 'success': orders.paymentStatus==='Pending'? 'warning': orders.paymentStatus==='Failed'?'danger':'secondary' %>">
+                  <%=orders.paymentStatus%>
+                </span>
+              </p>
+            </div>
+        
+            <!-- Shipping Address -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Shipping Address</h5>
+                  <p><strong>Name:</strong> <%=orders.address.name%></p>
+                  <p><strong>Address:</strong> <%=orders.address.city%>, <%=orders.address.state%>, <%=orders.address.pincode%></p>
+                  <p><strong>Landmark:</strong> <%=orders.address.landmark%></p>
+                  <p><strong>Phone:</strong> <%=orders.address.phonenumber%></p>
+                </div>
               </div>
             </div>
-            <% }); %>
+          </div>
+        
+          <!-- Products Section -->
+          <div class="mt-4">
+            <h6>Products:</h6>
+            <div class="products-container">
+              <% orders.orderedItems.forEach(item => { %>
+                <div class="order-details-row">
+                  <div class="order-details-text">
+                    <p><strong>Product Name:</strong> <%=item.products.productName%></p>
+                    <p><strong>Quantity:</strong> <%= item.quantity %></p>
+                    <p><strong>Price:</strong> ₹<%= item.price %></p>
+                  </div>
+                  <div>
+                    <img src="/uploads/product-images/<%=item.products.productImage[0]%>" alt="Product Image" class="product-image">
+                  </div>
+                </div>
+              <% }); %>
+            </div>
           </div>
         </div>
+        
       </div>
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title">Shipping Address</h5>
-          <p><strong>Name:</strong> <%=orders.address.name%></p>
-          <p><strong>Address:</strong> <%=orders.address.city%> , <%=orders.address.state%>, <%=orders.address.pincode%></p>
-          <p><strong>Landmark:</strong> <%=orders.address.landmark%></p>
-          <p><strong>Phone:</strong> <%=orders.address.phonenumber%></p>
-        </div>
-      </div>
+      
+      
     </div>
   </div>
 
@@ -156,6 +414,7 @@
     document.addEventListener("DOMContentLoaded", () => {
   const cancelOrderButton = document.getElementById("cancel-order");
   const returnOrderButton = document.getElementById("return-order");
+  const retryPaymentButton = document.getElementById("retry-payment")
   if (cancelOrderButton) {
     cancelOrderButton.addEventListener("click", async () => {
       const result = await Swal.fire({
@@ -333,9 +592,168 @@ if(cancelReasonResult.isConfirmed){
       }
     });
   }
+  if(retryPaymentButton){
+    retryPaymentButton.addEventListener("click", async() => {
+      try{
+        const response = await fetch('/retry-payment', {
+          method:'POST',
+          headers:{'Content-Type' : 'application/json'},
+          body:JSON.stringify({
+            orderId: '<%= orders.orderId  %>',
+          }),
+
+        });
+        if(!response.ok){
+          const errorData = await response.json()
+
+          Swal.fire({
+            title:'Order failed',
+            text:'Failed to create the order',
+            icon:'error',
+          });
+          return;
+        }
+        console.log("11")
+
+
+        const order = await response.json();
+
+        console.log("22", order)
+
+        if(!order || !order.razorpayOrder.id) {
+          return Swal.fire({
+            title:'Order Failed',
+            text:'Failed to create the order.Please try again',
+            icon:'error',
+            button:'OK',
+          });
+        }
+        const options = {
+          key: 'rzp_test_rry7kkHDgndyCv', 
+          amount: order.amount, 
+          currency: 'INR',
+          order_id: order.razorpayOrder.id, 
+          name: 'Your Store',
+          description: 'Payment for your order',
+          handler: async function (response) {
+            try {
+              const verifyResponse = await fetch('/verify-retry-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  paymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                  signature: response.razorpay_signature,
+                }),
+              });
+
+              const verifyData = await verifyResponse.json();
+
+              if (verifyData.success) {
+                    Swal.fire({
+                        title: 'Order Placed Successfully!',
+                        text: verifyData.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000,
+                    }).then(() => {
+                        window.location.href = '/order/success';
+                    });
+              } else {
+                alert('Payment verification failed. Please try again.');
+              }
+            } catch (error) {
+              console.error('Error verifying Razorpay payment:', error);
+              alert('An error occurred while verifying the payment. Please try again.');
+            }
+          },
+          prefill: {
+            name: '<%=user.name%>',
+            email: '<%=user.email%>',
+            contact: '<%=user.phone%>',
+          },
+          theme: { color: '#3399cc' },
+        };
+     const rzp = new Razorpay(options);
+        rzp.on('payment.failed',()=>{
+          alert('Payement failed')
+        });
+
+        rzp.open();
+      } catch (error) {
+        console.error('Error creating order with Razorpay:', error);
+        alert('An error occurred while creating the order. Please try again.');
+      }
+    })
+  }
 });
 
+
+function downloadInvoice(orderId) {
+  const {
+      jsPDF
+    } = window.jspdf;
+        const doc = new jsPDF();
+
+    // Order Details (Replace with actual order data)
+    
+    const orderDetails = {
+        orderId: "<%= orders.orderId %>",
+        date: "<%= new Date(orders.createdAt).toLocaleDateString() %>",
+        totalAmount: "₹<%= orders.finalAmount %>",
+        paymentType: "<%= orders.paymentType %>",
+        paymentStatus: "<%= orders.paymentStatus %>",
+        estimatedDelivery: "<%= estimatedDeliveryDate.toLocaleDateString() %>",
+        customerName: "<%= orders.address.name %>",
+        customerAddress: "<%= orders.address.city %>, <%= orders.address.state %>, <%= orders.address.pincode %>",
+        customerPhone: "<%= orders.address.phonenumber %>",
+        items: <%- JSON.stringify(orders.orderedItems).replace(/</g, '\\u003c') %>};  
+
+    // Set Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("Invoice", 90, 20);
+
+    // Order Info
+    doc.setFontSize(12);
+    doc.text(`Order ID: ${orderDetails.orderId}`, 14, 30);
+    doc.text(`Order Date: ${orderDetails.date}`, 14, 38);
+    doc.text(`Total Amount: ${orderDetails.totalAmount}`, 14, 46);
+    doc.text(`Payment Type: ${orderDetails.paymentType}`, 14, 54);
+    doc.text(`Payment Status: ${orderDetails.paymentStatus}`, 14, 62);
+    doc.text(`Estimated Delivery: ${orderDetails.estimatedDelivery}`, 14, 70);
+
+    // Customer Info
+    doc.setFontSize(14);
+    doc.text("Shipping Address:", 14, 80);
+    doc.setFontSize(12);
+    doc.text(`Name: ${orderDetails.customerName}`, 14, 88);
+    doc.text(`Address: ${orderDetails.customerAddress}`, 14, 96);
+    doc.text(`Phone: ${orderDetails.customerPhone}`, 14, 104);
+
+    // Order Items Table
+    const tableData = orderDetails.items.map(item => [
+    item.productName,  // Directly available in orderedItems
+    item.quantity,
+    `₹${item.price}`
+]);
+
+    doc.autoTable({
+        head: [["Product Name", "Quantity", "Price"]],
+        body: tableData,
+        startY: 110,
+        theme: "grid",
+        styles: { fontSize: 10, font: "helvetica" },
+        headStyles: { fillColor: [0, 102, 204] }
+    });
+
+    // Save PDF
+    doc.save(`Invoice_${orderDetails.orderId}.pdf`);
+}
+
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </main>
 
 

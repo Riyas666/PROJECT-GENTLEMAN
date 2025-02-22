@@ -32,9 +32,12 @@ router.get("/deleteCoupon", adminAuth,couponController.deleteCoupon)
 
 
 router.post("/generate-report",dashboardController.generateReport)
+router.post("/generate-sales-graph",dashboardController.generateGraph);
 
 router.get("/productoffer", adminController.getProductOffer)
 router.post("/createOffer", adminController.createOffer);
 router.patch("/deleteOffer/:id", adminController.removeOffer);
+
+
 
 module.exports = router;
