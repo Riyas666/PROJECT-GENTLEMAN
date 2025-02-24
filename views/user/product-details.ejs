@@ -615,6 +615,7 @@ addToCartButton.addEventListener('click', (e) => {
         }
  } )
       .catch((error) => {
+       window.location.href = '/login'
         console.error('Error adding item to cart:', error);
         Swal.fire({
         icon: 'error',
@@ -726,6 +727,7 @@ addToCartButton.addEventListener('click', (e) => {
       }
     })
     .catch((error) => {
+      window.location.href='/login'
       console.error("Error adding to wishlist:", error);
       Swal.fire("Error", "Something went wrong. Please try again.", "error");
     });

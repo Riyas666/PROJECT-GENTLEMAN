@@ -76,25 +76,8 @@
     <script src="/js/main.js"></script>
     <script>
         function deleteProduct(productId) {
-    Swal.fire({
-
-
-      title: 'Are you sure?',
-      text: "Do you really want to delete this item from your Wishlist?",
-      icon: 'warning',
-      iconColor: '#D3B382',  
-    background: '#fffcf3', 
-    color: 'hsl(0, 0%, 13%)',
-  
-    showCancelButton: true,
-    confirmButtonColor: '#d7b178',
-    cancelButtonColor: '#D3B382',
-  
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    }).then((result) => {
-      if (result.isConfirmed) {
-       
+   
+        
         fetch('/wishlist/delete', {
           method: 'POST',
           headers: {
@@ -120,9 +103,7 @@
             Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
           });
       }
-    });
-  }
-  
+   
 
 
 

@@ -23,6 +23,7 @@ const getCart = async (req, res) => {
 };
 
   const addToCartDetails = async (req, res, next) => {
+   
     const { productId, size, quantity } = req.body;
     console.log("This is the product id", size);
     const userId = req.session.user;
@@ -106,11 +107,16 @@ console.log("this is the existinggggggggg existing product", existingProduct);
         } else {
             return res.status(500).json({ success: false,message: 'Error occured',
             });
+          
         }
-    } catch (error) {
+      
+      }catch (error) {
         next(error);
       } 
-  };
+    
+  }
+     
+
 
   const updateCart = async (req, res) => {
     try {

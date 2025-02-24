@@ -179,7 +179,7 @@
                   <form id="couponForm" class="coupon__form form grid">
                     <div class="form__group grid">
                       <select id="couponSelect" class="form__input">
-                        <option value="">Select a Coupon</option>
+                        <option value="" >Select a Coupon</option>
                     <% coupons.forEach(coupon => { %>
                           <option value="<%= coupon._id %>" data-discount="<%= coupon.offerPrice %>" data-min-price="<%= coupon.minimumPrice %>">
                             <%= coupon.name %> - ₹<%= coupon.offerPrice %> OFF (Min: ₹<%= coupon.minimumPrice %>)
@@ -188,7 +188,7 @@
                       </select>
                       <div class="form__btn">
                         <button type="button" id="applyCouponBtn" class="btn flex btn--sm" style="background-color: black; color: white;">
-                          <i class="fi-rs-label" ></i> Apply
+                          <i class="fi-rs-label"></i> Apply
                         </button>
                       </div>
                     </div>
@@ -409,426 +409,453 @@
 
       <%-include("../../views/partials/user/footer")%>
 
+       <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
        <script>
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  const placeOrderBtn = document.getElementById('placeOrderBtn');
-
-  placeOrderBtn.addEventListener('click', async function () {
-    const paymentMethod = document.querySelector('input[name="radio"]:checked').id;
-   
-    const offerdiscountString = document.getElementById('offerdiscountAmount').textContent;
-    let offerdiscount= parseFloat(offerdiscountString.replace("₹", "").trim());
-
-    const cartItems = getCartItems(); 
-
-    if (!cartItems || cartItems.length === 0) {
-      return Swal.fire({
-        title: 'Cart Empty',
-        text: 'Your cart is empty. Please add items to the cart before placing an order.',
-        icon: 'error',
-        button: 'OK',
-      });
-    }
-
-    const selectedAddressId = document.querySelector('input[name="deliveryAddress"]:checked')?.value;
-   
-    if (!selectedAddressId) {
-      return Swal.fire({
-        title: 'Address Missing',
-        text: 'Please select a shipping address before placing the order.',
-        icon: 'error',
-        button: 'OK',
-      });
-    }
-
-    if (paymentMethod === 'l1') {
-      try {
-        const response = await fetch('/place', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include', 
-          body: JSON.stringify({
-            finalAmount,
-            paymentMethod: 'COD',
-            addressId: selectedAddressId,
-            offerdiscount
-
-          }),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-                    Swal.fire({
-                        title: 'Order Placed Successfully!',
-                        text: data.message,
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 2000,
-                    }).then(() => {
-                        window.location.href = data.redirectUrl;
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Order Failed',
-                        text: data.message,
-                        icon: 'error',
-                        button: 'Try Again',
-                    });
-                }
-      } catch (error) {
-        console.error('Error placing order with COD:', error);
-        alert('An error occurred while placing the order. Please try again.');
-      }
-    } else if (paymentMethod === 'l2') {
-     
-      try {
-        const response = await fetch('/place', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            finalAmount,
-            paymentMethod: 'Wallet',
-            addressId: selectedAddressId,
-            offerdiscount
-          }),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          Swal.fire({
-                        title: 'Order Placed Successfully!',
-                        text: data.message,
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 2000,
-                    }).then(() => {
-                        window.location.href = data.redirectUrl;
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Order Failed',
-                        text: data.message,
-                        icon: 'error',
-                        button: 'Try Again',
-                    });
-                }
-      } catch (error) {
-        console.error('Error placing order with Wallet:', error);
-        alert('An error occurred while placing the order. Please try again.');
-      }
-    } else if (paymentMethod === 'l3') {
-      try {
-        const response = await fetch('/place-order-online', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            finalAmount,
-            addressId: selectedAddressId,
-            paymentMethod:"Razorpay",
-            
-            offerdiscount
-          }),
-        });
-       if (!response.ok) {
-          const errorData = await response.json();
-    Swal.fire({
-        title: 'Order Failed',
-        text: errorData.message || 'Failed to create the order.',
-        icon: 'error',
-    });
-    return;
-}
-
-        const order = await response.json();
-       
-
-        if (!order ||  !order.razorpayOrder || !order.razorpayOrder.id ) {
-          return Swal.fire({
-            title: 'Order Failed',
-            text: 'Failed to create the order. Please try again.',
-            icon: 'error',
-            button: 'OK',
-          });
-        }
-        const options = {
-          key: 'rzp_test_rry7kkHDgndyCv', 
-          amount: order.amount, 
-          currency: 'INR',
-          order_id: order.razorpayOrder.id, 
-          name: 'Your Store',
-          description: 'Payment for your order',
-          handler: async function (response) {
-            try {
-              const verifyResponse = await fetch('/verify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  paymentId: response.razorpay_payment_id,
-                  orderId: response.razorpay_order_id,
-                  signature: response.razorpay_signature,
-                }),
+        document.addEventListener('DOMContentLoaded', () => {
+          const placeOrderBtn = document.getElementById('placeOrderBtn');
+        
+          placeOrderBtn.addEventListener('click', async function () {
+            const paymentMethod = document.querySelector('input[name="radio"]:checked').id;
+           
+            const offerdiscountString = document.getElementById('offerdiscountAmount').textContent;
+            let offerdiscount= parseFloat(offerdiscountString.replace("₹", "").trim());
+        
+            const cartItems = getCartItems(); 
+        
+            if (!cartItems || cartItems.length === 0) {
+              return Swal.fire({
+                title: 'Cart Empty',
+                text: 'Your cart is empty. Please add items to the cart before placing an order.',
+                icon: 'error',
+                button: 'OK',
               });
-              const verifyData = await verifyResponse.json();
-
-              if (verifyData.success) {
-                    Swal.fire({
-                        title: 'Order Placed Successfully!',
-                        text: verifyData.message,
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 2000,
-                    }).then(() => {
-                        window.location.href = '/order/success';
-                    });
-              } else {
-                alert('Payment verification failed. Please try again.');
-              }
-            } catch (error) {
-              console.error('Error verifying Razorpay payment:', error);
-              alert('An error occurred while verifying the payment. Please try again.');
             }
-          },
-          prefill: {
-            name: '<%=user.name%>',
-            email: '<%=user.email%>',
-            contact: '<%=user.phone%>',
-          },
-          theme: { color: '#3399cc' },
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.on('payment.failed',()=>{
-          alert('Payement failed')
-        })
-        rzp.open();
-      } catch (error) {
-        console.error('Error creating order with Razorpay:', error);
-        alert('An error occurred while creating the order. Please try again.');
-      }
-    } else {
-      alert('Please select a payment method.');
-    }
-  });
-
-
-
-
-
-function getCartItems() {
-  const cartItems = [];
-  
-  document.querySelectorAll(".order__table tbody tr").forEach((row) => {
-    if (!row.querySelector(".order__img")) return;
-
-    const productId = row.querySelector("img").getAttribute("src").split("/").pop(); 
-    const quantityText = row.querySelector(".table__quantity")?.textContent || "";
-    const quantity = parseInt(quantityText.replace("x ", "").trim()) || 0; 
-    const size = row.querySelector("td:nth-child(3) span")?.textContent?.trim() || "N/A"; 
-    const priceText = row.querySelector("td:nth-child(4) span")?.textContent || "₹0";
-    const price = parseFloat(priceText.replace("₹", "").trim()) || 0; 
-    const totalPriceText = row.querySelector(".table__price")?.textContent || "₹0";
-    const totalPrice = parseFloat(totalPriceText.replace("₹", "").trim()) || 0; 
-
-    if (productId && quantity > 0) {
-      cartItems.push({
-        productId,
-        quantity,
-        size,
-        price,
-        totalPrice,
-      });
-    }
-  });
-
-  return cartItems;
-}
-
-
-
-
-})
-
-
-//////ADDRESS PART//////////////
-
-document.addEventListener('DOMContentLoaded', function() {
-    const addButton = document.querySelector('.add-btnn');
-    const modal = document.getElementById('addressModal');
-    const closeButton = modal.querySelector('.modal-close');
-    const form = document.getElementById('addaddressform');
-
-  
-    function resetForm() {
-      form.reset(); 
-
-     
-      const errorElements = document.querySelectorAll('.error-message');
-      errorElements.forEach(error => {
-        error.textContent = '';
-      });
-    }
-    addButton.addEventListener('click', function() {
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    });
-
-    function closeModal() {
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-      resetForm();
-    }
-
-    closeButton.addEventListener('click', closeModal);
-
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && modal.classList.contains('active')) {
-        closeModal();
-      }
-    });
-  });
-  document.getElementById("addaddressform").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const addname = document.getElementById("addname").value.trim();
-    const city = document.getElementById("city").value.trim();
-    const state = document.getElementById("state").value
-    const pincode = document.getElementById("pincode").value.trim();
-    const landmark = document.getElementById("landmark").value.trim();
-    const addphone = document.getElementById("addphone").value.trim();
-    const addressType = document.getElementById("addressType").value
-    const addnameError = document.getElementById("addnameError");
-    const cityError = document.getElementById("cityError");
-    const stateError = document.getElementById("stateError");
-    const pincodeError = document.getElementById("pincodeError");
-    const landmarkError = document.getElementById("landmarkError");
-    const addphoneError = document.getElementById("addphoneError");
-    const addressTypeError = document.getElementById("addressTypeError")
-
-    addnameError.textContent = "";
-    cityError.textContent = "";
-    stateError.textContent = "";
-    pincodeError.textContent = "";
-    landmarkError.textContent = "";
-    addphoneError.textContent = "";
-    addressTypeError.textContent = "";
-
-
-    let isValid = true;
-
-    if (addname === "") {
-      addnameError.textContent = "Field is Required"
-      addnameError.style.color = "red";
-      isValid = false
-    }
-    const cityRegex = /^[A-Za-z\s]+$/;
-    if (city === "") {
-      cityError.textContent = "Field is Required"
-      cityError.style.color = "red";
-      isValid = false
-    }
-    if (!cityRegex.test(city)) {
-      cityError.textContent = "Enter valid city name"
-      cityError.style.color = "red";
-      isValid = false
-    }
-    if (state === "state") {
-      stateError.textContent = "Select any state"
-      stateError.style.color = "red";
-      isValid = false
-    }
-    const pincodeRegex = /^\d{6}$/
-    if (!pincodeRegex.test(pincode)) {
-      pincodeError.textContent = "Enter Valid Pincode"
-      pincodeError.style.color = "red";
-      isValid = false
-    }
-    if (landmark === "") {
-      landmarkError.textContent = "Field is Required"
-      landmarkError.style.color = "red";
-      isValid = false
-    }
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(addphone)) {
-      addphoneError.textContent = "Please Enter a valid Phone Number";
-      addphoneError.style.color = "red";
-      isValid = false;
-    }
-
-    if (addressType === "--none--") {
-      addressTypeError.textContent = "Select any Address Type"
-      addressTypeError.style.color = "red";
-      isValid = false
-    }
-    if (isValid) {
-      try {
-        const response = await fetch("/profile/add-address", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: addname,
-            city,
-            state,
-            pincode,
-            landmark,
-            phonenumber: addphone,
-            addressType,
-
-          })
-        })
-        const result = await response.json()
-        if (result.success) {
-          swal({
-            title: "Success!",
-            text: result.message,
-            icon: "success",
-            background: '#fff', 
-                    color: '#000', 
-                    confirmButtonColor: 'black', 
-                    confirmButtonText: 'OK',
-          }).then(() => {
-            window.location.href = '/checkout'
-          })
-        } else {
-          swal({
-            title: "Error",
-            text: result.message,
-            icon: "error",
-            button: "Try again"
-          })
+        
+            const selectedAddressId = document.querySelector('input[name="deliveryAddress"]:checked')?.value;
+           
+            if (!selectedAddressId) {
+              return Swal.fire({
+                title: 'Address Missing',
+                text: 'Please select a shipping address before placing the order.',
+                icon: 'error',
+                button: 'OK',
+              });
+            }
+        
+            if (paymentMethod === 'l1') {
+              try {
+                const response = await fetch('/place', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include', 
+                  body: JSON.stringify({
+                    finalAmount,
+                    paymentMethod: 'COD',
+                    addressId: selectedAddressId,
+                    offerdiscount
+        
+                  }),
+                });
+        
+                const data = await response.json();
+        
+                if (data.success) {
+                            Swal.fire({
+                                title: 'Order Placed Successfully!',
+                                text: data.message,
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 2000,
+                            }).then(() => {
+                                window.location.href = data.redirectUrl;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Order Failed',
+                                text: data.message,
+                                icon: 'error',
+                                button: 'Try Again',
+                            });
+                        }
+              } catch (error) {
+                console.error('Error placing order with COD:', error);
+                alert('An error occurred while placing the order. Please try again.');
+              }
+            } else if (paymentMethod === 'l2') {
+             
+              try {
+                const response = await fetch('/place', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    finalAmount,
+                    paymentMethod: 'Wallet',
+                    addressId: selectedAddressId,
+                    offerdiscount
+                  }),
+                });
+        
+                const data = await response.json();
+        
+                if (data.success) {
+                  Swal.fire({
+                                title: 'Order Placed Successfully!',
+                                text: data.message,
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 2000,
+                            }).then(() => {
+                                window.location.href = data.redirectUrl;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Order Failed',
+                                text: data.message,
+                                icon: 'error',
+                                button: 'Try Again',
+                            });
+                        }
+              } catch (error) {
+                console.error('Error placing order with Wallet:', error);
+                alert('An error occurred while placing the order. Please try again.');
+              }
+            } else if (paymentMethod === 'l3') {
+              try {
+                const response = await fetch('/place-order-online', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    finalAmount,
+                    addressId: selectedAddressId,
+                    paymentMethod:"Razorpay",
+                    offerdiscount
+                  }),
+                });
+               if (!response.ok) {
+                  const errorData = await response.json();
+            Swal.fire({
+                title: 'Order Failed',
+                text: errorData.message || 'Failed to create the order.',
+                icon: 'error',
+            });
+            return;
         }
-      }catch (error) {
-        console.log("Error", error)
-        swal({
-          title: "Error",
-          text: "An unexpected error occured",
-          icon: "error",
-          button: "ok"
+        
+                const order = await response.json();
+               
+        
+                if (!order ||  !order.razorpayOrder || !order.razorpayOrder.id ) {
+                  return Swal.fire({
+                    title: 'Order Failed',
+                    text: 'Failed to create the order. Please try again.',
+                    icon: 'error',
+                    button: 'OK',
+                  });
+                }
+                const options = {
+                  key: 'rzp_test_rry7kkHDgndyCv', 
+                  amount: order.amount, 
+                  currency: 'INR',
+                  order_id: order.razorpayOrder.id, 
+                  name: 'Your Store',
+                  description: 'Payment for your order',
+                  handler: async function (response) {
+                    try {
+                      const verifyResponse = await fetch('/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          paymentId: response.razorpay_payment_id,
+                          orderId: response.razorpay_order_id,
+                          signature: response.razorpay_signature,
+                        }),
+                      });
+                      const verifyData = await verifyResponse.json();
+        
+                      if (verifyData.success) {
+                            Swal.fire({
+                                title: 'Order Placed Successfully!',
+                                text: verifyData.message,
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 2000,
+                            }).then(() => {
+                                window.location.href = '/order/success';
+                            });
+                      } else {
+                        
+                          Swal.fire({
+                                title: 'Order Payment is Pending !',
+                                text: "Order Placed Successfully. Payment is Pending. You can make payment from The Order Details",
+                                icon: 'warning',
+                                showConfirmButton: false,
+                                timer: 2000,
+                            }).then(() => {
+                                window.location.href = '/profile/orders';
+                            });
+                      
+                    }
+                    } catch (error) {
+                      console.error('Error verifying Razorpay payment:', error);
+                      alert('An error occurred while verifying the payment. Please try again.');
+                    }
+                  },
+                  prefill: {
+                    name: '<%=user.name%>',
+                    email: '<%=user.email%>',
+                    contact: '<%=user.phone%>',
+                  },
+                  theme: { color: '#3399cc' },
+                  modal: {
+                ondismiss: function () {
+                    Swal.fire({
+                        title: 'Order Payment is Pending!',
+                        text: "Order Placed Successfully. Payment is Pending. You can make payment from the Order Details.",
+                        icon: 'warning',
+                        showConfirmButton: true,
+                        
+                    }).then(() => {
+                        window.location.href = '/profile/orders';
+                    });
+                }
+            }
+        };
+                const rzp = new Razorpay(options);
+                rzp.on('payment.failed',()=>{
+                  rzp.close();
+                  setTimeout(()=>{
+                    Swal.fire({
+                                title: "Payment Failed!",
+                                text: "Order Placed Successfully. Payment is Pending. You can make payment from The Order Details",
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 2000,
+                            }).then(() => {
+                                window.location.href = '/profile/orders';
+                            });
+                },500)
+                  })
+                 
+                rzp.open();
+              } catch (error) {
+                console.error('Error creating order with Razorpay:', error);
+                alert('An error occurred while creating the order. Please try again.');
+              }
+            } else {
+              alert('Please select a payment method.');
+            }
+          });
+        
+        
+        
+        
+        
+        function getCartItems() {
+          const cartItems = [];
+          
+          document.querySelectorAll(".order__table tbody tr").forEach((row) => {
+            if (!row.querySelector(".order__img")) return;
+        
+            const productId = row.querySelector("img").getAttribute("src").split("/").pop(); 
+            const quantityText = row.querySelector(".table__quantity")?.textContent || "";
+            const quantity = parseInt(quantityText.replace("x ", "").trim()) || 0; 
+            const size = row.querySelector("td:nth-child(3) span")?.textContent?.trim() || "N/A"; 
+            const priceText = row.querySelector("td:nth-child(4) span")?.textContent || "₹0";
+            const price = parseFloat(priceText.replace("₹", "").trim()) || 0; 
+            const totalPriceText = row.querySelector(".table__price")?.textContent || "₹0";
+            const totalPrice = parseFloat(totalPriceText.replace("₹", "").trim()) || 0; 
+        
+            if (productId && quantity > 0) {
+              cartItems.push({
+                productId,
+                quantity,
+                size,
+                price,
+                totalPrice,
+              });
+            }
+          });
+        
+          return cartItems;
+        }
         })
-      }
-    }
-  })
-  const inputs = ['addname', 'city', 'state', 'pincode', 'landmark', 'addphone', 'addressType'];
-
-  inputs.forEach(inputId => {
-    document.getElementById(inputId).addEventListener('input', function() {
-      const error = document.getElementById(inputId + 'Error');
-      error.textContent = '';
-    });
-  });
-      </script>
-       <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        
+        //////ADDRESS PART//////////////
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const addButton = document.querySelector('.add-btnn');
+            const modal = document.getElementById('addressModal');
+            const closeButton = modal.querySelector('.modal-close');
+            const form = document.getElementById('addaddressform');
+          
+            function resetForm() {
+              form.reset(); 
+        
+             
+              const errorElements = document.querySelectorAll('.error-message');
+              errorElements.forEach(error => {
+                error.textContent = '';
+              });
+            }
+            addButton.addEventListener('click', function() {
+              modal.classList.add('active');
+              document.body.style.overflow = 'hidden';
+            });
+        
+            function closeModal() {
+              modal.classList.remove('active');
+              document.body.style.overflow = '';
+              resetForm();
+            }
+        
+            closeButton.addEventListener('click', closeModal);
+        
+            modal.addEventListener('click', function(e) {
+              if (e.target === modal) {
+                closeModal();
+              }
+            });
+        
+            document.addEventListener('keydown', function(e) {
+              if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+              }
+            });
+          });
+          document.getElementById("addaddressform").addEventListener("submit", async function(e) {
+            e.preventDefault();
+        
+            const addname = document.getElementById("addname").value.trim();
+            const city = document.getElementById("city").value.trim();
+            const state = document.getElementById("state").value
+            const pincode = document.getElementById("pincode").value.trim();
+            const landmark = document.getElementById("landmark").value.trim();
+            const addphone = document.getElementById("addphone").value.trim();
+            const addressType = document.getElementById("addressType").value
+            const addnameError = document.getElementById("addnameError");
+            const cityError = document.getElementById("cityError");
+            const stateError = document.getElementById("stateError");
+            const pincodeError = document.getElementById("pincodeError");
+            const landmarkError = document.getElementById("landmarkError");
+            const addphoneError = document.getElementById("addphoneError");
+            const addressTypeError = document.getElementById("addressTypeError")
+        
+            addnameError.textContent = "";
+            cityError.textContent = "";
+            stateError.textContent = "";
+            pincodeError.textContent = "";
+            landmarkError.textContent = "";
+            addphoneError.textContent = "";
+            addressTypeError.textContent = "";
+        
+        
+            let isValid = true;
+        
+            if (addname === "") {
+              addnameError.textContent = "Field is Required"
+              addnameError.style.color = "red";
+              isValid = false
+            }
+            const cityRegex = /^[A-Za-z\s]+$/;
+            if (city === "") {
+              cityError.textContent = "Field is Required"
+              cityError.style.color = "red";
+              isValid = false
+            }
+            if (!cityRegex.test(city)) {
+              cityError.textContent = "Enter valid city name"
+              cityError.style.color = "red";
+              isValid = false
+            }
+            if (state === "state") {
+              stateError.textContent = "Select any state"
+              stateError.style.color = "red";
+              isValid = false
+            }
+            const pincodeRegex = /^\d{6}$/
+            if (!pincodeRegex.test(pincode)) {
+              pincodeError.textContent = "Enter Valid Pincode"
+              pincodeError.style.color = "red";
+              isValid = false
+            }
+            if (landmark === "") {
+              landmarkError.textContent = "Field is Required"
+              landmarkError.style.color = "red";
+              isValid = false
+            }
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(addphone)) {
+              addphoneError.textContent = "Please Enter a valid Phone Number";
+              addphoneError.style.color = "red";
+              isValid = false;
+            }
+        
+            if (addressType === "--none--") {
+              addressTypeError.textContent = "Select any Address Type"
+              addressTypeError.style.color = "red";
+              isValid = false
+            }
+            if (isValid) {
+              try {
+                const response = await fetch("/profile/add-address", {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    name: addname,
+                    city,
+                    state,
+                    pincode,
+                    landmark,
+                    phonenumber: addphone,
+                    addressType,
+        
+                  })
+                })
+                const result = await response.json()
+                if (result.success) {
+                  swal({
+                    title: "Success!",
+                    text: result.message,
+                    icon: "success",
+                    background: '#fff', 
+                            color: '#000', 
+                            confirmButtonColor: 'black', 
+                            confirmButtonText: 'OK',
+                  }).then(() => {
+                    window.location.href = '/checkout'
+                  })
+                } else {
+                  swal({
+                    title: "Error",
+                    text: result.message,
+                    icon: "error",
+                    button: "Try again"
+                  })
+                }
+              }catch (error) {
+                console.log("Error", error)
+                swal({
+                  title: "Error",
+                  text: "An unexpected error occured",
+                  icon: "error",
+                  button: "ok"
+                })
+              }
+            }
+          })
+          const inputs = ['addname', 'city', 'state', 'pincode', 'landmark', 'addphone', 'addressType'];
+        
+          inputs.forEach(inputId => {
+            document.getElementById(inputId).addEventListener('input', function() {
+              const error = document.getElementById(inputId + 'Error');
+              error.textContent = '';
+            });
+          });
+              </script>
        <script>
         document.getElementById('applyCouponBtn').addEventListener('click', function() {
           const couponSelect = document.getElementById('couponSelect');
@@ -871,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function() {
               })
             }
           } else {
-            alert('Please select a coupon.');
+          location.reload()
           }
         });
       </script>

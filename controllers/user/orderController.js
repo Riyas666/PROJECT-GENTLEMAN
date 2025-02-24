@@ -59,8 +59,11 @@ const loadCheckoutPage = async (req, res) => {
     try {
 
       const coupons = req.session.coupon;
+
       const userId = req.session.user; 
+
       const { addressId, paymentMethod , offerdiscount} = req.body; 
+
         if (!addressId || !paymentMethod) {
             return res.status(400).json({ success: false, message: "Invalid order details" });
         }  
@@ -315,11 +318,9 @@ for (const item of cart.items) {
       currency: 'INR',
       receipt: `order_rcptid_${Math.floor(Math.random() * 10000)}`,
     };
-
-    console.log("Creating order with options:", options);
-console.log("hahahaha", razorpayInstance)
+  
     const razorpayOrder = await razorpayInstance.orders.create(options);
-
+     
  const order = new Order({
   userId: userId,
   orderId: razorpayOrder.id,
@@ -349,23 +350,20 @@ cart.items = [];
 await cart.save();
 
 
-
-
-console.log("this is razzzzzzzzz", razorpayOrder)
-
 res.json({ success: true, razorpayOrder });    
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
     res.status(500).json({ error: 'Failed to create order' });
+   
   }
 };
 
-const verifyPayment = async (req, res) => {
 
+const verifyPayment = async (req, res) => {
 
   const verifyPaymentSignature = (orderId, paymentId, signature) => {
       const generatedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET) 
-          .update(`${orderId}|${paymentId}`)
+          .update(`${orderId}|${paymentId}`)   
           .digest('hex');
   
       return generatedSignature === signature;
