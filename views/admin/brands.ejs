@@ -209,27 +209,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll(".block-btn").forEach(button => {
         button.addEventListener("click", async (event) => {
-            const productId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
+            const brandId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
             try {
                 const response = await fetch(`${baseUrl}/blockBrand`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: productId, isBlocked: true }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
+                    body: JSON.stringify({ id: brandId,  }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
                 });
     //////////////////////   IF BLOCKED    ////////////////////
+    const result = await response.json();
                 if (response.ok) {
                     Swal.fire({
                         title: "Blocked!",
-                        text: "The Brand has been blocked.",
+                        text: result.message,
                         icon: "success",
                         timer: 1000, 
                         showConfirmButton: false
                     }).then(() => {
                         window.location.reload(); // RELOAD THE PAGE
                     });
-    ///////////////////////  IF ERROR   ////////////////////////                
+    ///////////////////////  IF ERROR  ////////////////////////                
                 } else {
-                    Swal.fire("Error!", "Failed to block the Brand.", "error");
+                    Swal.fire("Error!", result.message);
                 }
             } catch (error) {
                 Swal.fire("Error!", "An error occurred while blocking the Brand.", "error");
@@ -240,18 +241,19 @@ document.addEventListener("DOMContentLoaded", () => {
     /////////////////////    FOR UNBLOCKING THE PRODUCT  /////////////////////
     document.querySelectorAll(".unblock-btn").forEach(button => {
         button.addEventListener("click", async (event) => {
-            const productId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
+            const brandId = event.target.dataset.id; // FOR GETTING THE PRODUCT ID
             try {
                 const response = await fetch(`${baseUrl}/unblockBrand`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: productId, isBlocked: false }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE FALSE
+                    body: JSON.stringify({ id: brandId, }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE FALSE
                 });
     //////////////////////   IF UNBLOCKED    ////////////////////
+    const result = await response.json();
                 if (response.ok) {
                     Swal.fire({
                         title: "Unblocked!",
-                        text: "The Brand has been unblocked.",
+                        text: result.message,
                         icon: "success",
                         timer: 1000, 
                         showConfirmButton: false
@@ -260,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
     ///////////////////////  IF ERROR   ////////////////////////
                 } else {
-                    Swal.fire("Error!", "Failed to unblock the Brand.", "error");
+                    Swal.fire("Error!", result.message);
                 }
             } catch (error) {
                 Swal.fire("Error!", "An error occurred while unblocking the Brand.", "error");

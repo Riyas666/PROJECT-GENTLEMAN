@@ -447,7 +447,27 @@
     }
 
 
-
+    function deleteSingleImage(imageId, productId) {
+      fetch("/admin/products/deleteImage" , {
+        method:"POST",
+        headers: {
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+          imageNameToServer: imageId,
+          productIdToServer: productId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.status === true) {
+          window.location.reload();
+        }
+      })
+      .catch(error => {
+        console.error("Error deleting image:", error)
+      });
+    }
 
 
 

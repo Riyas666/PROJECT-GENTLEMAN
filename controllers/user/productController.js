@@ -1,7 +1,7 @@
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const User = require("../../models/categorySchema");
-const Brand = require("../../models/brandSchema")
+const Brand = require("../../models/brandSchema");
 
 
 const productDetails = async (req, res) => {
@@ -24,7 +24,6 @@ const productDetails = async (req, res) => {
             category: product.category,
             
         });
-        console.log("this is the brand name", product.sizes);
     } catch (error) {
         console.error("Error for fetching product details", error);
         res.redirect("/pageNotFound");
@@ -32,11 +31,10 @@ const productDetails = async (req, res) => {
 };
 
 
-
   const loadShopping = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 12;
+        const limit = 8;
         const skip = (page - 1) * limit;
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({isBlocked:false})
@@ -75,13 +73,8 @@ const productDetails = async (req, res) => {
         const products = await productsQuery.skip(skip).limit(limit);
         const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / limit);
-        
-
-
-        
 
         res.render("shop", {
-          
 
             products: products,
             categories: categories,
@@ -97,11 +90,9 @@ const productDetails = async (req, res) => {
         });
     } catch (error) {
         console.log("Shopping page not loading", error);
-        res.status(500).send("Server Error");
+        res.redirect("/pageNotFound");
     }
 };
-
- 
 
 module.exports = {
     productDetails,

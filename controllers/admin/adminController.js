@@ -4,11 +4,14 @@ const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
+const responseStatus = require("../../constants/responseStatus");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
+
 
 const pageerror = async (req, res) => {
     res.render("admin-error");
 };
-
 
 const loadLogin = async (req, res) => {
     if (!req.session.admin){
@@ -31,7 +34,6 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.render("admin-login", { message: "Invalid Email or password" });
         }
-
         req.session.admin = admin;
         return res.redirect("/admin/dashboard");
     } catch (error) {
@@ -90,17 +92,22 @@ const createOffer = async(req, res) =>{
 
         if(offerPercentage < products.offerPercentage){
 
-             return res.status(400).json({status:false, message:"Better offer already exist"});
+             return res.status(statuscode.BAD_REQUEST).json({
+                status:false, 
+                message: responseMessage.OFFER_ALREADY_EXISTS
+            });
 
         }else if(categoryOffer > offerPercentage){
 
-            return res.status(400).json({status:false, message:`Category already has a ${categoryOffer}% offer. No need to add a product offer.` });
+            return res.status(statuscode.BAD_REQUEST).json({
+                status:false, 
+                message: responseMessage.CATEGORY_HAS_BETTER_OFFER
+            });
 
         }
         
             products.offerPercentage = offerPercentage;
             products.offerName = offerName;
-
             await products.save();
         
        }else if(offerType === "category"){
@@ -108,14 +115,14 @@ const createOffer = async(req, res) =>{
         const category = await Category.findById(selectedItem);
 
         if(offerPercentage < category.offerPercentage){
-
-             return res.status(400).json({status:false, message:"Better offfer already exists"});
-
+            return res.status(statuscode.BAD_REQUEST).json({
+                status:false, 
+                message: responseMessage.OFFER_ALREADY_EXISTS
+            });
        }    
 
        category.offerPercentage = offerPercentage;
        category.offerName = offerName;
-
        await category.save();
 
        const products = await Product.find({category:selectedItem})
@@ -130,18 +137,23 @@ const createOffer = async(req, res) =>{
        }
     }
 
-    return res.status(200).json({ status: true, message: "Offer applied successfully" });
+    return res.status(statuscode.OK).json({
+         status: true, 
+         message: responseMessage.OFFER_APPLIED_SUCCESS 
+        });
   
     } catch (error) {
       console.error("Error adding offer:", error);
-      return res.status(500).json({ status: false, message: "Internal Server Error" });
+      return res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+        status: false, 
+        message: responseMessage.SERVER_ERROR 
+    });
     }
   };
 
   const removeOffer = async (req, res) => {
     try {
       const { id } = req.params;
-      console.log("aa", id)
       const updatedOffer = await Product.findByIdAndUpdate(
         id,
         { offerPercentage: 0, offerName: "" },
@@ -149,12 +161,22 @@ const createOffer = async(req, res) =>{
       );
   
       if (!updatedOffer) {
-        return res.status(404).json({ success: false, message: "Offer not found" });
+        return res.status(statuscode.NOT_FOUND).json({ 
+            success: false, 
+            message: responseMessage.OFFER_NOT_FOUND 
+        });
       }
   
-      res.json({ success: true, message: "Offer updated", offer: updatedOffer });
+      res.status(statuscode.OK).json({ 
+        success: true, 
+        message: responseMessage.OFFER_REMOVED_SUCCESS, 
+        offer: updatedOffer 
+    });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server error" });
+      res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: responseMessage.SERVER_ERROR 
+    });
     }
   };
 

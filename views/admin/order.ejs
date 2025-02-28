@@ -1,6 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notiflix@3.2.4/dist/notiflix-3.2.4.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.4/dist/notiflix-3.2.4.min.js"></script>
 
@@ -8,6 +8,23 @@
 
 
 <link rel="stylesheet" href="/admin-assets/css/orderManagement.css">
+<style>
+    .pagination-container { 
+          text-align: center; 
+          margin-bottom: 0; 
+         }
+    .pagination a, .pagination .current-page {
+          display: inline-block; 
+          padding: 5px 10px;
+          margin: 0 2px;
+          border: 1px solid #ddd; 
+          text-decoration: none; 
+          color: #333; 
+        } 
+      .pagination a:hover { 
+          background-color: #f5f5f5;
+         }
+</style>
   <div class="row" >
     <div class="col-12 " >
       <div class="alert alert-info d-flex align-items-center" role="alert" id="returnRequestNotification" style="display: none;" >
@@ -37,7 +54,7 @@
                 </tr>
               </thead>
               <tbody id="orderList">
-                <% orders.forEach(order => { %>
+                <% orderdetails.forEach(order => { %>
                 <tr style="background-color: rgb(48, 48, 48);">
                   <td><%= order.orderId %></td>
                   <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
@@ -118,6 +135,8 @@
                 <li><strong>Order ID:</strong> <span id="orderId"></span></li>
                 <li><strong>Status:</strong> <span id="orderStatus"></span></li>
                 <li><strong>Payment Method:</strong> <span id="paymentMethod"></span></li>
+                <li><strong>Payment Status:</strong> <span id="paymentStatus"></span></li>
+
                 <li><strong>Total Price:</strong> <span id="totalPrice"></span></li>
                 <li><strong>Created At:</strong> <span id="createdAt"></span></li>
               </ul>
@@ -158,8 +177,8 @@
           </table>
         </div>
       </div>
+    
       
-
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -185,6 +204,7 @@
       document.getElementById('orderId').innerText = `${order.order.orderId}`;
       document.getElementById('orderStatus').innerText =` ${order.order.status}`;
       document.getElementById('paymentMethod').innerText = `${order.order.paymentType}`;
+      document.getElementById('paymentStatus').innerText = `${order.order.paymentStatus}`;
       document.getElementById('totalPrice').innerText = ` ₹${order.order.totalPrice}`;
       document.getElementById('createdAt').innerText = `${new Date(order.order.createdAt).toLocaleDateString()}`;
 
@@ -251,10 +271,11 @@ const changeOrderStatus = async (orderId, newStatus) => {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || 'Failed to update order status');
     }
+    const data = await response.json()
 
     await Swal.fire({
   title: "Success!",
-  text: "Order status has been updated successfully",
+  text: data.message,
   icon: "success",
   confirmButtonText: "OK"
 })
@@ -352,7 +373,8 @@ function viewReturnRequestDetails() {
       console.error('Error fetching return request details:', error);
     });
 }
-// showReturnRequestNotification();
+
+
 function approveReturn() {
   const orderId = document.getElementById('returnOrderId').textContent;
   const refundText = document.getElementById('refundAmount').textContent;
@@ -369,7 +391,7 @@ const refundAmount = parseFloat(refundText.replace('₹', '').trim());
     .then(data => {
       if (data.success) {
 
-        Notiflix.Notify.success("Request Approved Successfully!", {
+        Notiflix.Notify.success(data.message, {
           timeout: 3000,             
     position: 'right-top',       
     clickToClose: true,           
@@ -398,11 +420,22 @@ function rejectReturn() {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        alert('Return Rejected');
+        Notiflix.Notify.failure(data.message, {
+          timeout: 3000,             
+    position: 'right-top',       
+    clickToClose: true,           
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',            
+    borderRadius: '10px',        
+    showOnlyTheLastOne: true,
+        })
+
+        setTimeout(() => {
+    window.location.href = "/admin/orders";
+  }, 500);
       } else {
         alert('Error rejecting return');
       }
     });
 }
-
 </script>

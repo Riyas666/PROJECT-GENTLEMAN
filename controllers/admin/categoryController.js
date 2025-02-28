@@ -1,12 +1,27 @@
 const Category = require("../../models/categorySchema");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
+
 
 const categoryInfo = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 4;
         const skip = (page - 1) * limit;
-        const categoryData = await Category.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit);
-        const totalCategories = await Category.countDocuments();
+
+        const searchQuery = req.query.search ? req.query.search.trim() : "";
+        
+        let filter = {};
+        if (searchQuery) {
+            filter = { name: { $regex: searchQuery, $options: "i" } }; 
+        }
+
+        const categoryData = await Category.find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalCategories = await Category.countDocuments(filter);
         const totalPages = Math.ceil(totalCategories / limit);
 
         res.render("category", {
@@ -14,7 +29,9 @@ const categoryInfo = async (req, res) => {
             currentPage: page,
             totalPages,
             totalCategories,
+            searchQuery, 
         });
+
     } catch (error) {
         console.error(error);
         res.redirect("/pageerror");
@@ -27,10 +44,12 @@ const addCategory = async (req, res) => {
     const trimmedName = name.trim();
 
     try {
-
         const existingCategory = await Category.findOne({ name: trimmedName });
         if (existingCategory) {
-            return res.status(400).json({ error: "Category already exist" });
+            return res.status(statuscode.BAD_REQUEST).json({ 
+                success:false,
+                message:responseMessage.CATEGORY_EXIST
+                });
         };
 
         const newCategory = new Category({
@@ -39,36 +58,53 @@ const addCategory = async (req, res) => {
         });
 
         await newCategory.save();
-
-        return res.json({ message: "Category added Successfully" });
+        return res.status(statuscode.CREATED).json({ 
+            success: true,
+            message: responseMessage.CATEGORY_ADDED
+         });
 
     } catch (error) {
-        return res.status(500).json({ error: "Internal Server Error" });
+        return res.status(statuscode.INTERNAL_SERVER_ERROR).json({ error: SERVER_ERROR });
     };
 };
 
-const getListCategory = async (req, res) => {
 
-    try {
+const listCategory = async(req, res) =>{
+    const {id}= req.body;
+try{
+    await Category.updateOne({_id: id}, {$set:{isListed:true}});
+    return res.status(statuscode.OK).json({
+        success:true,
+        message:responseMessage.CATEGORY_LISTED
+    })
+}catch(error){
+    console.error("Error listing the category", error);
+    return res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+        success:false,
+        message:responseMessage.SERVER_ERROR
+    })
+  }
+}
 
-        let id = req.query.id;
-        await Category.updateOne({ _id: id }, { $set: { isListed: false } });
-        res.redirect("/admin/category");
-    } catch (error) {
-        res.redirect("/pageerror");
-    }
-};
+
+const unlistCategory = async(req, res) =>{
+    const {id}= req.body;
+try{
+    await Category.updateOne({_id: id}, {$set:{isListed:false}});
+    return res.status(statuscode.OK).json({
+        success:true,
+        message:responseMessage.CATEGORY_UNLISTED
+    })
+}catch(error){
+    console.error("Error unlisting the category", error);
+    return res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+        success:false,
+        message:responseMessage.SERVER_ERROR
+    })
+  }
+}
 
 
-const getUnListCategory = async (req, res) => {
-    try {
-        let id = req.query.id;
-        await Category.updateOne({ _id: id }, { $set: { isListed: true } });
-        res.redirect("/admin/category");
-    } catch (error) {
-        res.redirect("/pageerror");
-    };
-};
 
 const getEditCategory = async (req, res) => {
     try {
@@ -99,7 +135,10 @@ const editCategory = async (req, res) => {
         });
 
         if (existingCategory) {
-            return res.status(400).json({ error: "Category already exists, please choose another name" });
+            return res.status(statuscode.BAD_REQUEST).json({
+                success: false,
+                message: responseMessage.CATEGORY_EXIST,
+                 });
         }
 
         category.name = trimmedName; 
@@ -107,17 +146,23 @@ const editCategory = async (req, res) => {
 
         await category.save();
 
-        return res.json({ success:true, message: "Category updated successfully" });
+        return res.status(statuscode.CREATED).json({ 
+            success: true, 
+            message: responseMessage.CATEGORY_UPDATED 
+        });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false,
+            message: responseMessage.SERVER_ERROR 
+        });
     };
 };
 module.exports = {
     categoryInfo,
     addCategory,
-    getListCategory,
-    getUnListCategory,
     getEditCategory,
     editCategory,
+    listCategory,
+    unlistCategory
 };

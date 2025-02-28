@@ -133,13 +133,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 const response = await fetch(`${baseUrl}/blockCustomer`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: customerId, isBlocked: true }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
+                    body: JSON.stringify({ id: customerId,  }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
                 });
 //////////////////////   IF BLOCKED    ////////////////////
+                const data = await response.json()
                 if (response.ok) {
                     Swal.fire({
                         title: "Blocked!",
-                        text: "The User has been blocked.",
+                        text: data.message,
                         icon: "success",
                         timer: 1000, 
                         showConfirmButton: false
@@ -166,11 +167,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id: customerId, isBlocked: false }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE FALSE
                 });
+                const data = await response.json()
+                
 //////////////////////   IF UNBLOCKED    ////////////////////
                 if (response.ok) {
                     Swal.fire({
                         title: "Unblocked!",
-                        text: "The User has been unblocked.",
+                        text: data.message,
                         icon: "success",
                         timer: 1000, 
                         showConfirmButton: false

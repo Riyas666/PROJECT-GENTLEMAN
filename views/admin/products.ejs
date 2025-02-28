@@ -157,13 +157,14 @@
                 const response = await fetch(`${baseUrl}/blockProduct`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: productId, isBlocked: true }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
+                    body: JSON.stringify({ id: productId }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE TRUE
                 });
     //////////////////////   IF BLOCKED    ////////////////////
+    const data = await response.json()
                 if (response.ok) {
                     Swal.fire({
                         title: "Blocked!",
-                        text: "The product has been blocked.",
+                        text: data.message,
                         icon: "success",
                         timer: 1000, 
                         showConfirmButton: false
@@ -172,10 +173,10 @@
                     });
     ///////////////////////  IF ERROR   ////////////////////////                
                 } else {
-                    Swal.fire("Error!", "Failed to block the product.", "error");
+                    Swal.fire("Error!", data.message, "error");
                 }
             } catch (error) {
-                Swal.fire("Error!", "An error occurred while blocking the product.", "error");
+                Swal.fire("Error!", data.message, "error");
             }
         });
     });
@@ -188,13 +189,14 @@
                 const response = await fetch(`${baseUrl}/unblockProduct`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: productId, isBlocked: false }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE FALSE
+                    body: JSON.stringify({ id: productId }) // SEND TO ID THAT THE PRODUCT IS BLOCKED SO ISPRODUCT WILL BE FALSE
                 });
     //////////////////////   IF UNBLOCKED    ////////////////////
+    const data = await response.json()
                 if (response.ok) {
                     Swal.fire({
                         title: "Unblocked!",
-                        text: "The product has been unblocked.",
+                        text: data.message,
                         icon: "success",
                         timer: 1000, 
                         showConfirmButton: false

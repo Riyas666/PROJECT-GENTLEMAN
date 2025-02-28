@@ -1,4 +1,7 @@
 const User = require("../../models/userSchema");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
+
 
 const customerInfo = async (req, res) => {
     try {
@@ -38,26 +41,38 @@ const customerInfo = async (req, res) => {
 
 
 const customerBlocked = async (req, res) => {
-    const { id, isBlocked } = req.body;
+    const { id } = req.body;
 
     try {
-        await User.updateOne({ _id: id }, { $set: { isBlocked } });
-        res.status(200).json({ success: true });
+        await User.updateOne({ _id: id }, { $set: { isBlocked:true } });
+        res.status(statuscode.OK).json({ 
+            success: true ,
+            message: responseMessage.USER_BLOCKED
+        });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to block product." });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            message:responseMessage.SERVER_ERROR
+        })
     }
 };
 
 
 const customerunBlocked = async (req, res) => {
     try {
-        const { id, isBlocked } = req.body;
-        await User.updateOne({ _id: id }, { $set: { isBlocked } });
-        res.status(200).json({ success: true });
+        const { id } = req.body;
+        await User.updateOne({ _id: id }, { $set: { isBlocked:false } });
+        res.status(statuscode.OK).json({ 
+            success: true,
+            message:responseMessage.USER_UNBLOCKED 
+        });
        
     } catch (error) {
         console.error("Error in customerunBlocked:", error.message);
-        res.status(500).json({ success: false, error: "Failed to unblock product." });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            message:responseMessage.SERVER_ERROR
+        })
     }
 };
 

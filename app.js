@@ -11,18 +11,14 @@ const cors =require("cors")
 const userRouter = require("./routes/userRouter");
 const profileRouter = require("./routes/user/profileRouter");
 const cartRouter = require("./routes/user/cartRouter");
-const brandRouter = require("./routes/admin/brandRouter");
 const adminRouter = require("./routes/admin/adminRouter");
-const productRouter = require("./routes/admin/productRouter");
-const categoryRouter = require("./routes/admin/categoryRouter");
-const customerRouter = require("./routes/admin/customerRouter");
-const orderRouter = require("./routes/admin/orderRouter");
+
 db();
 
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
 const {errorHandler} = require("./middlewares/errorhandling")
 app.use(cors({
-    origin: 'http://localhost:3000', // Replace with your frontend URL
+    origin: 'http://localhost:3000', 
     credentials: true
   }));
 app.use(nocache());
@@ -59,13 +55,9 @@ app.use(errorHandler)
 app.use("/", userRouter);
 app.use("/profile", profileRouter);
 app.use("/cart", cartRouter);
-app.use("/admin", adminRouter);
-app.use("/admin/category", categoryRouter);
-app.use("/admin/products", productRouter);
-app.use("/admin/brands", brandRouter);
-app.use("/admin/users", customerRouter);
-app.use("/admin/orders", orderRouter)
 
+
+app.use("/admin", adminRouter);
 
 app.get("/*", (req,res) =>{
     res.redirect("/pageNotFound")

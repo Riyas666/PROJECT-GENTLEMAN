@@ -1,12 +1,15 @@
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Coupon = require("../../models/couponSchema");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
+
+
 
 const getCart = async (req, res) => {
   try {
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId }).populate("items.productId")
-    console.log("bb", cart)
     if (!cart) {
       return res.render('cart', { cartItems: [], total: 0 });
     }
@@ -18,37 +21,49 @@ const getCart = async (req, res) => {
     res.render('cart', { cartItems: cart.items, total });
   } catch (error) {
     console.error('Error fetching cart:', error);
-    res.status(500).send('Error fetching cart');
+    res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+      success: false, 
+      message: responseMessage.SERVER_ERROR 
+  });
   }
 };
 
   const addToCartDetails = async (req, res, next) => {
    
     const { productId, size, quantity } = req.body;
-    console.log("This is the product id", size);
     const userId = req.session.user;
     const maxQuantity = 5;
-  
     if (!productId || !size || !quantity || quantity <= 0) {
-      return res.status(400).json({ error: 'Invalid product, size, or quantity' });
+      return res.status(statuscode.BAD_REQUEST).json({ 
+        error: responseMessage.INVALID_INPUT 
+      });
     }
   
     try {
 
       const product = await Product.findById(productId);
       if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
+        return res.status(statuscode.NOT_FOUND).json({ 
+          error: responseMessage.PRODUCT_NOT_FOUND 
+        });
       }
+
       const sizeObject = product.sizes.find(item => item.size === size);
       const availableStock = sizeObject.quantity;
 
       if (availableStock < quantity) {
-                  return res.status(400).json({ success: false, message: `Not enough stock for size ${size}` });
+                  return res.status(statuscode.BAD_REQUEST).json({ 
+                    success: false, 
+                    message: responseMessage.NOT_ENOUGH_STOCK(size) 
+                  });
                }
 
                if (quantity > maxQuantity) {
-                     return res.status(400).json({ success: false, message:` You can only add up to ${maxQuantity} of this item. `});
-                       }         
+                     return res.status(statuscode.BAD_REQUEST).json({ 
+                      success: false, 
+                      message: responseMessage.MAX_QUANTITY_LIMIT(maxQuantity)
+                    });
+              }         
 
       let cart = await Cart.findOne({ userId });
       if (!cart) {
@@ -67,22 +82,31 @@ const getCart = async (req, res) => {
                 }],
             });
             await cart.save();
-            console.log("This is the cart", cart);
-            return res.status(200).json({ success: true, message: 'Item added to cart successfully!' });
+            return res.status(statuscode.OK).json({ 
+              success: true, 
+              message: responseMessage.ITEM_ADDED 
+            });
         }
+
+
         if (Array.isArray(cart.items)) {
 
             const existingProduct = cart.items.find(item => item.productId.toString() == productId && item.size == size);
 
             if (existingProduct) {
                 const newQuantity = existingProduct.quantity + quantity; 
-console.log("this is the existinggggggggg existing product", existingProduct);
                 
                 if (newQuantity > maxQuantity ) {
-                    return res.status(400).json({ success: false, message:` You can only add up to ${maxQuantity} of this item.` });
+                    return res.status(statuscode.BAD_REQUEST).json({ 
+                      success: false, 
+                      message: responseMessage.MAX_QUANTITY_LIMIT(maxQuantity) 
+                    });
                 }
                 if (newQuantity > availableStock) {
-                    return res.status(400).json({ success: false, message: 'Not enough stock available for this size' });
+                    return res.status(statuscode.BAD_REQUEST).json({ 
+                      success: false, 
+                      message: responseMessage.NOT_ENOUGH_STOCK(size) 
+                    });
                 }
 
                 existingProduct.quantity = newQuantity;
@@ -103,10 +127,15 @@ console.log("this is the existinggggggggg existing product", existingProduct);
             } 
 
             await cart.save(); 
-            return res.status(200).json({ success: true, message: `Item added to cart successfully!` });
+            return res.status(statuscode.OK).json({ 
+              success: true, 
+              message: responseMessage.ITEM_ADDED
+             });
         } else {
-            return res.status(500).json({ success: false,message: 'Error occured',
-            });
+          res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR 
+        });
           
         }
       
@@ -126,19 +155,28 @@ console.log("this is the existinggggggggg existing product", existingProduct);
       const cart = await Cart.findOne({ userId });
       if (!cart) {
         console.error("Cart not found for user:", userId);
-        return res.status(404).json({ success: false, error: 'Cart not found' });
+        return res.status(statuscode.NOT_FOUND).json({ 
+          success: false, 
+          error: responseMessage.CART_NOT_FOUND 
+        });
       }
   
       const cartItem = cart.items.find(item => item.productId.toString() === productId &&item.size==size);
       if (!cartItem) {
         console.error("Item not found in cart for product ID:", productId);
-        return res.status(404).json({ success: false, error: 'Item not found in cart' });
+        return res.status(statuscode.NOT_FOUND).json({ 
+          success: false, 
+          error: responseMessage.ITEM_NOT_FOUND 
+        });
       }
 
       const product = await Product.findById(productId);
       if (!product) {
         console.error("Product not found for ID:", productId);
-        return res.status(404).json({ success: false, error: 'Product not found' });
+        return res.status(statuscode.NOT_FOUND).json({ 
+          success: false, 
+          error: responseMessage.PRODUCT_NOT_FOUND 
+        });
       }
   
       const sizeObject = product.sizes.find(item => item.size == cartItem.size);
@@ -147,70 +185,106 @@ console.log("this is the existinggggggggg existing product", existingProduct);
   
       if (quantity > maxQuantity) {
         console.error(`Requested quantity ${quantity} exceeds max limit of ${maxQuantity}`);
-        return res.status(400).json({ success: false, message: `You can only add up to ${maxQuantity} items of this product.` });
+        return res.status(statuscode.BAD_REQUEST).json({ 
+          success: false, 
+          message: responseMessage.MAX_QUANTITY_LIMIT(maxQuantity) 
+        });
       }
   
       if (quantity > availableStock) {
         console.error(`Requested quantity ${quantity} exceeds available stock of ${availableStock}`);
-        return res.status(400).json({ success: false, message: `Not enough stock available. Only ${availableStock} items available for this size.` });
+        return res.status(statuscode.BAD_REQUEST).json({ 
+          success: false, 
+          message: responseMessage.NOT_ENOUGH_STOCK(size) 
+        });
       }
   
       cartItem.quantity = quantity;
       cartItem.totalPrice = cartItem.price * quantity;
 
-      console.log("vv",cart);
 
       const totel = cart.items.reduce((acc,value)=>{
         return acc + value.totalPrice
       },0);
 
-      console.log("kk",totel)
      
       await cart.save();
       console.log("Cart updated successfully:", cart);
-      res.json({ success: true, totel, cart: cart });
+      res.status(statuscode.OK).json({ 
+        success: true, 
+        totel, 
+        cart: cart 
+      });
     } catch (error) {
       console.error("Error updating cart:", error);
-      res.status(500).json({ success: false, error: 'Failed to update cart' });
+      res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: responseMessage.SERVER_ERROR 
+    });
     }
   };
+
+
   const deleteCartItem = async (req, res) => {
     try {
-        const { productId, size } = req.body; // Include size in the request
+        const { productId, size } = req.body; 
 
         const updatedCart = await Cart.findOneAndUpdate(
             { userId: req.session.user },
-            { $pull: { items: { productId, size } } }, // Remove only the matching size
+            { $pull: { items: { productId, size } } }, 
             { new: true }
         );
 
         if (!updatedCart) {
-            return res.status(404).json({ success: false, error: "Cart item not found" });
+            return res.status(statuscode.NOT_FOUND).json({ 
+              success: false, 
+              error: responseMessage.CART_ITEM_NOT_FOUND 
+            });
         }
 
-        res.json({ success: true, cart: updatedCart });
+        res.status(statuscode.OK).json({ 
+          success: true, 
+          cart: updatedCart 
+        });
     } catch (error) {
         console.error("Error deleting cart item:", error);
-        res.status(500).json({ success: false, error: "Internal server error" });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+          success: false, 
+          message: responseMessage.SERVER_ERROR 
+      });
     }
 };
 
 const applyCoupon = async (req, res) => {
+
   try {
+
     const { couponId, discountAmount, finalAmount } = req.body;
     const userId = req.session.user;
     const coupon = await Coupon.findById(couponId);
     
+    
     if (!coupon) {
-      return res.status(400).json({ message: 'Invalid coupon.' });
+      return res.status(statuscode.BAD_REQUEST).json({
+        success: false, 
+        message: responseMessage.INVALID_COUPON 
+      });
     }
 
     req.session.coupon = { couponId, discountAmount, finalAmount };
 
-    res.json({ success: true, message: 'Coupon applied successfully', discountAmount, finalAmount });
+    return res.json({ 
+      success: true,
+      message: responseMessage.COUPON_APPLIED, 
+      discountAmount,
+      finalAmount
+    });
   } catch (error) {
     console.error('Error applying coupon:', error);
-    res.status(500).json({ message: 'An error occurred while applying the coupon.' });
+    res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+      success: false, 
+      message: responseMessage.SERVER_ERROR 
+  });
   }
 };
 

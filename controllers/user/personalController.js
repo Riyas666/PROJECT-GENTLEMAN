@@ -4,13 +4,16 @@ const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema")
 const Order = require("../../models/orderSchema");
 const bcrypt = require("bcrypt");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
+
+
 
 const profilePage = async(req,res)=>{
     try{
         const userId = req.session.user;
         const userData = await User.findById(userId)
         const addressData = await Address.findOne({userId: userId});
-        console.log("this is the userData", userData)
         res.render("userprofile", {
             user:userData,
             userAddress:addressData
@@ -20,15 +23,11 @@ const profilePage = async(req,res)=>{
         res.redirect("/pageNotFound")
     }
 }
+
 const updateProfile = async (req, res) => {
     try {
         const userId = req.session.user;
-console.log("this is user id", userId)
-        
-
-const data = req.body;
-console.log("this is the date",data)
-
+        const data = req.body;
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { 
@@ -41,21 +40,21 @@ console.log("this is the date",data)
         if (!updatedUser) {
             return res.json({
                 success: false,
-                message: 'User not found'
+                message: responseMessage.USER_NOT_FOUND
             });
         }
 
         res.json({
             success: true,
-            message: 'Profile updated successfully',
+            message: responseMessage.PROFILE_UPDATE_SUCCESS,
             user: updatedUser
         });
 
     } catch (error) {
         console.error('Profile update error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to update profile'
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR 
         });
     }
 };
@@ -76,55 +75,54 @@ const getChangePassword = async(req,res) =>{
   
 const changePassword = async(req,res)=>{
     try{
-
     
     const userId = req.session.user;
     const userData = await User.findById(userId)
     const {currentPassword, newPassword, confirmPassword} = req.body;
-
     const isMatch = await bcrypt.compare(currentPassword, userData.password);
     if(!isMatch){
-        return res.status(404).json({
+        return res.status(statuscode.NOT_FOUND).json({
             success:false,
-            message:"Current Password is incorrect"
+            message: responseMessage.PASSWORD_INCORRECT
         })
     }
-    if(newPassword!==confirmPassword){
-        return res.status(404).json({
+    if(newPassword !== confirmPassword){
+        return res.status(statuscode.NOT_FOUND).json({
             success:false,
-            message:"New Passwords do not match"
+            message: responseMessage.PASSWORD_MISMATCH
         })
     }
-    if(newPassword.length<8){
-        return res.status(404).json({
-            success:false,
-            message:"Passwords must be atleast 8 Characters"
+    if(newPassword.length < 8){
+        return res.status(statuscode.NOT_FOUND).json({
+            success: false,
+            message: responseMessage.PASSWORD_TOO_SHORT
         })
     }
     const hashedPassword = await bcrypt.hash(newPassword,10)
     userData.password = hashedPassword;
     await userData.save()
-    res.status(200).json({
-        success:true,
-        message:"Passwords Updated Successfully"
+    res.status(statuscode.OK).json({
+        success: true,
+        message: responseMessage.PASSWORD_UPDATED
     })
 }catch(error){
     console.error("Change password error:", error);
-  res.status(500).json({
-    success: false,
-    message: "Failed to change password",
-  });
+    res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: responseMessage.SERVER_ERROR 
+    });
 }
 }
 
 const getAddressPage = async(req,res)=>{
+
     try{
+
         const userId = req.session.user;
         const userData = await User.findById(userId)
         const currentPage = parseInt(req.query.page) || 1;
         const itemsPerPage = 4;
         const skip = (currentPage - 1) * itemsPerPage; 
-
         const addressData = await Address.findOne({ userId: userId });
         if (!addressData || addressData.address.length === 0) {
             return res.render('address', {
@@ -136,8 +134,6 @@ const getAddressPage = async(req,res)=>{
         }
         const totalAddresses = addressData.address.length;
         const totalPages = Math.ceil(totalAddresses / itemsPerPage);
-
-        
         const paginatedAddresses = addressData.address.slice(skip, skip + itemsPerPage);
 
         
@@ -161,7 +157,6 @@ const getAddressPage = async(req,res)=>{
 
 const addAddress = async(req,res) =>{
    try{
-
     
     const userId = req.session.user
     const {name, city, state, pincode, landmark, phonenumber, addressType } = req.body;
@@ -179,38 +174,40 @@ const addAddress = async(req,res) =>{
         userAddress.address.push({name, city, landmark, state, pincode, phonenumber, addressType})
         await userAddress.save()
     }
-        return res.status(200).json({
-            success:true,
-            message:"Address added successfully"
+        return res.status(statuscode.OK).json({
+            success: true,
+            message: responseMessage.ADDRESS_ADDED
         })
    }catch(error){
-      console.log("Error when adding the address",error)
+      console.error("Error when adding the address",error)
     
-      res.status(500).json({
-        success: false,
-        message: "Failed to add password",
-      });
+      res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: responseMessage.SERVER_ERROR 
+    });
    }
 }
+
 const editAddress = async (req, res) => {
     try {
         const { addressId, name, city, state, pincode, landmark, phonenumber, addressType } = req.body;
-     
-
         const userId = req.session.user;
-
         const userAddress = await Address.findOne({ userId });
 
-
         if (!userAddress) {
-            return res.status(404).json({ success: false, message: "User address not found" });
+            return res.status(statuscode.NOT_FOUND).json({ 
+                success: false, 
+                message: responseMessage.ADDRESS_NOT_FOUND 
+            });
         }
        
             const addressIndex = userAddress.address.findIndex((addr) => addr._id.toString() === addressId);
             if (addressIndex === -1) {
-                return res.status(404).json({ success: false, message: "Address not found" });
+                return res.status(statuscode.NOT_FOUND).json({ 
+                    success: false, 
+                    message: responseMessage.ADDRESS_NOT_FOUND 
+                });
             }
-               
 
                 userAddress.address[addressIndex] = {
                     ...userAddress.address[addressIndex].toObject(),
@@ -225,49 +222,66 @@ const editAddress = async (req, res) => {
                 };
 
                 await userAddress.save();
-                 return res.status(200).json({ success: true, message: "Address updated successfully" });
+                 return res.status(statuscode.OK).json({ 
+                    success: true, 
+                    message: responseMessage.ADDRESS_UPDATED
+                });
         
     } catch (error) {
         console.error("Error updating address:", error);
         if (!res.headersSent) {
-            res.status(500).json({ success: false, message: "Failed to update address" });
+            res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+                success: false, 
+                message: responseMessage.SERVER_ERROR 
+            });
         }
     }
 };
 
 
-const deleteAddress = async (req, res) => {
-    try {
-        console.log(req.params)
-        const  addressId  = req.params.addressId; 
-        const userId = req.session.user; 
-        console.log("this is the delete reuqest", addressId, userId)
+    const deleteAddress = async (req, res) => {
+        try {
+            console.log(req.params)
+            const  addressId  = req.params.addressId; 
+            const userId = req.session.user; 
+            const userAddress = await Address.findOne({ userId });
 
-        const userAddress = await Address.findOne({ userId });
+            if (!userAddress) {
+                return res.status(statuscode.NOT_FOUND).json({ 
+                    success: false, 
+                    message: responseMessage.ADDRESS_NOT_FOUND 
+                });
+            }
 
-        if (!userAddress) {
-            return res.status(404).json({ success: false, message: "User address not found" });
+            const addressIndex = userAddress.address.findIndex((addr) => addr._id.toString() === addressId);
+
+            if (addressIndex === -1) {
+                return res.status(statuscode.NOT_FOUND).json({ 
+                    success: false, 
+                    message: responseMessage.ADDRESS_NOT_FOUND
+                });
+            }
+
+            userAddress.address.splice(addressIndex, 1);
+
+            await userAddress.save();
+
+            res.status(statuscode.OK).json({ 
+                success: true, 
+                message: responseMessage.ADDRESS_DELETED 
+            });
+        } catch (error) {
+
+            console.error("Error deleting address:", error);
+
+            if (!res.headersSent) {
+                res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+                    success: false, 
+                    message: responseMessage.SERVER_ERROR 
+                });
+            }
         }
-
-        const addressIndex = userAddress.address.findIndex((addr) => addr._id.toString() === addressId);
-
-        if (addressIndex === -1) {
-            return res.status(404).json({ success: false, message: "Address not found" });
-        }
-
-        userAddress.address.splice(addressIndex, 1);
-
-        await userAddress.save();
-
-        res.status(200).json({ success: true, message: "Address deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting address:", error);
-
-        if (!res.headersSent) {
-            res.status(500).json({ success: false, message: "Failed to delete address" });
-        }
-    }
-};
+    };
 
 
 
@@ -282,7 +296,7 @@ const getOrders = async (req, res) => {
       console.log(JSON.stringify(order[0].orderedItems, null, 2))
   
       if (order.length === 0) {
-        return res.status(404).render("orders", {
+        return res.status(statuscode.NOT_FOUND).render("orders", {
           success: false,
           message: "No orders found.",
           order
@@ -295,30 +309,29 @@ const getOrders = async (req, res) => {
       });
     } catch (error) {
       console.error("Error fetching orders:", error);
-      res.status(500).render("orders", {
+      res.status(statuscode.INTERNAL_SERVER_ERROR).render("orders", {
         success: false,
-        message: "An error occurred while fetching orders.",
+        message: responseMessage.SERVER_ERROR,
       });
     }
   };
-
-  
-
-
 
 
   const wallet = async(req,res)=>{
     const userId = req.session.user;
     try{
         const user = await User.findById(userId)
-        console.log("zzzz", user.wallet.transactions)
+        const wallet = user.wallet.transactions.reverse();
+        res.render("wallet", {wallet, user})
 
-        const wallet = user.wallet.transactions.reverse()
-res.render("wallet", {wallet, user})
-    }catch(error){
-console.error(error)
-    }
-  }
+       }catch(error){
+        console.error(error)
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR
+       })
+ }
+}
 
 module.exports = {
     profilePage,

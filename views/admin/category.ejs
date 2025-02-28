@@ -141,12 +141,12 @@
                     </td>
                     <td class="text-start">
                         <%if(category.isListed){%> 
-                      <button class="btn btn-danger" style="width: 70px">
-                        <a href="/admin/category/listCategory?id=<%=category._id%>" class="text-white">Unlist</a>
+                      <button class="btn btn-danger unlist-btn" data-id="<%=category._id%>" style="width: 75px">
+                        Unlist
                       </button>
                       <%}else{%>
-                      <button class="btn btn-success" style="width: 70px">
-                        <a href="/admin/category/unlistCategory?id=<%=category._id%>" class="text-white">List</a>
+                      <button class="btn btn-success list-btn" data-id="<%=category._id%>" style="width: 75px">
+                        List
                       </button>
                       <%}%>
                     </td>
@@ -162,10 +162,6 @@
         </div>
       </div>
     </div>
-
-
-
-
 
     <!----------------------------- PAGINATION ------------------------------->
             
@@ -231,7 +227,6 @@
 
 
 <script>
-  //////////////FORM VALIDATION//////////////
     function handleFormSubmit(event){
         event.preventDefault()
             if(!validateForm()){
@@ -274,7 +269,6 @@
 }
             
         
-    //////////////VALIDATE FORM//////////////
     function validateForm(){
         clearErrorMessages()
         const name = document.getElementsByName("name")[0].value.trim()
@@ -313,6 +307,67 @@
             element.style.display = "none"
         })
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const baseUrl = "/admin/category";
+
+        /////////////////////    FOR LISTING THE PRODUCT  /////////////////////
+
+        document.querySelectorAll(".list-btn").forEach(button => {
+            button.addEventListener("click", async (event) => {
+                const categoryId = button.dataset.id; 
+                try {
+                    const response = await fetch(`${baseUrl}/list`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: categoryId,  }) 
+                    });
+                    const result = await response.json();
+                    if(response.ok){
+                      Swal.fire({
+                        title:"Listed",
+                        text:result.message,
+                        icon:"success",
+                        timer:1000,
+                        showConfirmButton:false
+                      }).then(() => window.location.reload())
+                    }else{
+                      Swal.fire("Error!", result.message)
+                    }
+                  }catch(error){
+                    Swal.fire("Error", "An error occurred while listing the category", "error")
+                  }
+                })
+              });
+
+              document.querySelectorAll(".unlist-btn").forEach(button => {
+        button.addEventListener("click", async () => {  
+            const categoryId = button.dataset.id;
+            try {
+                const response = await fetch(`${baseUrl}/unlist`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: categoryId })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    Swal.fire({
+                        title: "Unisted!",
+                        text: result.message,
+                        icon: "success",
+                        timer: 1000,
+                        showConfirmButton: false
+                    }).then(() => window.location.reload());
+                } else {
+                    Swal.fire("Error!", result.message || "Failed to Unlist the category.", "error");
+                }
+            } catch (error) {
+                Swal.fire("Error!", "An error occurred while Unlisting the category.", "error");
+            }
+        });
+    });
+});
+
 
 
 

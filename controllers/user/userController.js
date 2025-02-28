@@ -5,9 +5,9 @@ const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const Brand = require("../../models/brandSchema");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
 
-
-//FOR RENDER THE SIGNUP PAGE IF HAVE SESSION THEN TO THE HOME PAGE
 const loadSignup = async (req, res) => {
     try {
         if (req.session.user) {
@@ -17,11 +17,10 @@ const loadSignup = async (req, res) => {
         }
     } catch (error) {
         console.log("Home page not Loading", error);
-        res.status(500).send("Server Error");
+        res.status(statuscode.INTERNAL_SERVER_ERROR).send("Server Error");
     }
 };
 
-//AFTER THE SIGNUP PAGE IT WILL MOVE TO THE  OTP
 const signup = async (req, res) => {
     try {
         const { name, email, phone, password, cPassword } = req.body;
@@ -52,12 +51,10 @@ const signup = async (req, res) => {
     }
 };
 
-//FOR GENERATING THE OTP
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-//SEND THE OTP TO THE MAIL
 async function SendVerificationEmail(email, otp) {
     try {
         const transporter = nodemailer.createTransport({
@@ -86,12 +83,14 @@ async function SendVerificationEmail(email, otp) {
     }
 }
 
-//FOR RESENDING THE OTP
 const resendOtp = async (req, res) => {
     try {
         const { email } = req.session.userData;
         if (!email) {
-            return res.status(400).json({ success: false, message: "Email not found in session" });
+            return res.status(statuscode.BAD_REQUEST).json({ 
+                success: false,
+                 message: "Email not found in session" 
+                });
         }
 
         const otp = generateOtp();
@@ -101,17 +100,25 @@ const resendOtp = async (req, res) => {
 
         if (emailSent) {
             console.log(`new otp is ${otp}`);
-            res.status(200).json({ success: true, message: "OTP Resend Successfully" });
+            res.status(statuscode.OK).json({
+                 success: true, 
+                 message: responseMessage.OTP_RESEND_SUCCESS 
+                });
         } else {
-            res.status(500).json({ success: false, message: "OTP resend failed" });
+            res.status(statuscode.BAD_REQUEST).json({ 
+                success: false, 
+                message: responseMessage.OTP_FAILED 
+            });
         }
     } catch (error) {
         console.error("Error resending OTP", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR 
+        });
+        }
 };
 
-//FOR VERIFY THE OTP
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
@@ -129,26 +136,33 @@ const verifyOtp = async (req, res) => {
                 password: passwordHash,
             });
             await saveUserData.save();
-            console.log("user savred");
             req.session.user = saveUserData._id;
-            return res.status(200).json({ success: true, redirectUrl: "/home" });
+            return res.status(statuscode.OK).json({ 
+                success: true, 
+                redirectUrl: "/home" 
+            });
         } else {
-            res.status(400).json({ success: false, message: "Invalid OTP, please try again" });
+            res.status(statuscode.BAD_REQUEST).json({ 
+                success: false, 
+                message: responseMessage.INVALID_OTP
+            });
         }
     } catch (error) {
         console.error("Error verifying otp", error);
-        res.status(500).json({ success: false, message: "An error occured" });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR 
+        });
     }
 };
 
-//LOADING THE HOME PAGE ALSO CHECKING THE SESSION
 const loadHomePage = async (req, res) => {
+
     try {
+
         const user = req.session.user;
         const categories = await Category.find({ isListed: true });
-        console.log("Categories:", categories);
         let brandData = await Brand.find({isBlocked:false})
-        console.log("zzzzz", brandData)
         let productData = await Products.find({
             isBlocked: false,
             category: { $in: categories.map((category) => category._id) },
@@ -158,22 +172,19 @@ const loadHomePage = async (req, res) => {
         productData = productData.slice(0, 4);
         if (user) {
             const userData = await User.findById(user);
-           
             res.render("home", { user: userData, products: productData, brands:brandData });
         } else {
             return res.render("home", { products: productData ,brands:brandData});
         }
     } catch (error) {
         console.log("Home page not found");
-        res.status(500).send("Server Error");
+        res.status(statuscode.INTERNAL_SERVER_ERROR).send("Server Error");
     }
 };
 
-//PASSWORD HASHING
 const securePassword = async (password) => {
     try {
         const passwordHash = await bcrypt.hash(password, 10);
-
         return passwordHash;
     } catch (error) {
         console.error("Password hashing failed:", error);
@@ -181,7 +192,6 @@ const securePassword = async (password) => {
     }
 };
 
-//RENDER THE LOGIN PAGE IF SESSION HAVE THEN TO THE HOME PAGE
 const loadLogin = async (req, res) => {
     try {
         if (req.session.user) {
@@ -194,7 +204,6 @@ const loadLogin = async (req, res) => {
     }
 };
 
-//AFTER THE SIGNUP PAGE IT WILL MOVE TO THE HOMEPAGE
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -223,16 +232,7 @@ const login = async (req, res) => {
 };
 
 
-//PAGE NOT FOUND
-const pageNotFound = async (req, res) => {
-    try {
-        res.render("error-404");
-    } catch (error) {
-        res.redirect("/pageNotFound");
-    }
-};
 
-//FOR LOGOUT
 const logout = async (req, res) => {
     try {
         req.session.destroy((err) => {
@@ -249,9 +249,15 @@ const logout = async (req, res) => {
 };
 
 
+const pageNotFound = async (req, res) => {
+    try {
+        res.render("error-404");
+    } catch (error) {
+        res.redirect("/pageNotFound");
+    }
+};
 
 
-//EXPORTING..
 module.exports = {
     loadSignup,
     signup,

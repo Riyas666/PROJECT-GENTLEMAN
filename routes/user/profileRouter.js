@@ -16,7 +16,7 @@ router.get("/orders", userAuth, personalController.getOrders)
 //ADDRESS SECTION
 router.get("/address", userAuth, personalController.getAddressPage)
 router.post('/add-address', userAuth, personalController.addAddress);
-router.post('/edit-address', userAuth, personalController.editAddress);
+router.patch('/edit-address', userAuth, personalController.editAddress);
 router.delete('/delete-address/:addressId',userAuth, personalController. deleteAddress);
 
 

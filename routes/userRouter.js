@@ -74,8 +74,6 @@ router.post('/retry-payment', orderController.retryPayment);
 
 
 
-
-
 router.get("/wishlist",userAuth, wishlistController.getWishlist)
 router.post("/addToWishlist", userAuth,wishlistController.addToWishlist)
 router.post('/wishlist/delete',userAuth, wishlistController.deleteWishlistItem);
@@ -85,11 +83,8 @@ router.post('/wishlist/delete',userAuth, wishlistController.deleteWishlistItem);
 
 
 router.post("/apply-coupon",userAuth, cartController.applyCoupon)
-
 router.post('/place-order-online',userAuth, orderController.placeOrderOnline);
-
 router.post('/verify-payment', userAuth,orderController.verifyPayment); 
-
 router.post('/verify-retry-payment', userAuth, orderController.verifyRetryPayment)
 
 module.exports = router;

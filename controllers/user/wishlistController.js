@@ -1,13 +1,10 @@
 const User = require("../../models/userSchema");
-const Product = require("../../models/productSchema")
-
-
-
-
+const Product = require("../../models/productSchema");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
 
 const getWishlist = async(req,res)=>{
     try{
-
       const userId = req.session.user;
       const user = await User.findById(userId).populate("wishlist.productId");
       res.render("wishlist", {
@@ -25,18 +22,23 @@ const getWishlist = async(req,res)=>{
   
 const addToWishlist = async(req,res)=>{
     try{
-      
       const {productId,size} = req.body;
       const userId = req.session.user;
                                                  
       if (!productId) {
-        return res.status(400).json({ status: false, message: "Product ID is required" });
+        return res.status(statuscode.BAD_REQUEST).json({ 
+          status: false, 
+          message: "Product ID is required" 
+        });
       }
   
       const user = await User.findById(userId) 
       const product = await Product.findById(productId);
       if (!product) {
-        return res.status(404).json({ status: false, message: "Product not found" });
+        return res.status(statuscode.NOT_FOUND).json({
+           success: false, 
+           message: responseMessage.PRODUCT_NOT_FOUND
+          });
       }
   
   
@@ -49,19 +51,27 @@ const addToWishlist = async(req,res)=>{
   
   
       if (!selectedSize) {
-        return res.status(400).json({ status: false, message: "No valid size available for this product" });
+        return res.status(statuscode.BAD_REQUEST).json({ 
+          success: false, 
+          message: "No valid size available for this product" });
       }
   
       if (user.wishlist?.some((item) => item.productId?.toString() === productId &&item.size===selectedSize)) {
-        return res.status(200).json({ status: false, message: "Product already in wishlist" });
+        return res.status(200).json({
+           success: false, 
+           message: responseMessage.PRODUCT_ALREADY_WISHLIST 
+          });
       }
-
+ 
       const sizeObject = product.sizes.find((item) => item.size === selectedSize);
       if (!sizeObject) {
-        return res.status(400).json({ status: false, message: "Invalid size selected" });
+        return res.status(statuscode.BAD_REQUEST).json({
+          success: false, 
+          message: "Invalid size selected" 
+        });
       }
       
-      const stockStatus = sizeObject.quantity > 0 ? 'In Stock' : 'Out of Stock';     
+      const stockStatus = sizeObject.quantity > 0 ? 'In Stock' : 'Out of Stock';
   
       user.wishlist.push ({
         name:product.productName,
@@ -72,29 +82,28 @@ const addToWishlist = async(req,res)=>{
       })
 
       await user.save()
-      res.status(200).json({ 
-        status: true, 
-        message: "Product added to wishlist"
+      res.status(statuscode.OK).json({ 
+        status: true,
+        message: responseMessage.PRODUCT_ADDED
      });
   
     }catch(error){
       console.error(error);
-      res.status(500).json({ 
-        status: false, 
-        message: "Internal server error"
-     });
+      res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: responseMessage.SERVER_ERROR 
+    });
     }
   }
 
 
-  
 const deleteWishlistItem = async (req, res) => {
     try {
       const { productId } = req.body; 
       const userId = req.session.user;
   
       if (!productId) {
-        return res.status(400).json({ success: false, message: "Product ID is required" });
+        return res.status(statuscode.BAD_REQUEST).json({ success: false, message: "Product ID is required" });
       }
   
       const updatedUser = await User.findByIdAndUpdate(
@@ -104,24 +113,29 @@ const deleteWishlistItem = async (req, res) => {
       ).populate("wishlist.productId"); 
   
       if (!updatedUser) {
-        return res.status(404).json({ success: false, message: "User not found" });
+        return res.status(statuscode.NOT_FOUND).json({ success: false, message: "User not found" });
       }
   
-      res.status(200).json({
+      res.status(statuscode.OK).json({
         success: true,
-        message: "Item removed from wishlist successfully",
+        message: responseMessage.PRODUCT_REMOVED_WISHLIST,
         wishlist: updatedUser.wishlist, 
       });
     } catch (error) {
       console.error("Error deleting wishlist item:", error);
-      res.status(500).json({ success: false, message: "Internal server error" });
+      res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: responseMessage.SERVER_ERROR 
+    });
     }
   };
   
 
   
   module.exports = {
+    
     getWishlist,
     addToWishlist,
     deleteWishlistItem,
+
   }

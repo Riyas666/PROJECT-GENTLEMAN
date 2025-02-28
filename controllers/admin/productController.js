@@ -8,6 +8,9 @@ const { uploadProductImage } = require("../../utils/multer");
 const { error } = require("console");
 const { isArgumentsObject } = require("util/types");
 const { BASE_UPLOAD_PATH } = require("../../utils/multer");
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
+
 
 const productAddPage = async (req, res) => {
     try {
@@ -28,7 +31,6 @@ const addProducts = async (req, res) => {
             const uploadPath = path.join( "public", "uploads", "product-images");
             if (!fs.existsSync(uploadPath)) {
                 fs.mkdirSync(uploadPath, { recursive: true });
-                console.log("Directory created:", uploadPath);  
             } else {
                 console.log("Directory already exists:", uploadPath);  
                            }
@@ -46,7 +48,10 @@ const addProducts = async (req, res) => {
 
         const categoryId = products.category;
         if (!categoryId) {
-            return res.status(400).json({ error: "Category is required." });
+            return res.status(statuscode.BAD_REQUEST).json({
+                success:false, 
+                message: responseMessage.CATEGORY_REQUIRED 
+            });
         };
 
         const category = await Category.findOne({
@@ -55,7 +60,10 @@ const addProducts = async (req, res) => {
         });
 
         if (!category) {
-            return res.status(400).json({ error: "Invalid category name" });
+            return res.status(statuscode.BAD_REQUEST).json({ 
+                success:false,
+                error: "Invalid category name" 
+            });
         };
 
         let sizes = [];
@@ -88,9 +96,12 @@ const addProducts = async (req, res) => {
         return res.redirect("/admin/products");
     } catch (error) {
         console.error("error saving product", error);
-        return res.redirect("/admin/pageerror");
-    }
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR
+    })
 };
+}
 
 
 const getAllProducts = async (req, res) => {
@@ -133,24 +144,34 @@ const getAllProducts = async (req, res) => {
 
 
 const blockProduct = async (req, res) => {
-    const { id, isBlocked } = req.body;
+    const { id } = req.body;
     try {
-        await Product.updateOne({ _id: id }, { $set: { isBlocked } });
-
-        res.status(200).json({ success: true });
-        
+        await Product.updateOne({ _id: id }, { $set: { isBlocked:true } });
+        res.status(statuscode.OK).json({ 
+            success: true,
+            message:responseMessage.PRODUCT_BLOCKED 
+        });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to block product." });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR 
+        });
     }
 };
 
 const unblockProduct = async (req, res) => {
     try {
-        const { id, isBlocked } = req.body;
-        await Product.updateOne({ _id: id }, { $set: { isBlocked } });
-        res.status(200).json({ success: true });
+        const { id } = req.body;
+        await Product.updateOne({ _id: id }, { $set: { isBlocked:false } });
+        res.status(statuscode.OK).json({ 
+            success: true,
+            message:responseMessage.USER_UNBLOCKED 
+        });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to unblock product." });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: responseMessage.SERVER_ERROR 
+        });
     }
 };
 
@@ -162,13 +183,13 @@ const getEditProduct = async (req, res) => {
         const brand = await Brand.find({isBlocked:false})
         const sizes = product.sizes || [];
 
-        
         res.render("edit-product", {
             product: product,
             cat: category,
             brand:brand,
             sizes: sizes,
         });
+
     } catch (error) {
         res.redirect("/admin/pageerror");
     }
@@ -195,33 +216,30 @@ const editProduct = async (req, res) => {
       const updatedImages = [...filteredImages, ...newImages];
       const sizesArray = req.body.sizes || [];
       const quantitiesArray = req.body.quantities || [];
-
-
-const sizes = sizesArray.map((size, index) => ({
-    size: size,
-    quantity: parseInt(quantitiesArray[index], 10) || 0 
-}));
-       
-        const updateFields = {
-            productName: data.productName,
-            description: data.description,
-            brand: data.brand,
-            category: data.category,
-            regularPrice: data.regularPrice,
-            salePrice: data.salePrice,
-            productImage: updatedImages,
-            sizes: sizes
-          };
+      const sizes = sizesArray.map((size, index) => ({
+        size: size,
+        quantity: parseInt(quantitiesArray[index], 10) || 0 
+    }));
+      const updateFields = {
+        productName: data.productName,
+        description: data.description,
+        brand: data.brand,
+        category: data.category,
+        regularPrice: data.regularPrice,
+        salePrice: data.salePrice,
+        productImage: updatedImages,
+        sizes: sizes
+      };
 
           await Product.findByIdAndUpdate(id, updateFields, { new: true });
-
-          console.log("Product updated successfully:", updateFields);
           res.redirect("/admin/products");
         } catch (error) {
           console.error("Error updating product:", error);
           res.redirect("/admin/pageerror");
         }
       };
+
+
 const deleteSingleImage = async (req, res) => {
     try {
         const { imageNameToServer, productIdToServer } = req.body;

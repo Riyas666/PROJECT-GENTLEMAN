@@ -324,7 +324,6 @@
       const pricePerItem = parseFloat(row.querySelector(".table__price").textContent.replace("₹", ""));
       subtotalElement.textContent = `₹${(pricePerItem * newQuantity).toFixed(2)}`;
 
-      console.log("aaa")
       updateCartOnServer(productId, size, newQuantity);
 
     }

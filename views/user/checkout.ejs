@@ -273,11 +273,11 @@
                     <input
                       type="radio"
                       name="radio"
-                      id="l1"
+                      id="COD"
                       checked
                       class="payment__input"
                     />
-                    <label for="l1" class="payment__label"
+                    <label for="COD" class="payment__label"
                       >Cash On Delivery</label
                     >
                   </div>
@@ -285,19 +285,19 @@
                     <input
                       type="radio"
                       name="radio"
-                      id="l2"
+                      id="wallet"
                       class="payment__input"
                     />
-                    <label for="l2" class="payment__label">Wallet Payment</label>
+                    <label for="wallet" class="payment__label">Wallet Payment</label>
                   </div>
                   <div class="payment__option flex">
                     <input
                       type="radio"
                       name="radio"
-                      id="l3"
+                      id="Razorpay"
                       class="payment__input"
                     />
-                    <label for="l3" class="payment__label">Razorpay</label>
+                    <label for="Razorpay" class="payment__label">Razorpay</label>
                   </div>
                 </div>
             
@@ -444,7 +444,7 @@
               });
             }
         
-            if (paymentMethod === 'l1') {
+            if (paymentMethod === 'COD') {
               try {
                 const response = await fetch('/place', {
                   method: 'POST',
@@ -483,7 +483,7 @@
                 console.error('Error placing order with COD:', error);
                 alert('An error occurred while placing the order. Please try again.');
               }
-            } else if (paymentMethod === 'l2') {
+            } else if (paymentMethod === 'wallet') {
              
               try {
                 const response = await fetch('/place', {
@@ -521,7 +521,7 @@
                 console.error('Error placing order with Wallet:', error);
                 alert('An error occurred while placing the order. Please try again.');
               }
-            } else if (paymentMethod === 'l3') {
+            } else if (paymentMethod === 'Razorpay') {
               try {
                 const response = await fetch('/place-order-online', {
                   method: 'POST',
@@ -861,7 +861,7 @@
           const couponSelect = document.getElementById('couponSelect');
           const selectedCoupon = couponSelect.options[couponSelect.selectedIndex];
       
-          // Get coupon details
+
           const couponId = selectedCoupon.value;
           const discount = parseFloat(selectedCoupon.getAttribute('data-discount'));
           const minPrice = parseFloat(selectedCoupon.getAttribute('data-min-price'));
@@ -883,19 +883,49 @@
                 },
                 body: JSON.stringify({ couponId, discountAmount, finalAmount })
               })
+             
               .then(response => response.json())
               .then(data => {
-                console.log('Coupon applied successfully:', data);
+                if(data.success) {
+                  Notiflix.Notify.success(data.message, {
+    timeout: 3000,           
+    position: 'right-top',       
+    clickToClose: true,           
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',          
+    borderRadius: '10px',        
+    showOnlyTheLastOne: true,     
+  });
+                }else{
+                  Notiflix.Notify.failure(data.message, {
+    timeout: 3000,           
+    position: 'right-top',       
+    clickToClose: true,           
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',          
+    borderRadius: '10px',        
+    showOnlyTheLastOne: true,     
+  });
+                }
               })
               .catch(error => {
                 console.error('Error applying coupon:', error);
+                Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong while applying the coupon. Please try again.'
+          });
               });
             } else {
-              Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:"You can't apply this Coupon. Your total is low for this coupon"
-              })
+              Notiflix.Notify.failure("You can't apply this Coupon. Your total is low for this coupon.", {
+    timeout: 3000,           
+    position: 'right-top',       
+    clickToClose: true,           
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',          
+    borderRadius: '10px',        
+    showOnlyTheLastOne: true,     
+  });
             }
           } else {
           location.reload()
@@ -903,6 +933,7 @@
         });
       </script>
 
+<script src="https://cdn.jsdelivr.net/npm/notiflix/dist/notiflix-3.2.6.min.js"></script>
 
 
 

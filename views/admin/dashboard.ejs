@@ -1,5 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
 <style>
+
   /* Main Layout Styles */
   .content-main {
     padding: 20px;
@@ -310,6 +311,9 @@ canvas {
   #orderStatusChart{
     width: 1rem;
   }
+  .page-link{
+    color: white;
+  }
 </style>
 <section class="content-main">
  
@@ -317,27 +321,12 @@ canvas {
   <div class="content-header">
 
     <h2 class="content-title card-title">Dashboard Analytics</h2>
-
-  
-
-    
-
+    <button class="btn btn-primary">
+      <i class="fas fa-download"></i> Export Report
+    </button>
   </div>
-  <div class="chart-containerr card">
-    <canvas id="salesChart"></canvas>
-</div>
-<div class="chart-container card">
-    <canvas id="orderStatusChart"></canvas>
-</div>
-
-
   <div class="card mb-4">
-    <div class="card mb-4" style="display: flex; justify-content: flex-end; margin-left: 62rem; top: 0.5rem;
-    right: 0.5rem;">
-      <button class="btn btn-primary">
-        <i class="fas fa-download"></i> Export Report
-      </button>
-  </div>
+   
     <div class="card-body">
       <form id="reportFilterForm">
         <div class="row g-3">
@@ -347,7 +336,7 @@ canvas {
 
               <option value="Daily">Daily Report</option>
               <option value="Weekly">Weekly Report</option>
-              <option value="monthly">Monthly Report</option>
+              <option value="Monthly">Monthly Report</option>
               <option value="Yearly">Yearly Report</option>
               <option value="Custom Date Range">Custom Date Range</option>
             </select>
@@ -527,6 +516,36 @@ canvas {
     </div>
   </div>
 
+  <div class="container">
+    
+    <div class="row">
+      <div class="col-md-12">
+  <div class="chart-containerr card"  >
+    <canvas id="salesChart"></canvas>
+</div>
+</div>
+
+      <!-- First Chart (Order Status) -->
+       <div class="row">
+      <div class="col-md-6">
+          <div class="chart-container card p-3">
+              <canvas id="orderStatusChart"></canvas>
+          </div>
+      </div>
+
+      <!-- Second Chart (Order Details) -->
+      <div class="col-md-6">
+          <div class="chart-container card p-3">
+              <canvas id="orderdetailschart"></canvas>
+          </div>
+      </div>
+  </div>
+</div>
+
+  </div>
+
+
+
 
 
 
@@ -691,6 +710,7 @@ canvas {
             <li><strong>Order ID:</strong> <span id="orderId"></span></li>
             <li><strong>Status:</strong> <span id="orderStatus"></span></li>
             <li><strong>Payment Method:</strong> <span id="paymentMethod"></span></li>
+            <li><strong>Payment Status:</strong> <span id="paymentStatus"></span></li>
             <li><strong>Total Price:</strong> <span id="totalPrice"></span></li>
             <li><strong>Created At:</strong> <span id="createdAt"></span></li>
           </ul>
@@ -738,8 +758,12 @@ let salesChart = new Chart(document.getElementById("salesChart"), {
     },
     options: {
         responsive: true,
+        interaction:{
+          mode:'nearest',
+          intersect:false
+        },
         scales: {
-            x: { // Ensure X-axis shows all dates
+            x: { 
                 title: { display: true, text: "Date (DD-MM-YYYY)" },
                 ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 }
             },
@@ -747,12 +771,25 @@ let salesChart = new Chart(document.getElementById("salesChart"), {
                 beginAtZero: true,
                 ticks: {
                     callback: function(value) {
-                        return '$' + value.toLocaleString();
+                        return '₹' + value.toLocaleString();
                     }
                 }
             }
         },
         plugins: {
+          
+          tooltip: {
+        enabled: true, 
+        mode: 'nearest',  
+        intersect: false,  
+        position: 'nearest', 
+        callbacks: {
+            label: function (tooltipItem) {
+                let value = tooltipItem.raw; 
+                return `₹${value.toLocaleString()}`; 
+            }
+        }
+    },
             title: {
                 display: true,
                 text: 'Sales Overview'
@@ -762,7 +799,6 @@ let salesChart = new Chart(document.getElementById("salesChart"), {
     }
 });
 
-// Initialize Orders Chart
 const orderChart = new Chart(document.getElementById("orderStatusChart"), {
     type: 'bar',
     data: {
@@ -777,6 +813,10 @@ const orderChart = new Chart(document.getElementById("orderStatusChart"), {
     },
     options: {
         responsive: true,
+        interaction: {
+            mode: 'nearest', 
+            intersect: false
+        },
         scales: {
             x: {
                 title: { display: true, text: "Date (DD-MM-YYYY)" },
@@ -788,6 +828,18 @@ const orderChart = new Chart(document.getElementById("orderStatusChart"), {
             }
         },
         plugins: {
+            tooltip: {
+                enabled: true,
+                mode: 'nearest',  
+                intersect: false,  
+                position: 'nearest', 
+                callbacks: {
+                    label: function (tooltipItem) {
+                        let value = tooltipItem.raw;
+                        return `Orders: ${value}`;
+                    }
+                }
+            },
             title: {
                 display: true,
                 text: 'Order Count'
@@ -797,7 +849,28 @@ const orderChart = new Chart(document.getElementById("orderStatusChart"), {
     }
 });
 
-// Function to update charts
+const allordersstatus = new Chart(document.getElementById("orderdetailschart"), {
+    type: 'doughnut',
+    data: {
+        labels: ['Delivered', 'Cancelled', 'Pending', 'Returned'],
+        datasets: [{
+            label: 'Order Status',
+            data: [],
+            backgroundColor: ['#4CAF50', '#F44336', '#FF9800', '#2196F3'],
+            hoverOffset: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Order Status Breakdown'
+            },
+            legend: { position: 'top' }
+        }
+    }
+});
 function updateCharts(chartData) {
     salesChart.data.labels = chartData.labels;
     salesChart.data.datasets[0].data = chartData.sales;
@@ -806,16 +879,24 @@ function updateCharts(chartData) {
     orderChart.data.labels = chartData.labels;
     orderChart.data.datasets[0].data = chartData.orders;
     orderChart.update();
+
+    allordersstatus.data.datasets[0].data = [
+        chartData.statusCounts.delivered,
+        chartData.statusCounts.cancelled,
+        chartData.statusCounts.pending,
+        chartData.statusCounts.returned
+    ];
+
+    allordersstatus.update();
 }
 
-// Fetch and update charts on page load
 function fetchSalesData() {
   fetch("/admin/generate-sales-graph", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ reportType, startDate, endDate }) 
 })
-.then(response => response.json())  // This fails if the response is HTML
+.then(response => response.json())  
 .then(result => {
     console.log("Fetched Chart Data:", result);
     if (result.success) {
@@ -827,7 +908,6 @@ function fetchSalesData() {
 .catch(error => console.error("Error fetching chart data:", error));
 }
 
-// Automatically load sales data when the page loads
 window.onload = fetchSalesData;
 
   document.getElementById('reportFilterForm').addEventListener('submit', function(e) {
@@ -835,12 +915,7 @@ window.onload = fetchSalesData;
     const reportType = document.getElementById('reportType').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-    const data = {
-      reportType: reportType,
-      startDate: startDate,
-      endDate: endDate
-
-    };
+    const data = { reportType,startDate,endDate};
     console.log("qqq", data)
 
     fetch('/admin/generate-report', {
@@ -893,7 +968,9 @@ window.onload = fetchSalesData;
 
           tbody.innerHTML = tableRows;
         }
-      }).catch(error => {});
+      }).catch(error => {
+        console.error("Error generateing report", error)
+      });
   });
 
 
@@ -937,6 +1014,7 @@ window.onload = fetchSalesData;
         document.getElementById('orderId').innerText = `${order.order.orderId}`;
         document.getElementById('orderStatus').innerText = ` ${order.order.status}`;
         document.getElementById('paymentMethod').innerText = `${order.order.paymentType}`;
+        document.getElementById('paymentStatus').innerText = `${order.order.paymentStatus}`;
         document.getElementById('totalPrice').innerText = ` ₹${order.order.totalPrice}`;
         document.getElementById('createdAt').innerText = `${new Date(order.order.createdAt).toLocaleDateString()}`;
 

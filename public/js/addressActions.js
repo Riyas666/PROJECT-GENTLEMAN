@@ -1,8 +1,6 @@
 
 
-// This function is responsible for handling address deletion
 const deleteAddress = async (addressId) => {
-    // Show a confirmation dialog using SweetAlert
     const result = await Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
@@ -56,7 +54,6 @@ const deleteAddress = async (addressId) => {
                 });
             }
         } catch (error) {
-            // Catch any errors that occur during the fetch process
             console.error("Error deleting address:", error);
             Swal.fire({
                 title: 'Error',

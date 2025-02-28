@@ -1,4 +1,4 @@
-function deleteProduct(productId, size) {  // Accept size as a parameter
+function deleteProduct(productId, size) {  
   Swal.fire({
     title: 'Are you sure?',
     text: "Do you really want to delete this item from your cart?",
@@ -12,16 +12,14 @@ function deleteProduct(productId, size) {  // Accept size as a parameter
     cancelButtonText: 'Cancel',
   }).then((result) => {
     if (result.isConfirmed) {
-      // Send the delete request with productId and size
       fetch('/cart/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, size }),  // Include size
+        body: JSON.stringify({ productId, size }), 
       })
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            // Show a success message
             Swal.fire({
               title: 'Deleted!',
               text: 'The item has been removed from your cart.',
@@ -31,7 +29,7 @@ function deleteProduct(productId, size) {  // Accept size as a parameter
               confirmButtonColor: 'black',
             });
 
-            removeProductFromUI(productId, size); // Pass size to remove function
+            removeProductFromUI(productId, size); 
           } else {
             Swal.fire('Error!', data.error || 'Failed to delete the product.', 'error');
           }

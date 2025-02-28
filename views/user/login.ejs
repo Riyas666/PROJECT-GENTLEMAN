@@ -52,6 +52,13 @@
   width: 100%;
   padding-right: 35px; /* Make space for the icon */
 }
+
+.error-message {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  display: block;
+}
 </style>
     <title>Ecommerce Website</title>
   </head>
@@ -125,7 +132,7 @@
                 <h3 class="mb-0">Login</h3>
               </div>
               <div class="card-body">
-                <form method="post" action="/login">
+                <form method="post" id="registrationForm" action="/login">
                   <!-- Email Input -->
                   <div class="mb-3">
                     <label for="email" class="form-label">Email Address</label>

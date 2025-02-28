@@ -451,26 +451,11 @@
     </div>
   </section>
   <!--=============== SWIPER JS ===============-->
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-  <script src="/js/main.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="/js/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/notiflix/dist/notiflix-3.2.6.min.js"></script>
 
-
 <script>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -527,7 +512,9 @@ addToCartButton.addEventListener('click', (e) => {
     const quantity = parseInt(quantityInput.value, 10);
     const productId = '<%= product._id %>';
 
+
     
+
 
     if (!selectedSize) {
       Swal.fire({
@@ -603,13 +590,15 @@ addToCartButton.addEventListener('click', (e) => {
      
         }
          else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error Adding to Cart',
-            text: data.error,
-          
-         
-        });
+          Notiflix.Notify.failure(data.message, {
+    timeout: 3000,
+    position: 'right-top',
+    clickToClose: true,
+    cssAnimationStyle: 'zoom',
+    fontSize: '16px',        
+    borderRadius: '10px',       
+    showOnlyTheLastOne: true,   
+  });
         
           
         }

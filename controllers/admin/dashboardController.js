@@ -1,40 +1,32 @@
 const Order = require("../../models/orderSchema");
 const User = require("../../models/userSchema");
 const Coupon = require("../../models/couponSchema")
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
 
 const loadDashboard = async (req, res) => {
     if (req.session.admin) {
         try {
             const totalOrders = await Order.countDocuments();
             const totalUsers = await User.countDocuments({ isAdmin: false });
-
             const totalSales = await Order.aggregate([
                 { $group: { _id: null, totalSales: { $sum: "$finalAmount" } } }
             ]);
-
             const totalDiscount = await Order.aggregate([
                 { $group: { _id: null, totalDiscount: { $sum: "$discount" } } }
             ]);
-
-
-
             const coupons = await Coupon.find({});
-
-            
             const page = parseInt(req.query.page) || 1;  
             const limit = 10;  
             const skip = (page - 1) * limit;
-
             const order = await Order.find({})
                 .populate("userId")
                 .sort({ createdAt: -1 })   
                 .skip(skip)
                 .limit(limit);
-
             const totalPages = Math.ceil(totalOrders / limit); 
-
-      console.log("bb", order)
-     
+            
+            
       const topProduct = await Order.aggregate([
         { $unwind: "$orderedItems" },  
         {
@@ -65,8 +57,6 @@ const loadDashboard = async (req, res) => {
             }
         }
     ]);
-    
-    console.log("toppp", topProduct);
     
 
     const topBrands = await Order.aggregate([
@@ -101,7 +91,6 @@ const loadDashboard = async (req, res) => {
        
     ]);
 
-    console.log("Branddss", topBrands)
 
             const topCategories = await Order.aggregate([
                 { $unwind:"$orderedItems" },
@@ -133,9 +122,6 @@ const loadDashboard = async (req, res) => {
                 },
                 {$unwind:"$categoryDetails"}
             ])
-
-
-            console.log("qwer", topCategories)
 
             res.render("dashboard", {
                 totalUsers,
@@ -174,12 +160,14 @@ const generateReport = async(req,res) =>{
             const today = new Date();
             const firstDay = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - today.getUTCDay(), 0, 0, 0, 0));
             const lastDay = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - today.getUTCDay() + 6, 23, 59, 59, 999));
+            
             reportData = await Order.find({createdAt:{$gte:new Date(firstDay), $lte: new Date(lastDay) }}).populate("userId");
 
       }else if(reportType==='Monthly'){
             const monthStart = new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), 1));
             const monthEnd = new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59, 999));
-            reportData = await Order.find({createdAt:{$gte: new Date(monthStart), $lte: new Date(monthEnd)}}).populate("userId");
+            
+            reportData = await Order.find({createdAt:{$gte: monthStart, $lte: monthEnd}}).populate("userId");
         
        }else if(reportType==='Yearly'){
             const yearStart = new Date(Date.UTC(new Date().getFullYear(), 0, 1));
@@ -192,50 +180,63 @@ const generateReport = async(req,res) =>{
             const end = new Date(endDate);
             end.setUTCHours(23, 59, 59, 999); 
             reportData = await Order.find({createdAt:{$gte:start, $lte: end}});
-
       }
-
       res.json({success:true, reportData})
 
     }catch(error){
-        res.status(500).json({ success: false, message: "Error generating report." });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            message:responseMessage.SERVER_ERROR
+        })
     };
 };
 
-
-
 const generateGraph = async (req, res) => {
     try {
-        // Fetch all orders sorted by date
         const chartData = await Order.aggregate([
-            { $sort: { createdAt: 1 } },  // Sort orders by date (ascending)
+            { $sort: { createdAt: 1 } },  
             { 
                 $group: {
-                    _id: { $dateToString: { format: "%d-%m-%Y", date: "$createdAt" } }, // Format date as DD-MM-YYYY
-                    totalSales: { $sum: "$finalAmount" },  // Sum of sales
-                    orderCount: { $sum: 1 }  // Count of orders
+                    _id: { $dateToString: { format: "%d-%m-%Y", date: "$createdAt" } },
+                    totalSales: { $sum: "$finalAmount" },
+                    orderCount: { $sum: 1 } 
                 }
             },
-            { $sort: { _id: 1 } } // Ensure sorted order in response
+            { $sort: { _id: 1 } } 
         ]);
 
-        // Extract labels and dataset values
+        const statusCounts = await Order.aggregate([
+            {$group:{_id:"$status", count:{$sum:1}}}
+        ])
+
+
         const labels = chartData.map(data => data._id);
         const salesData = chartData.map(data => data.totalSales);
         const orderCounts = chartData.map(data => data.orderCount);
 
-        res.json({
+        const statusData = {
+            delivered: statusCounts.find(s => s._id === "Delivered")?.count || 0,
+            cancelled: statusCounts.find(s => s._id === 'Cancelled')?.count || 0,
+            pending: statusCounts.find(s => s._id === 'Pending')?.count || 0,
+            returned: statusCounts.find(s => s._id === 'Returned')?.count || 0
+        };
+
+
+        res.status(statuscode.OK).json({
             success: true,
             chartData: {
-                labels, // Date labels
-                sales: salesData, // Sales amounts
-                orders: orderCounts // Order counts
+                labels,
+                sales: salesData, 
+                orders: orderCounts ,
+                statusCounts:statusData
             }
         });
-
     } catch (error) {
         console.error("Error generating chart data:", error);
-        res.status(500).json({ success: false, message: "Error generating chart data" });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            message:responseMessage.SERVER_ERROR
+        })
     }
 };
 

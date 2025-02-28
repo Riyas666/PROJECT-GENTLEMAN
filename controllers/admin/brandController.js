@@ -1,9 +1,9 @@
 const Brand = require("../../models/brandSchema");
-
+const statuscode = require("../../constants/statusCodes");
+const responseMessage = require("../../constants/responseMessage");
 
 const getBrandPage = async(req,res) =>{
     try{
-        
         const page = parseInt(req.query.page) || 1;
         const limit = 4;
         const skip = (page-1)*limit;
@@ -11,20 +11,19 @@ const getBrandPage = async(req,res) =>{
         .sort({createdAt:-1})
         .skip(skip)
         .limit(limit)
-        
         const totalBrands = await Brand.countDocuments();
         const totalPages = Math.ceil(totalBrands/limit);
-        const reverseBrand = brandData.reverse();
         
         res.render("brands", {
             limit,
-            data:reverseBrand,
+            data:brandData,
             currentPage:page,
             totalPages,
             totalBrands
         });
 
         }catch(error){
+            console.log("Error fetching brands",error);
             res.redirect("/pageerror")
     };
 };
@@ -32,53 +31,85 @@ const getBrandPage = async(req,res) =>{
 
 const addBrand = async(req,res) =>{
 
-    const brand = req.body.name;
+    const brand = req.body.name.trim();
     const image = req.file.filename;
-    const trimmedBrand = brand.trim()
     try{
-       
-        const existingBrand = await Brand.findOne({brand:trimmedBrand})  
-
+        const existingBrand = await Brand.findOne({brand:brand})  
         if(existingBrand){
-            return res.status(400).json({error:"Brand already exist"})
+            return res.status(statuscode.BAD_REQUEST).json({
+                success:false,
+                message:responseMessage.BRAND_EXIST,
+                })
         }
-       
             const newBrand = new Brand({
-                brandName :trimmedBrand,
+                brandName :brand,
                 brandImage: image,
             });
-
             await newBrand.save();
-            res.redirect("/admin/brands");
-        
+            return res.status(statuscode.CREATED).json({
+                success: true,
+                message: responseMessage.BRAND_ADDED, 
+                brand: newBrand,
+            });
+           
     }catch(error){
-        res.redirect("/pageerror");
+        console.error("Error adding brand",error);
+        return res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            message:responseMessage.SERVER_ERROR
+        })
     };
 };
 
 const blockBrand = async (req, res) => {
 
-    const { id, isBlocked } = req.body;
-
+    const { id } = req.body;
+    
     try {
+        const brand = await Brand.findById(id);
+        if(!brand){
+            return res.status(statuscode.NOT_FOUND).json({
+                success:false,
+                message:responseMessage.BRAND_NOT_FOUND
+            })
+        }
 
-        await Brand.updateOne({ _id: id }, { $set: { isBlocked } });
-        res.status(200).json({ success: true });
-       
+        await Brand.updateOne({ _id: id }, { $set: { isBlocked: true } });
+
+        res.status(statuscode.OK).json({ 
+            success: true ,
+            message: responseMessage.BRAND_BLOCKED_SUCCESS
+        });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to block Brand." });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            error: responseMessage.SERVER_ERROR });
     };
 };
 
 
 const unblockBrand = async (req, res) => {
+    const { id } = req.body;
     try {
-        const { id, isBlocked } = req.body;
-        await Brand.updateOne({ _id: id }, { $set: { isBlocked } });
+        const brand = await Brand.findById(id);
+        if(!brand){
+            return res.status(statuscode.NOT_FOUND).json({
+                success:false,
+                message:responseMessage.BRAND_NOT_FOUND
+            })
+        }
 
-        res.status(200).json({ success: true });
+        await Brand.updateOne({ _id: id }, { $set: { isBlocked: false } });
+
+        res.status(statuscode.OK).json({ 
+            success: true ,
+            message: responseMessage.BRAND_UNBLOCKED_SUCCESS
+        });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to unblock product." });
+        res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            error: responseMessage.SERVER_ERROR 
+        });
     }
 };
 
