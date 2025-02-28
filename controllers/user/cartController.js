@@ -209,7 +209,6 @@ const getCart = async (req, res) => {
 
      
       await cart.save();
-      console.log("Cart updated successfully:", cart);
       res.status(statuscode.OK).json({ 
         success: true, 
         totel, 
@@ -241,9 +240,14 @@ const getCart = async (req, res) => {
               error: responseMessage.CART_ITEM_NOT_FOUND 
             });
         }
+        const cart = await Cart.findOne({userId:req.session.user})
 
+        const totel = cart.items.reduce((acc,value) => {
+          return acc + value.totalPrice
+        }, 0)
         res.status(statuscode.OK).json({ 
           success: true, 
+          totel,
           cart: updatedCart 
         });
     } catch (error) {

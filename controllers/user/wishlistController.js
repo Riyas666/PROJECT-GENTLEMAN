@@ -84,7 +84,7 @@ const addToWishlist = async(req,res)=>{
       await user.save()
       res.status(statuscode.OK).json({ 
         status: true,
-        message: responseMessage.PRODUCT_ADDED
+        message: responseMessage.PRODUCT_ADDED_WISHLIST
      });
   
     }catch(error){
@@ -130,12 +130,57 @@ const deleteWishlistItem = async (req, res) => {
     }
   };
   
+  const removeFromWishlist = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const userId = req.session.user; 
+
+        if (!userId) {
+            return res.status(statuscode.UNAUTHORIZED).json({
+                success: false,
+                message: responseMessage.UNAUTHORIZED_USER
+            });
+        }
+
+        if (!productId) {
+            return res.status(statuscode.BAD_REQUEST).json({
+                success: false,
+                message: "product id required"
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $pull: { wishlist: { productId } } }, 
+            { new: true } 
+        ).populate("wishlist.productId");
+
+        if (!updatedUser) {
+            return res.status(statuscode.NOT_FOUND).json({
+                success: false,
+                message: responseMessage.USER_NOT_FOUND
+            });
+        }
+
+        return res.status(statuscode.OK).json({
+            success: true,
+            message: "product removed",
+            wishlist: updatedUser.wishlist
+        });
+
+    } catch (error) {
+        console.error("Error removing product from wishlist:", error);
+        return res.status(statuscode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: responseMessage.SERVER_ERROR
+        });
+    }
+};
 
   
   module.exports = {
-    
     getWishlist,
     addToWishlist,
     deleteWishlistItem,
-
+    removeFromWishlist
   }

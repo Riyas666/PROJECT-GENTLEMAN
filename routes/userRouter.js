@@ -42,9 +42,19 @@ router.post("/verify-otp", userController.verifyOtp);
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
 router.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/signup" }), (req, res) => {
-    console.log(`req.user___${req.user}`)
-    req.session.userData = { name:req.user.name, email: req.user.email, password:req.user.password };
-    res.redirect("/home");
+    req.login(req.user, (err) => {
+        if(err) {
+            console.error("Login Error:", err);
+            return res.redirect("/signup")
+        }
+        
+        req.session.userData = req.user;
+        req.session.user = req.session.userData._id;
+        
+        console.log("dcdc", req.session.userData)
+        res.redirect("/home")
+    })
+
 });
 
 
@@ -77,7 +87,7 @@ router.post('/retry-payment', orderController.retryPayment);
 router.get("/wishlist",userAuth, wishlistController.getWishlist)
 router.post("/addToWishlist", userAuth,wishlistController.addToWishlist)
 router.post('/wishlist/delete',userAuth, wishlistController.deleteWishlistItem);
-// router.post("/wishlist/remove", wishlistController.removeFromWishlist)
+router.post("/wishlist/remove", wishlistController.removeFromWishlist)
 
 
 

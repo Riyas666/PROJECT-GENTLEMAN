@@ -562,25 +562,25 @@ addToCartButton.addEventListener('click', (e) => {
     showOnlyTheLastOne: true,    
   });
       }else if (data.message.includes('You can only add up to')) {
-          Notiflix.Notify.warning(data.message, {
-    timeout: 3000,                
-    position: 'right-top',       
-    clickToClose: true,          
-    cssAnimationStyle: 'zoom',   
-    fontSize: '16px',            
-    borderRadius: '10px',       
-    showOnlyTheLastOne: true,    
-  });
+        Swal.fire({
+                    title: 'Warning!',
+                    text: data.message,
+                    icon: 'warning',
+                    background: '#fff', 
+                    color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
+                })
         } else if (data.message.includes('Not enough stock for size')) {
-          Notiflix.Notify.failure(data.message, {
-    timeout: 3000,               
-    position: 'right-top',       
-    clickToClose: true,          
-    cssAnimationStyle: 'zoom',
-    fontSize: '16px',        
-    borderRadius: '10px',       
-    showOnlyTheLastOne: true,   
-  });
+          Swal.fire({
+                    title: 'Error!',
+                    text: data.message,
+                    icon: 'error',
+                    background: '#fff', 
+                    color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
+                });
         } else if (data.message.includes('Product not found')) {
           Swal.fire({
             icon: 'error',
@@ -590,17 +590,15 @@ addToCartButton.addEventListener('click', (e) => {
      
         }
          else {
-          Notiflix.Notify.failure(data.message, {
-    timeout: 3000,
-    position: 'right-top',
-    clickToClose: true,
-    cssAnimationStyle: 'zoom',
-    fontSize: '16px',        
-    borderRadius: '10px',       
-    showOnlyTheLastOne: true,   
-  });
-        
-          
+          Swal.fire({
+                    title: 'Error!',
+                    text: data.message,
+                    icon: 'error',
+                    background: '#fff', 
+                    color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
+                })
         }
  } )
       .catch((error) => {
@@ -710,7 +708,15 @@ addToCartButton.addEventListener('click', (e) => {
     .then((response) => response.json())
     .then((data) => {
       if (data.status) {
-        Swal.fire("Success", data.message, "success");
+        Notiflix.Notify.success(data.message, {
+    timeout: 3000,                
+    position: 'right-top',       
+    clickToClose: true,          
+    cssAnimationStyle: 'zoom',   
+    fontSize: '16px',            
+    borderRadius: '10px',         
+    showOnlyTheLastOne: true,    
+  });
       } else {
         Swal.fire("Error", data.message, "error");
       }

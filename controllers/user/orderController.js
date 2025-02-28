@@ -365,18 +365,23 @@ const verifyPayment = async (req, res) => {
       });
     }
   };
-  
+    
 
 const orderDetails = async(req,res)=>{
     const userId = req.session.user;
     const id = req.params.id;
 
     try{
+
         const user = User.find({userId})
         const orders = await Order.findById(id).populate("orderedItems.products").populate("address")
         const estimatedDeliveryDate = new Date(orders.createdAt);
         estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 2);
-        res.render("orderdetails", {orders,user, estimatedDeliveryDate})
+        res.render("orderdetails", {
+          orders,
+          user, 
+          estimatedDeliveryDate
+        })
 
     } catch(error) {
       console.log(error)
@@ -407,7 +412,6 @@ const cancelOrder = async (req, res) => {
 
         await user.save(); 
 
-        console.log(`Refunded ₹${order.finalAmount} to user wallet`);
       } else {
         return res.status(statuscode.NOT_FOUND).json({ 
           success: false,
@@ -432,7 +436,7 @@ const cancelOrder = async (req, res) => {
         await product.save(); 
       }
     }
-    }
+  }
 
     order.status = status;
     order.cancelReason = reason
@@ -494,7 +498,7 @@ const returnOrder = async (req, res) => {
     res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
       success: false, 
       message: responseMessage.SERVER_ERROR 
-  });
+    });
   }
 }; 
 
@@ -521,7 +525,6 @@ const retryPayment = async (req, res) => {
       orderDetails.orderId = razorpayOrder.id;
 
       await orderDetails.save()
-
       res.json({ success: true, razorpayOrder, amount: options.amount });  
 
   } catch (error) {
@@ -556,7 +559,6 @@ const verifyRetryPayment = async (req, res) => {
 
       order.paymentStatus = "Success";
       await order.save();
-
       res.status(statuscode.OK).json({ 
         success: true, 
         message: responseMessage.RETRY_PAYMENT_SUCCESS 

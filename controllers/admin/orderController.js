@@ -26,7 +26,7 @@ const orderDetails = async (req, res) => {
     });
    }
 
-   res.json({order:orders});   
+   res.json({order: orders});   
 
    } catch (error) {
      console.error(error);

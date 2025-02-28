@@ -88,7 +88,16 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            Swal.fire('Deleted!', 'The item has been removed from your cart.', 'success').then((res)=>{
+            Swal.fire({
+                    title: 'Removed!',
+                    text: data.message,
+                    icon: 'success',
+                    background: '#fff', 
+                    color: '#000', 
+                    showConfirmButton: false,
+                    timer:1000,
+          
+                }).then((res)=>{
               if(res.isConfirmed){
                   window.location.href="/wishlist"
               }

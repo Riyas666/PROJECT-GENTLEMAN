@@ -17,9 +17,14 @@ function deleteProduct(productId, size) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId, size }), 
       })
+      
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
+            document.querySelectorAll('.cartTotel').forEach(item => {
+              item.innerHTML = data.totel;
+            });
+
             Swal.fire({
               title: 'Deleted!',
               text: 'The item has been removed from your cart.',

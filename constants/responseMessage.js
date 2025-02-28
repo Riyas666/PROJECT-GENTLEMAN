@@ -37,12 +37,12 @@ const responseMessage = Object.freeze({
     RETURN_REQUEST_SUCCESS: "Return request submitted Successfully",
     INVALID_INPUT: "Invalid product, size, or quantity.",
     PRODUCT_NOT_FOUND: "Product not found.",
-    ITEM_ADDED: "Item added to cart successfully!",
+    ITEM_ADDED: "Product added to cart successfully!",
 
     CART_NOT_FOUND: "Cart not found.",
     CART_ITEM_NOT_FOUND:"Item not found in cart.",
     ITEM_NOT_FOUND: "Item not found in cart.",
-    MAX_QUANTITY_LIMIT: (max) => `You can only add up to ${max} items of this product.`,
+    MAX_QUANTITY_LIMIT: (max) => `You can only add up to ${max} items of this product to cart.`,
     NOT_ENOUGH_STOCK: (size) => `Not enough stock available for size ${size}.`, 
 
     USER_UNBLOCKED:"User has been Unblocked",
@@ -56,6 +56,7 @@ const responseMessage = Object.freeze({
   
     PRODUCT_ALREADY_WISHLIST: "Product already in wishlist",
     PRODUCT_REMOVED_WISHLIST: "Product removed from wishlist successfully",
+    PRODUCT_ADDED_WISHLIST: "Product added to wishlist successfully",
  //PERSONALCONROLLER
 
   PROFILE_UPDATE_SUCCESS: "Profile updated successfully",
@@ -77,6 +78,13 @@ const responseMessage = Object.freeze({
   INVALID_OTP: "Invalid OTP, please try again",
 
     CATEGORY_REQUIRED:"Category Is Required",
+
+
+
+
+    UNAUTHORIZED_USER: "User not authorized. Please log in.",
+    WISHLIST_NOT_FOUND: "Wishlist not found.",
+    PRODUCT_NOT_FOUND_IN_WISHLIST: "Product not found in wishlist.",
 
 
 
