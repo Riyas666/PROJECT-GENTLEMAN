@@ -42,6 +42,8 @@ const addCategory = async (req, res) => {
 
     const { name, description } = req.body;
     const trimmedName = name.trim();
+    console.log("aa", trimmedName)
+    console.log("bb", description)
 
     try {
         const existingCategory = await Category.findOne({ name: trimmedName });
@@ -51,20 +53,25 @@ const addCategory = async (req, res) => {
                 message:responseMessage.CATEGORY_EXIST
                 });
         };
-
-        const newCategory = new Category({
+       
+        const newCategory =  new Category({
            name: trimmedName,
-           description,
+           description: description,
         });
+        console.log("bb" , newCategory) 
 
         await newCategory.save();
+        console.log("cc")
+
         return res.status(statuscode.CREATED).json({ 
             success: true,
-            message: responseMessage.CATEGORY_ADDED
+            message: responseMessage.CATEGORY_ADDED,
+            
          });
 
     } catch (error) {
-        return res.status(statuscode.INTERNAL_SERVER_ERROR).json({ error: SERVER_ERROR });
+        console.error("Error adding category", error);
+        return res.status(statuscode.INTERNAL_SERVER_ERROR).json({ error: responseMessage.SERVER_ERROR });
     };
 };
 

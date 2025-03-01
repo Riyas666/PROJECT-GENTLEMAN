@@ -87,10 +87,10 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md-3">
-            <form method="post" action="/admin/category/addCategory" onsubmit="return handleFormSubmit(event)">
+            <form method="post" id="addCategoryForm" action="/admin/category/addCategory">
               <div class="mb-4">
-                <label for="product_name" class="form-label">Name</label>
-                <input type="text" name="name" placeholder="Type here" class="form-control" id="product_name" required/>
+                <label for="product_name"  class="form-label">Name</label>
+                <input type="text" name="name" placeholder="Type here" class="form-control" id="categoryName" required/>
                 <div id="name-error" class="error-message"></div>
               </div>
               <div class="mb-4">
@@ -120,7 +120,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                    <%cat.reverse().forEach((category, index)=>{%>
+                    <%cat.forEach((category, index)=>{%>
                   <tr>
                     <td></td>
                     <td class="text-start"><%=category.name%></td>
@@ -227,90 +227,68 @@
 
 
 <script>
-    function handleFormSubmit(event){
-        event.preventDefault()
-            if(!validateForm()){
-                return;
-            }
-            const name = document.getElementsByName("name")[0].value;
-            const description = document.getElementById("descriptionId").value;
 
-            fetch("/admin/category/addCategory",{
-                method:"POST",
-                headers:{
-                    'content-type':'application/json'
-                },
-                body:JSON.stringify({name, description})
-            })
-            .then(response=>{
-                if(!response.ok){
-                    return response.json().then(err=>{
-                        throw new Error(err.error)
-                    })
-                }
-                return response.json()
-            })
-            .then(data => {
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: data.message
-      }).then(() => {
-        location.reload();
-      });
-    })
-    .catch(error => {
-      Swal.fire({
-        icon: "error",
-        title: "Oops",
-        text: error.message
-      });
-    });
+function validateForm() {
+    const categoryName = document.getElementById("categoryName").value.trim();
+    const namerror = document.getElementById("name-error")
+    if (!categoryName) {
+        namerror.textContent = "Category name is required";
+        return false;
+    }
+    return true;
 }
-            
+document.addEventListener("DOMContentLoaded", () => {
+    const baseUrl = "/admin/category";
+    const addCategoryForm = document.getElementById("addCategoryForm");
+
+    if (addCategoryForm) {
+        addCategoryForm.addEventListener("submit", handleFormSubmit);
+    }
+
+    /////////////////////    ADD CATEGORY   /////////////////////
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
         
-    function validateForm(){
-        clearErrorMessages()
-        const name = document.getElementsByName("name")[0].value.trim()
-        const description = document.getElementById("descriptionId").value.trim()
-        isValid = true;
+        if (!validateForm()) return
+        const name = document.getElementsByName("name")[0].value.trim();
+        const description = document.getElementById("descriptionId").value.trim();
 
+        try {
+            const response = await fetch(`${baseUrl}/addCategory`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, description }),
+            });
 
+            const result = await response.json();
+console.log("aaa", result)
 
-        if(name===""){
-            displayErrorMessage("name-error", "Pleasse enter a name")
-            isValid = false
-        }else if(!/^[a-zA-Z\s]+$/.test(name)){ 
-            displayErrorMessage("name-error", "Category name should contain only alphabetic characters")
-            isValid = false
+            if (response.ok && result.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: result.message,
+                    timer: 1000,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } else {
+              Swal.fire({
+        title: "Error!",
+        text: result.message || "Something went wrong.",
+        icon: "error",
+        confirmButtonText: "OK"
+      });         
+       }
+        } catch (error) {
+          console.error("Error", error);
+            Swal.fire({ 
+              icon: "error", 
+              title: "Oops!", 
+              text: "error"
+            });
         }
-        if(description===""){
-            displayErrorMessage("description-error", "Pleasse enter a description")
-            isValid = false
-        }
-
-        return isValid;
     }
-
-
-    function displayErrorMessage(elementId,message){
-        var errorElement = document.getElementById(elementId);
-        errorElement.innerText = message;
-        errorElement.style.display = "block"
-    }
-///////////ERROR MESSAGE CLEAR///////////
-
-    function clearErrorMessages(){
-        const errorElements = document.getElementsByClassName("error-message");
-        Array.from(errorElements).forEach((element) =>{
-            element.innerText = "";
-            element.style.display = "none"
-        })
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        const baseUrl = "/admin/category";
-
         /////////////////////    FOR LISTING THE PRODUCT  /////////////////////
 
         document.querySelectorAll(".list-btn").forEach(button => {

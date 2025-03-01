@@ -22,7 +22,7 @@ const categorySchema = new mongoose.Schema({
     },
     offerName: {
         type: String,
-        required: true
+        required: false
     }, 
    
 }, {timestamps:true})
