@@ -96,12 +96,9 @@
                     color: '#000', 
                     showConfirmButton: false,
                     timer:1000,
-          
-                }).then((res)=>{
-              if(res.isConfirmed){
-                  window.location.href="/wishlist"
-              }
-          });
+                }).then(()=>{
+                  window.location.reload()
+                })
         } else {
             Swal.fire('Error!', data.error || 'Failed to delete the product.', 'error');
             }

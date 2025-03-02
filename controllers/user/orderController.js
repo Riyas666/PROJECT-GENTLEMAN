@@ -75,6 +75,13 @@ const loadCheckoutPage = async (req, res) => {
             });
         }  
 
+        if( paymentMethod==="COD" && finalAmount>1000){
+          return res.status(statuscode.BAD_REQUEST).json({
+            success: false,
+            message: responseMessage.COD_LIMIT
+          })
+        }
+
       const discount = offerdiscount + coupons?coupons.discountAmount : 0;
       const cart = await Cart.findOne({ userId })
         if (!cart || cart.items.length === 0) {
@@ -156,12 +163,7 @@ const loadCheckoutPage = async (req, res) => {
         switch(paymentMethod){
     
           case 'COD':
-            if(finalAmount>1000){
-              return res.status(statuscode.BAD_REQUEST).json({
-                success: false,
-                message: responseMessage.COD_LIMIT
-              })
-            }
+            
 
             await newOrder.save();
             break;
@@ -213,9 +215,13 @@ const loadCheckoutPage = async (req, res) => {
   
 const placeOrderOnline = async (req, res) => {
   try {
+   
     const coupons = req.session.coupon;
     const userId = req.session.user; 
     const {  addressId,  paymentMethod } = req.body;
+
+
+
     const cart = await Cart.findOne({userId})
     if (!cart || cart.items.length === 0) {
       return res.status(statuscode.NOT_FOUND).json({ 
@@ -235,6 +241,7 @@ const placeOrderOnline = async (req, res) => {
           message: `${responseMessage.PRODUCT_NOT_FOUND} (ID: ${item.productId})` 
         });
       }
+
       const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
     
               if (!sizeObject || sizeObject.quantity < item.quantity) {
@@ -245,6 +252,7 @@ const placeOrderOnline = async (req, res) => {
               }         
           }
 
+
           for (const item of cart.items) {
             const product = products.find((prod) => prod._id.toString() === item.productId.toString());
             const sizeObject = product.sizes.find((sizes) => sizes.size == item.size);
@@ -254,11 +262,16 @@ const placeOrderOnline = async (req, res) => {
         }
 
         const totalPrice = cart.items.reduce((acc, item) => acc + item.totalPrice, 0);
+        console.log("this is the total price", totalPrice)
         const finalAmount = totalPrice ; 
+        if (coupons && coupons.finalAmount) {
+          finalAmount = coupons.finalAmount;
+        }
+    
         const address = await Address.findOne({ userId, "address._id": addressId });
         const selectedAddress = address.address.find(addr => addr._id == addressId);
         const options = {
-        amount: coupons?coupons.finalAmount*100:finalAmount*100, 
+        amount: finalAmount * 100, 
         currency: 'INR',
         receipt: `order_rcptid_${Math.floor(Math.random() * 10000)}`,
       };
@@ -280,7 +293,7 @@ const placeOrderOnline = async (req, res) => {
         address: selectedAddress,
         totalPrice: totalPrice ,
         discount:coupons?coupons.discountAmount:0,
-        finalAmount:coupons?coupons.finalAmount:finalAmount,
+        finalAmount:finalAmount,
         status: "Pending", 
         paymentType: paymentMethod, 
         paymentStatus: "Pending", 
