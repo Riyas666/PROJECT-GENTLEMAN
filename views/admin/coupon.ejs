@@ -133,6 +133,7 @@
                  Add Coupon
                </button>
              </div>
+             
              <div id="err-msg" class="error-message"></div>
            </body>
          </form>
@@ -190,96 +191,165 @@
 
 
 <script>
+    // Set default start date as today (optional)
+    function setDefaultStartDate(){
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = (today.getMonth() + 1).toString().padStart(2, "0");
+      const day = today.getDate().toString().padStart(2, "0");
+      document.getElementById("startingDate").value = `${year}-${month}-${day}`;
+    }
 
-function setDefaultStartDate(){
-    const today = new Date();
-    const year = today.getFullYear();
-    let month = (today.getMonth()+1).toString().padStart(2,"0");
-    let day = today.getDate().toString().padStart(2,"0");
-    document.getElementById("startingDate").value = `${year}-${month}-${day}`
-}
+    // Coupon Form Submission with Validation
+    document.getElementById("couponForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+      if (!validateCouponForm()) 
+      return;
+      
+      const formData = {
+        couponName: document.getElementById("coupon-name").value.trim(),
+        startDate: document.getElementById("startingDate").value,
+        endDate: document.getElementById("expiringDate").value,
+        offerPrice: document.getElementsByName("offerPrice")[0].value,
+        minimumPrice: document.getElementsByName("minimumPrice")[0].value
+      };
 
+      try {
+        const response = await fetch("/admin/createCoupon", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        });
 
-document.getElementById("couponForm").addEventListener("submit", async function (event) {
-  event.preventDefault();
+        const data = await response.json();
 
-
-  const formData = {
-    couponName : document.getElementById("coupon-name").value,
-    startDate : document.getElementById("startingDate").value,
-    endDate : document.getElementById("expiringDate").value,
-    offerPrice : document.getElementsByName("offerPrice")[0].value,
-    minimumPrice : document.getElementsByName("minimumPrice")[0].value
-  }
-
-  try{
-    const response = await fetch("/admin/createCoupon", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+        if (data.success) {
+          Swal.fire({
+            icon:"success",
+            title: "Success!",
+            text: data.message
+          }).then(() => {
+            window.location.href = "/admin/coupon";
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: data.message
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          icon:"error",
+          title:"Error",
+          text: error.message
+        });
+      }
     });
 
-    const data = await response.json();
+    // Validate Coupon Form Inputs
+    function validateCouponForm() {
+      clearCouponErrorMessages();
+      let isValid = true;
+      
+      const couponName = document.getElementById("coupon-name").value.trim();
+      const startDate = document.getElementById("startingDate").value;
+      const endDate = document.getElementById("expiringDate").value;
+      const offerPrice = document.getElementsByName("offerPrice")[0].value;
+      const minimumPrice = document.getElementsByName("minimumPrice")[0].value;
+      
+      if (couponName === "") {
+        displayCouponErrorMessage("error-coupon-name", "Please enter a coupon name");
+        isValid = false;
+      }
+      
+      if (!startDate) {
+        displayCouponErrorMessage("error-start-date", "Please select a start date");
+        isValid = false;
+      }
+      
+      if (!endDate) {
+        displayCouponErrorMessage("error-end-date", "Please select an end date");
+        isValid = false;
+      }
+      
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const today = new Date();
+        if (end < start) {
+          displayCouponErrorMessage("error-end-date", "End date must be after start date");
+          isValid = false;
+        }
+        if (end < today) {
+        displayCouponErrorMessage("error-end-date", "End date must be in the future");
+        isValid = false;
+    }
+      }
+      
+      if (!offerPrice || isNaN(offerPrice) || Number(offerPrice) <= 0) {
+        displayCouponErrorMessage("error-offer-price", "Please enter a valid offer price greater than 0");
+        isValid = false;
+      }
+      
+      if (!minimumPrice || isNaN(minimumPrice) || Number(minimumPrice) <= 0) {
+        displayCouponErrorMessage("error-minimum-price", "Please enter a valid minimum price greater than 0");
+        isValid = false;
+      }
+      if(Number(offerPrice) > Number(minimumPrice)){
+        displayCouponErrorMessage("error-minimum-price", "Minimum price should be greater than offer price");
+        isValid = false;
+      }
+      
+      return isValid;
+    }
 
-    if(data.success){
-      Swal.fire({
-        icon:"success",
-        title: "Success!",
-        text: data.message,
-      }).then(() =>{
-        window.location.href = "/admin/coupon"
-      });
-    }else{
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: data.message,
+    // Display error message for coupon form
+    function displayCouponErrorMessage(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerText = message;
+      errorElement.style.display = "block";
+    }
+
+    // Clear all coupon error messages
+    function clearCouponErrorMessages() {
+      const errorElements = document.getElementsByClassName("error-message");
+      Array.from(errorElements).forEach(element => {
+        element.innerText = "";
+        element.style.display = "none";
       });
     }
-  }catch(error){
-    console.error("Error:", error);
-    Swal.fire({
-      icon:"error",
-      title:"Error",
-      text:data.message,
-    })
-  }
-})
 
-
-
-
-
- function deleteCoupon(couponId) {
-  fetch(`/admin/deletecoupon?id=${couponId}`,
-    {method:"DELETE"}
-  ).then((response) => response.json())
-  .then((data) =>{
-    if(data.success){
-      Swal.fire({
-        icon:'success',
-        title:"Deleted",
-        text:data.message
-      })
-    }else{
-      Swal.fire({
-        icon:'error',
-        title:"Error!",
-        text:"Failed to delete the coupon. please try again"
-      })
+    // Delete coupon function (for completeness)
+    function deleteCoupon(couponId) {
+      fetch(`/admin/deletecoupon?id=${couponId}`, { method: "DELETE" })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: "Deleted",
+              text: data.message
+            }).then(() => location.reload());
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: "Error!",
+              text: "Failed to delete the coupon. Please try again"
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error deleting coupon:", error);
+          Swal.fire({
+            icon: 'error',
+            title: "Error!",
+            text: error.message || "An error occurred"
+          });
+        });
     }
-  })
-  .catch((error) =>{
-    console.error("Error deleting coupon:", error);
-    Swal.fire({
-      icon:'error',
-      title:"Error!",
-      text: data.message
-    })
-  })
- }
+  </script>
 
 
 </script>

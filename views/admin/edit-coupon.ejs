@@ -165,14 +165,75 @@
 
  document.getElementById("coupon-form").addEventListener("submit", async function (event) {
   event.preventDefault();
+  let isValid = true;
+
+const couponId = document.getElementById("coupon-id").value;
+const couponName = document.getElementById("coupon-name").value.trim();
+const startDate = document.getElementById("startingDate").value;
+const endDate = document.getElementById("expiringDate").value;
+const offerPrice = document.getElementById("offer-price").value.trim();
+const minimumPrice = document.getElementById("minimum-price").value.trim();
+
+// Clear previous error messages
+document.querySelectorAll(".error-message").forEach(el => el.textContent = "");
+
+// Validation Checks
+if (couponName === "") {
+  displayCouponErrorMessage("error-coupon-name", "Please enter a coupon name");
+  isValid = false;
+}
+
+if (!startDate) {
+  displayCouponErrorMessage("error-start-date", "Please select a start date");
+  isValid = false;
+}
+
+if (!endDate) {
+  displayCouponErrorMessage("error-end-date", "Please select an end date");
+  isValid = false;
+}
+
+if (startDate && endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const today = new Date();
+
+  if (end < start) {
+    displayCouponErrorMessage("error-end-date", "End date must be after the start date");
+    isValid = false;
+  }
+
+  if (end < today) {
+    displayCouponErrorMessage("error-end-date", "End date must be in the future");
+    isValid = false;
+  }
+}
+
+if (!offerPrice || isNaN(offerPrice) || Number(offerPrice) <= 0) {
+  displayCouponErrorMessage("error-offer-price", "Please enter a valid offer price greater than 0");
+  isValid = false;
+}
+
+if (!minimumPrice || isNaN(minimumPrice) || Number(minimumPrice) <= 0) {
+  displayCouponErrorMessage("error-minimum-price", "Please enter a valid minimum price greater than 0");
+  isValid = false;
+}
+
+if (Number(offerPrice) > Number(minimumPrice)) {
+  displayCouponErrorMessage("error-minimum-price", "Minimum price should be greater than offer price");
+  isValid = false;
+}
+
+if (!isValid) return;
+
 
   const couponData = {
-    couponId: document.getElementById("coupon-id").value,
-    couponName: document.getElementById("coupon-name").value,
-    startDate: document.getElementById("startingDate").value,
-    endDate: document.getElementById("expiringDate").value,
-    offerPrice: document.getElementById("offer-price").value,
-    minimumPrice: document.getElementById("minimum-price").value,
+    couponId,
+    couponName,
+    startDate,
+    endDate,
+    offerPrice,
+    minimumPrice,
   };
 
   try {
@@ -210,6 +271,12 @@
     });
   }
 });
+
+function displayCouponErrorMessage(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerText = message;
+      errorElement.style.display = "block";
+    }
 
 </script>
 <%- include("../../views/partials/admin/footer") %>
