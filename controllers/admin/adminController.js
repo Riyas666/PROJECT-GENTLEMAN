@@ -67,7 +67,7 @@ const getProductOffer = async(req, res) =>{
         const merge = [...productsoffer, ...categoryoffer];
         merge.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-            res.render("productOffer", {
+            res.render("productoffer", {
                 products,
                 productsoffer,
                 categoryoffer,
