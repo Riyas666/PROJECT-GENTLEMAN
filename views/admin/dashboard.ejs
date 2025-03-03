@@ -321,8 +321,8 @@ canvas {
   <div class="content-header">
 
     <h2 class="content-title card-title">Dashboard Analytics</h2>
-    <button class="btn btn-primary">
-      <i class="fas fa-download"></i> Export Report
+    <button class="btn btn-primary" onclick=" exportReport()">
+      <i class="fas fa-download" ></i> Export Report
     </button>
   </div>
   <div class="card mb-4">
@@ -480,9 +480,9 @@ canvas {
                 </span>
               </td>
 
-              <td>₹<%=(order.finalAmount + order.discount).toLocaleString()%></td>
-              <td>₹<%=order.discount.toLocaleString()%></td>
-              <td>₹<%=order.finalAmount.toLocaleString()%></td>
+              <td><%=(order.finalAmount + order.discount).toLocaleString()%>/-</td>
+              <td><%=order.discount.toLocaleString()%>/-</td>
+              <td><%=order.finalAmount.toLocaleString()%>/-</td>
               <td>
                 <button onclick="viewOrderDetails('<%=order._id%>')" class="btn btn-primary btn-sm">View</button>
               </td>
@@ -946,23 +946,23 @@ window.onload = fetchSalesData;
               row.status === 'Cancelled' ? 'danger' : 'info';
             tableRows += `
                 <tr>
-                   <td>${new Date(row.createdAt).toLocaleDateString('en-GB')}</td>
-                    <td>${row.orderId}</td>
-                    <td>${row.userId.name}</td>
-                    <td>${row.orderedItems.length}</td>
-                    <td>
-                                <span class="badge bg-${statusClass}">
-                        ${row.status}
+                  <td>${new Date(row.createdAt).toLocaleDateString('en-GB')}</td>
+                  <td>${row.orderId}</td>
+                  <td>${row.userId.name}</td>
+                  <td>${row.orderedItems.length}</td>
+                  <td>
+                    <span class="badge bg-${statusClass}">
+                      ${row.status}
                     </span>
-                            </td>
-<td>&#8377;${row.finalAmount + row.discount}</td>
-                    <td>&#8377;${row.discount.toLocaleString()}</td>
-                            <td>&#8377;${row.finalAmount.toLocaleString()}</td>
-                    <td>
-                                <button onclick="viewOrderDetails('${row._id}')" class="btn btn-primary btn-sm">View</button>
-                            </td>
+                  </td>
+                  <td>&#8377;${row.finalAmount + row.discount}</td>
+                  <td>&#8377;${row.discount.toLocaleString()}</td>
+                  <td>&#8377;${row.finalAmount.toLocaleString()}</td>
+                  <td>
+                    <button onclick="viewOrderDetails('${row._id}')" class="btn btn-primary btn-sm">View</button>
+                  </td>
                 </tr>
-            `;
+                `;
 
           });
 
