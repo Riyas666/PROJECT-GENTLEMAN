@@ -559,7 +559,7 @@
                   amount: order.razorpayOrder.amount,
                   currency: 'INR',
                   order_id: order.razorpayOrder.id, 
-                  name: 'Your Store',
+                  name: 'Gentle Man',
                   description: 'Payment for your order',
                   handler: async function (response) {
                     try {
@@ -607,7 +607,7 @@
                     email: '<%=user.email%>',
                     contact: '<%=user.phone%>',
                   },
-                  theme: { color: '#3399cc' },
+                  theme: { color: '#000000' },
                   modal: {
                 ondismiss: function () {
                     Swal.fire({

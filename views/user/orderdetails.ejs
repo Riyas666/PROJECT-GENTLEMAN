@@ -460,10 +460,8 @@ if(cancelReasonResult.isConfirmed){
           confirmButtonText: 'Submit',
           cancelButtonText: 'Cancel'
         });
-
         if (returnReasonResult.isConfirmed) {
           const reason = returnReasonResult.value;
-
           let finalReason = reason;
         
           if (reason === 'Other') {
@@ -494,12 +492,12 @@ if(cancelReasonResult.isConfirmed){
                 reason: finalReason
               }),
             });
-            const data = await response.json()
-
+            const data = await response.json();
             if (!response.ok) {
               throw new Error('Failed to return the order');
             }
 
+              
             await Swal.fire({
               title: 'Returned!',
               text: data.message,
@@ -618,6 +616,10 @@ if(cancelReasonResult.isConfirmed){
 });
 
 
+  </script>
+  <script>
+    
+
 function downloadInvoice(orderId) {
   const {
       jsPDF
@@ -628,15 +630,18 @@ function downloadInvoice(orderId) {
     const orderDetails = {
         orderId: "<%= orders.orderId %>",
         date: "<%= new Date(orders.createdAt).toLocaleDateString() %>",
-        totalAmount: "₹<%= orders.finalAmount %>",
+        totalAmount: "<%= orders.finalAmount %>/-",
         paymentType: "<%= orders.paymentType %>",
         paymentStatus: "<%= orders.paymentStatus %>",
         estimatedDelivery: "<%= estimatedDeliveryDate.toLocaleDateString() %>",
         customerName: "<%= orders.address.name %>",
         customerAddress: "<%= orders.address.city %>, <%= orders.address.state %>, <%= orders.address.pincode %>",
         customerPhone: "<%= orders.address.phonenumber %>",
-        items: "<%= JSON.stringify(orders.orderedItems).replace(/</g, '\\u003c') %>"
+        items: `<%- JSON.stringify(orders.orderedItems) %>`
+
       };  
+
+      const parsedItems = JSON.parse(orderDetails.items);
 
     // Set Title
     doc.setFont("helvetica", "bold");
@@ -661,10 +666,10 @@ function downloadInvoice(orderId) {
     doc.text(`Phone: ${orderDetails.customerPhone}`, 14, 104);
 
     // Order Items Table
-    const tableData = orderDetails.items.map(item => [
+    const tableData = parsedItems.map(item => [
     item.productName,  // Directly available in orderedItems
     item.quantity,
-    `₹${item.price}`
+    `${item.price}/-`
 ]);
 
     doc.autoTable({
@@ -679,7 +684,6 @@ function downloadInvoice(orderId) {
     // Save PDF
     doc.save(`Invoice_${orderDetails.orderId}.pdf`);
 }
-
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>

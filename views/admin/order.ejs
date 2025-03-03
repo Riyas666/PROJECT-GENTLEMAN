@@ -279,11 +279,9 @@ const changeOrderStatus = async (orderId, newStatus) => {
   icon: "success",
   confirmButtonText: "OK"
 })
- .then((result) => {
-  if (result.isConfirmed) {
-    location.reload(); 
-  }
-});
+ .then(()=>{
+  location.reload()
+ })
     const statusCell = document.querySelector(`#order_${orderId}`);
     if (statusCell) {
 
