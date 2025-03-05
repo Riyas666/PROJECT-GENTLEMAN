@@ -96,7 +96,7 @@ const addProducts = async (req, res) => {
         return res.redirect("/admin/products");
     } catch (error) {
         console.error("error saving product", error);
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ 
+        return res.status(statuscode.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
             message: responseMessage.SERVER_ERROR
     })
