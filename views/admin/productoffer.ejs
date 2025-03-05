@@ -199,8 +199,10 @@
           icon: "success",
           title: "Added",
           text: "Offer added successfully!",
-          confirmButtonText: "OK",
-        }).then(() => location.reload());
+          color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
+                          }).then(() => location.reload());
       } else {
         Swal.fire("Failed", data.message || "Adding offer failed", "error");
       }

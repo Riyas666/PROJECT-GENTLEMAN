@@ -234,7 +234,9 @@ addBrandForm.addEventListener("submit", async (e) => {
         title: "Error!",
         text: result.message || "Something went wrong.",
         icon: "error",
-        confirmButtonText: "OK"
+        color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
       });
     }
   } catch (error) {
@@ -243,7 +245,9 @@ addBrandForm.addEventListener("submit", async (e) => {
       title: "Error!",
       text: "An unexpected error occurred.",
       icon: "error",
-      confirmButtonText: "OK"
+      color: '#000', 
+                    confirmButtonColor: 'black', 
+                    confirmButtonText: 'OK',
     });
   }
 });
