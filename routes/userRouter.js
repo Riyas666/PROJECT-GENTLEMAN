@@ -16,6 +16,7 @@ const wishlistController = require("../controllers/user/wishlistController")
 router.get("/pageNotFound", userController.pageNotFound);
 
 //LOAD HOME PAGE
+router.get("/", userController.loadHomePage);
 router.get("/home", userController.loadHomePage);
 
 //LOAD THE LOGIN PAGE
