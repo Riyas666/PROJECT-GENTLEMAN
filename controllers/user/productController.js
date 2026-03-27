@@ -1,11 +1,11 @@
-const Product = require("../../models/productSchema");
+const Product = require("../../models/productSchema")
 const Category = require("../../models/categorySchema");
-const User = require("../../models/categorySchema");
+const User = require("../../models/userSchema");
 const Brand = require("../../models/brandSchema");
 
 
 const productDetails = async (req, res) => {
-    try {
+        try {
         const userId = req.session.user;
         const userData = await User.findById(userId);
         const productId = req.query.id;
@@ -14,15 +14,17 @@ const productDetails = async (req, res) => {
         const categoryOffer = findCategory?.categoryOffer || 0;
         const productOffer = product.productOffer || 0;
         const totalOffer = categoryOffer + productOffer;
+        const products = await Product.find({ isBlocked: false }).populate("category").populate("brand");
 
+        console.log("this issss", products)
         res.render("product-details", {
-            user: userData,
+            user: userData ,
             product: product,
             sizes: product.sizes,
             totalOffer: totalOffer,
             brand: product.brand,
             category: product.category,
-            
+            products: products
         });
     } catch (error) {
         console.error("Error for fetching product details", error);
@@ -94,7 +96,23 @@ const productDetails = async (req, res) => {
     }
 };
 
+
+const getProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ isBlocked: false })
+            .populate("brand")
+            .populate("category");
+            console.log("this is products", products)
+        res.json(products);
+        
+    } catch (error) {
+        console.log("Error fetching products", error);
+        res.status(500).json({ error: "Failed to fetch products" });
+    }
+}
+
 module.exports = {
     productDetails,
-    loadShopping
+    loadShopping, 
+    getProducts
 };

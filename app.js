@@ -1,12 +1,11 @@
 const express = require("express");
-
 const app = express();
 const path = require("path");
 const dotenv = require("dotenv");
+dotenv.config();
 const nocache = require("nocache");
 const session = require("express-session");
 const passport = require("./config/passport");
-dotenv.config();
 const db = require("./config/db");
 const cors =require("cors")
 const userRouter = require("./routes/userRouter");
@@ -19,7 +18,7 @@ db();
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
 const {errorHandler} = require("./middlewares/errorhandling")
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: 'http://localhost:5173', 
     credentials: true
   }));
 app.use(nocache());
@@ -56,9 +55,8 @@ app.use(errorHandler)
 app.use("/", userRouter);
 app.use("/profile", profileRouter);
 app.use("/cart", cartRouter);
-
-
 app.use("/admin", adminRouter);
+
 
 app.get("/*", (req,res) =>{
     res.redirect("/pageNotFound")

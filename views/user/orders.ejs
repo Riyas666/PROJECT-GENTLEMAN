@@ -1,29 +1,7 @@
 <%-include("../../views/partials/user/userprofile")%>
 <style>
 /* Base styles */
-.main {
-  background-color: #ffffff;
-  min-height: 100vh;
-}
 
-/* Breadcrumb styles */
-.breadcrumb {
-  padding: 1.5rem 0;
-  border-bottom: 1px solid #eee;
-}
-
-.breadcrumb__list {
-  gap: 0.5rem;
-}
-
-.breadcrumb__link {
-  color: #666;
-  transition: color 0.3s ease;
-}
-
-.breadcrumb__link:hover {
-  color: #000;
-}
 
 .tab__header {
   font-size: 1.5rem;
@@ -178,7 +156,6 @@
                 <td>₹<%= order.finalAmount.toFixed(2) %></td>
                 <td><a href="/order-details/<%=order._id%>" class="view__order">View</a></td>
               </tr>
-
               <% }); %>
               <% } else { %>
               <tr>
@@ -186,6 +163,7 @@
               </tr>
               <% } %>
             </tbody>
+
           </table>
         </div>
       </div>

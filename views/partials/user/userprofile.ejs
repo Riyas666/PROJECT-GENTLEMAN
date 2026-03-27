@@ -24,7 +24,9 @@ height:4rem
   .breadcrumb{
     height: 5rem;
   }
-
+.card-body{
+  background-color: var(--section-body-color);
+}
 
 
 
@@ -54,18 +56,8 @@ height:4rem
     opacity: 0.5; /* Reduced opacity for disabled state */
 }
 
-.form__input:disabled {
-    background-color: #f5f5f5; /* Light gray background for disabled inputs */
-    cursor: not-allowed; /* Not allowed cursor for disabled inputs */
-}
-
-.form__input:enabled {
-    background-color: #fff; /* White background for enabled inputs */
-}
-
-.btn:disabled {
-    opacity: 0.5; /* Reduced opacity for disabled buttons */
-    cursor: not-allowed; /* Not allowed cursor for disabled buttons */
+.text-wallet{
+  color: #969696;
 }
 
 .address__actions {
@@ -73,7 +65,7 @@ height:4rem
   display: flex;
   gap: 10px;
 } 
-.btn {
+/* .btn {
   padding: 8px 12px;
   font-size: 14px;
   border: none;
@@ -95,7 +87,7 @@ height:4rem
 
 .btn:hover {
   opacity: 0.9;
-}
+} */
 
 .add__address {
   margin-top: 20px;
@@ -110,7 +102,7 @@ height:4rem
                   max-width: 450px; /* Reduced from 600px */
                   margin: 1rem auto; /* Reduced from 2rem */
                   padding: 1.25rem; /* Reduced from 2rem */
-                  background-color: #ffffff;
+                  background-color: #0e0e0e;
                   border-radius: 8px; /* Reduced from 12px */
                   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
                   width: 90%;
@@ -125,10 +117,13 @@ height:4rem
                   border-bottom: 1px solid #eee;
                   font-size: 1.25rem; /* Reduced from 1.5rem */
               }
+
           
               .form-control,
               .form-select {
-                  border: 1px solid #e0e0e0;
+                color: #FFFFFF;
+                background-color: #0e0e0e !important;
+                  border: 1px solid #4f4e4e;
                   padding: 0.5rem 0.75rem; /* Reduced padding */
                   border-radius: 6px; /* Reduced from 8px */
                   transition: all 0.3s ease;
@@ -136,11 +131,18 @@ height:4rem
                   font-size: 0.875rem; /* 14px */
                   line-height: 1.4;
                   height: auto;
+                  
+              }
+              .form-control:focus{
+                 color: #FFFFFF;
+                background-color: #0e0e0e;
+                border: none;
+                
               }
           
               .form-label {
                   font-weight: 500;
-                  color: #34495e;
+                  color: #FFFFFF;
                   margin-bottom: 0.25rem; /* Reduced from 0.5rem */
                   font-size: 0.875rem; /* 14px */
               }
@@ -231,36 +233,6 @@ height:4rem
 <body>
   <!--=============== HEADER ===============-->
   <header class="header">
-    <div class="header__top">
-      <div class="header__container container">
-        <div class="header__contact">
-
-        </div>
-        <p class ="header__alert-news">
-          "Welcome to Gentleman Store - Quality Redefined!"
-        </p>
-        <%if(userStatus){%>
-        <div class="dropdown">
-          <a href="#" class="sign-in-lnk"><%=userName%></a>
-          <div class="dropdown-content">
-
-            <a href="/profile">Profile</a>
-            <a href="/logout">Logout</a>
-          </div>
-        </div>
-
-        <%}else{%>
-
-        <a href="/login" class="header__top-action" style="margin-left: 40rem;">
-          Log In
-        </a>
-        <a href="/signup" class="header__top-action">
-          Signup
-        </a>
-        <%}%>
-        </div>
-      </div>
-
       <nav class="nav container">
         <a href="/home" class="nav__logo">
          <img class="nav__logo-img" src="/img/111.png" alt="websitelogo">
@@ -285,25 +257,37 @@ height:4rem
             <li class="nav__item">
               <a href="/profile" class="nav__link">My Account</a>
             </li>
-            <li class="nav__item">
-              <a href="/compare" class="nav__link">Compare</a>
-            </li>
            
           </ul>
         </div>
         <div class="header__user-actions">
           <a href="/wishlist" class="header__action-btn" title="Wishlist">
-            <img src="/img/icon-heart.svg" alt="" />
+            <img src="/img/beautiful-heart-line-icon-free-vector.jpg" alt="" />
             
           </a>
           <a href="/cart" class="header__action-btn" title="Cart">
-            <img src="/img/icon-cart.svg" alt="" />
+            <img src="/img/shopping-bag-white-icon.svg" alt="" />
             
           </a>
-          <a href="/profile" class="header__action-btn" title="Profile">
-            <img src="/img/download.png" alt="" />
-           
-          </a>
+          <%if(userStatus){%>
+        <div class="dropdown">
+          <a href="#" class="sign-in-lnk"><%=userName%></a>
+          <div class="dropdown-content">
+
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+
+        <%}else{%>
+
+        <a href="/login" class="header__top-action" style="margin-left: 40rem;">
+          Log In
+        </a>
+        <a href="/signup" class="header__top-action">
+          Signup
+        </a>
+        <%}%>
        
           <div class="header__action-btn nav__toggle" id="nav-toggle">
             <img src="/img/menu-burger.svg" alt="">

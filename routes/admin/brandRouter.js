@@ -12,4 +12,5 @@ router.post("/addBrand",adminAuth, uploadBrandImage.single("image"), brandContro
 router.patch("/blockBrand",adminAuth,brandController.blockBrand);
 router.patch("/unblockBrand",adminAuth, brandController.unblockBrand);
 
+
 module.exports = router;

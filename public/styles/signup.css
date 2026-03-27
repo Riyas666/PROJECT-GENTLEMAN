@@ -6,13 +6,14 @@
     --header-height: 4rem;
 
     /*========== Colors ==========*/
-    --first-color: black;
+    --first-color: #ffffff;
     --first-color-alt: black;
-    --title-color: hsl(0, 0%, 13%);
-    --text-color: black;
+    --title-color: #ffffff;
+    --text-color: #ffffff;
     --text-color-dark: black;
     --text-color-light: white;
-    --body-color: hsl(0, 0%, 100%);
+    --body-color: #0a0a0a;
+    --section-body-color: #0e0e0e;
     --container-color: hsl(0, 0%, 93%);
     --border-color: black;
     --border-color-alt: black;
@@ -121,6 +122,7 @@ table {
 
 /*=============== REUSABLE CSS CLASSES ===============*/
 .container {
+    
     max-width: 1320px;
     margin-inline: auto;
     padding-inline: 0.75rem;
@@ -175,7 +177,22 @@ table {
 
 
 
-
+.card-header, .card-body{
+    border: none;
+}
+.card{
+    background-color: var(--section-body-color);
+    border: none;
+}
+.form-label{
+    /* color: var(--text-color); */
+    color: #969696;
+}
+.form-control, .form-control:focus {
+    background-color: var(--section-body-color);
+    border: none;
+    color: var(--text-color);
+}
 
 .header__top {
     background-color: var(--first-color-alt);
@@ -294,7 +311,7 @@ table {
 /*=============== BUTTONS ===============*/
 
 .btnnn {
-    background-color: black;
+    background-color: #b58a2a;
     color: white;
     height: 49px;
     padding: 0 20px;
@@ -439,7 +456,7 @@ table {
 
 /*=============== BREADCRUMBS ===============*/
 .breadcrumb {
-    background-color: var(--container-color);
+    background-color: var(--section-body-color);
     padding: 1rem 0;
 }
 

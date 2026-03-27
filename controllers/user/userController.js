@@ -32,6 +32,7 @@ const signup = async (req, res) => {
         if (findUser) {
             return res.render("signup", { message: "User with this email already exists" });
         }
+        console.log("Email",email)
 
         const otp = generateOtp();
         const emailSent = await SendVerificationEmail(email, otp);

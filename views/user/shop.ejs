@@ -13,6 +13,8 @@
 }
 
 .search__wrapper {
+  color: var(--text-color);
+  background-color: var(--section-body-color);
   position: relative;
   
 }
@@ -42,7 +44,8 @@
 
 .filter__select,
 .sort__select {
-  color:black;
+  background: var(--section-body-color);
+  color:var(--text-color);
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
@@ -175,13 +178,7 @@
           <a href="details.html">
             <h3 class="product__title"><%=products[i].productName%></h3>
           </a>
-          <div class="product__rating">
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-            <i class="fi fi-rs-star"></i>
-          </div>
+         
           <div class="product__price flex">
             <span class="new__price">₹<%=products[i].salePrice.toLocaleString('en-IN')%></span>
             <span class="old__price">₹<%=products[i].regularPrice%></span>

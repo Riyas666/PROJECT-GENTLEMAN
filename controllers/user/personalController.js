@@ -283,38 +283,37 @@ const editAddress = async (req, res) => {
         }
     };
 
-
-
 const getOrders = async (req, res) => {
-    try {
-      const userId = req.session.user;  
-      const order = await Order.find({ userId })
+  try {
+    const userId = req.session.user;
+
+    let orders = await Order.find({ userId })
       .populate({
         path: 'orderedItems.products',
-        model: 'Product' 
-      }).exec()
-      console.log(JSON.stringify(order[0].orderedItems, null, 2))
-  
-      if (order.length === 0) {
-        return res.status(statuscode.NOT_FOUND).render("orders", {
-          success: false,
-          message: "No orders found.",
-          order
-        });
-      }
-      const orders = order.reverse()
-      res.render("orders", {
-        success: true,
-        orders,  
+        model: 'Product'
       });
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(statuscode.INTERNAL_SERVER_ERROR).render("orders", {
-        success: false,
-        message: responseMessage.SERVER_ERROR,
-      });
+
+    if (orders.length > 0) {
+      console.log(JSON.stringify(orders[0].orderedItems, null, 2));
     }
-  };
+
+    orders = orders.reverse();
+
+    res.render("orders", {
+      success: true,
+      orders
+    });
+
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+
+    res.status(500).render("orders", {
+      success: false,
+      message: "Server error",
+      orders: [] // ALWAYS SEND
+    });
+  }
+};
 
 
   const wallet = async(req,res)=>{

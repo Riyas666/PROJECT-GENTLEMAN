@@ -25,39 +25,9 @@
   
 </style>
 
-<body>
+<body class="<%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>">
   <!--=============== HEADER ===============-->
   <header class="header">
-    <div class="header__top">
-      <div class="header__container container">
-        <div class="header__contact">
-
-        </div>
-        <p class ="header__alert-news">
-          "Welcome to Gentleman Store - Quality Redefined!"
-        </p>
-        <%if(userStatus){%>
-        <div class="dropdown">
-          <a href="#" class="sign-in-lnk"><%=userName%></a>
-          <div class="dropdown-content">
-
-            <a href="/profile">Profile</a>
-            <a href="/logout">Logout</a>
-          </div>
-        </div>
-
-        <%}else{%>
-
-        <a href="/login" class="header__top-action" style="margin-left: 40rem;">
-          Log In
-        </a>
-        <a href="/signup" class="header__top-action">
-          Signup
-        </a>
-        <%}%>
-        </div>
-      </div>
-
       <nav class="nav container">
         <a href="/home" class="nav__logo">
          <img class="nav__logo-img" src="/img/111.png" alt="websitelogo">
@@ -74,7 +44,7 @@
           </div>
           <ul class="nav__list">
             <li class="nav__item">
-              <a href="/home" class="nav__link active-link">Home</a>
+              <a href="/home" class="nav__link">Home</a>
             </li>
             <li class="nav__item">
               <a href="/shop" class="nav__link ">Shop</a>
@@ -82,34 +52,42 @@
             <li class="nav__item">
               <a href="/profile" class="nav__link">My Account</a>
             </li>
-            <li class="nav__item">
-              <a href="/compare" class="nav__link">Compare</a>
-            </li>
-<!--            
+            <%if(!userStatus){%>
             <li class="nav__item">
               <a href="/login" class="nav__link">Login</a>
-            </li> -->
+            </li>
+            <%}%>
+
            
           </ul>
-         
-        </div>
-        <div class="header__user-actions">
+         <div class="header__user-actions">
           <a href="/wishlist" class="header__action-btn" title="Wishlist">
-            <img src="/img/icon-heart.svg" alt="" />
+            <img src="/img/beautiful-heart-line-icon-free-vector.jpg" alt="" />
             
           </a>
           <a href="/cart" class="header__action-btn" title="Cart">
-            <img src="/img/icon-cart.svg" alt="" />
+            <img src="/img/shopping-bag-white-icon.svg" alt="" />
             
           </a>
-          <a href="/profile" class="header__action-btn" title="Profile">
-            <img src="/img/download.png" alt="" />
-           
-          </a>
+          <%if(userStatus){%>
+        <div class="dropdown">
+          <a href="#" class="sign-in-lnk"><%=userName%></a>
+          <div class="dropdown-content">
+
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+
+        <%}else{%>
+
+        <%}%>
        
           <div class="header__action-btn nav__toggle" id="nav-toggle">
             <img src="/img/menu-burger.svg" alt="">
           </div>
         </div>
+        </div>
+        
       </nav>
     </header>
