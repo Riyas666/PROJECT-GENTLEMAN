@@ -19,7 +19,7 @@ db();
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
 const {errorHandler} = require("./middlewares/errorhandling")
 app.use(cors({
-    origin: 'http://localhost:5173', 
+    origin: true, 
     credentials: true
   }));
 app.use(nocache());
@@ -51,22 +51,22 @@ app.set("views", [path.join(__dirname, "views/user"), path.join(__dirname, "view
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(logoutStatusMiddleware);
-app.use(errorHandler)
+
 
 app.use("/", userRouter);
 app.use("/profile", profileRouter);
 app.use("/cart", cartRouter);
 app.use("/admin", adminRouter);
-
+app.use(errorHandler)
 
 app.get("/*", (req,res) =>{
     res.redirect("/pageNotFound")
 })
 
 
-const PORT = 3000 || process.env.PORT;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log("http://localhost:3000");
+    console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;
