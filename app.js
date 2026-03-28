@@ -15,6 +15,7 @@ const adminRouter = require("./routes/admin/adminRouter");
 
 db();
 
+
 const logoutStatusMiddleware = require("./middlewares/logoutStatus");
 const {errorHandler} = require("./middlewares/errorhandling")
 app.use(cors({
